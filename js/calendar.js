@@ -173,6 +173,15 @@ function placeholderMarkup(view) {
     </div>`;
 }
 
+// Scroll assignments can be clamped to 0 when the flex layout has not been
+// measured yet (resize, rotation, browser zoom). Re-apply them next frame.
+function setScrollTop(container, top) {
+  container.scrollTop = top;
+  if (top > 0 && container.scrollTop < top - 1) {
+    requestAnimationFrame(() => { container.scrollTop = top; });
+  }
+}
+
 function restoreScroll(stage, dateKey) {
   const container = stage.querySelector('#timelineScroll');
   if (!container) return;
@@ -180,13 +189,13 @@ function restoreScroll(stage, dateKey) {
   const hourHeight = row ? row.getBoundingClientRect().height : 60;
 
   if (previousDateKey === dateKey && previousScrollTop !== null) {
-    container.scrollTop = previousScrollTop;
+    setScrollTop(container, previousScrollTop);
   } else if (dateKey === todayKey()) {
     // Keep the current time ~1.75 hours below the top so the ongoing block is
     // fully visible with a little context above it.
-    container.scrollTop = Math.max(0, (nowMinutes() / 60 - 1.75) * hourHeight);
+    setScrollTop(container, Math.max(0, (nowMinutes() / 60 - 1.75) * hourHeight));
   } else {
-    container.scrollTop = 5.5 * hourHeight;
+    setScrollTop(container, 5.5 * hourHeight);
   }
 
   if (!container.dataset.scrollBound) {

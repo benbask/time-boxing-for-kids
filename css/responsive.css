@@ -97,7 +97,10 @@
     width: 100%;
     max-width: 100%;
     padding-bottom: 2px;
+    scrollbar-width: none;
   }
+
+  .profile-chips::-webkit-scrollbar { display: none; }
 
   .profile-chip {
     min-height: 38px;
@@ -118,10 +121,16 @@
     padding-bottom: 100px;
   }
 
-  .timeline-scroll {
-    max-height: min(80dvh, 900px);
-    min-height: 260px;
+  .timeline-legend {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
   }
+
+  .timeline-legend::-webkit-scrollbar { display: none; }
+
+  .legend-items { flex-wrap: nowrap; }
 
   .event-block {
     left: 4px;
@@ -178,8 +187,6 @@
     --gutter-width: 70px;
   }
 
-  .timeline-scroll { max-height: min(66dvh, 780px); }
-
   .event-title { font-size: 0.92rem; }
 
   .nav-icon-btn {
@@ -190,15 +197,86 @@
   }
 }
 
-/* Short landscape screens (phones on their side) */
+/* Short screens (phone landscape, browser zoom, small windows).
+   Chrome stays compact so the timeline and footer always fit on screen. */
 
-@media (max-height: 560px) and (orientation: landscape) {
-  .timeline-scroll {
-    max-height: calc(100dvh - 190px);
-    min-height: 200px;
+@media (max-height: 700px) {
+  .app-header {
+    padding-top: 6px;
+    padding-bottom: 6px;
   }
 
-  .app-footer { display: none; }
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    font-size: 18px;
+  }
+
+  .brand-text p { display: none; }
+
+  .app-main { padding-top: 8px; }
+
+  .view { gap: 8px; }
+
+  .calendar-stage { gap: 8px; }
+
+  .date-display { min-width: 0; }
+  .date-sub { font-size: 0.76rem; }
+}
+
+/* Very short viewports: the profile bar becomes one compact row that scrolls
+   sideways, so the timeline keeps most of the screen. */
+
+@media (max-height: 640px) {
+  .profile-bar {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .profile-bar::-webkit-scrollbar { display: none; }
+
+  .profile-chips {
+    flex: 0 0 auto;
+    width: auto;
+    padding-bottom: 0;
+  }
+
+  .profile-bar-actions { flex: none; }
+
+  /* Long dates stay on one line so the toolbar cannot eat the timeline. */
+  .date-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (max-height: 560px) {
+  .timeline {
+    --hour-height: 48px;
+  }
+
+  .timeline-scroll { min-height: 0; }
+
+  .profile-chip { min-height: 34px; }
+  .mini-btn { min-height: 30px; }
+
+  .date-nav .icon-btn,
+  .date-nav > .btn-ghost { min-height: 38px; }
+
+  .seg-btn,
+  .btn { min-height: 38px; }
+}
+
+@media (max-height: 480px) {
+  .timeline-card { min-height: 190px; }
+  .app-main { padding-bottom: 6px; }
 }
 
 /* Touch devices: no hover-only affordances */

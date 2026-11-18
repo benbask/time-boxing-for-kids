@@ -184,6 +184,17 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 39 | Tidak ada error console saat interaksi Fase 2 | Lulus |
 | 40 | Tidak ada overflow horizontal pada 390 px dengan Fase 2 aktif | Lulus |
 
+### Perbaikan tata letak (footer & tinggi dinamis)
+
+| # | Pengujian | Hasil |
+| --- | --- | --- |
+| 41 | Halaman tidak bisa di-scroll; hanya kartu timeline yang scroll (body `overflow: hidden`) | Lulus |
+| 42 | Footer selalu terlihat penuh di 390×844, 844×390 (landscape), dan 1440×900 | Lulus |
+| 43 | Timeline mengisi sisa tinggi layar (tidak ada `max-height` piksel); jam 23:00 tetap tercapai | Lulus |
+| 44 | Emulasi zoom 1,5× (viewport 260×563): footer terlihat, timeline 235 px, tanpa scroll halaman | Lulus |
+| 45 | Emulasi zoom 2× (viewport 195×422): footer terlihat, area utama scroll, kartu timeline minimal 190 px | Lulus |
+| 46 | Klik mouse pada blok kegiatan membuka dialog edit; drag tetap tidak membuka dialog | Lulus |
+
 **Batasan yang belum diverifikasi:**
 
 - Drag/resize dan snapping (Fase 2) belum ada.

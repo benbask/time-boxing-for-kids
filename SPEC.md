@@ -719,6 +719,16 @@ A single "Fokus" button in the calendar toolbar toggles a temporary full-screen 
 
 Decision: Focus mode is **temporary UI state**, held in memory only. It is deliberately not written to `settings`, not included in the LocalStorage schema, and not exported. A reload starts unfocused, and switching to the Profiles or Settings page exits Focus mode automatically. Only the calendar views (Day, and later Week/Month) can be focused.
 
+## 22.8 Viewport-locked shell (footer always visible)
+
+The app is a single viewport-height column: `.app` is `height: 100dvh` with `overflow: hidden`, so the document itself never scrolls. The footer sits in normal flow at the bottom of that column instead of being `position: fixed`, so it can never cover timeline content and is always on screen at any browser zoom level.
+
+- `.app-main` is the only scrolling region for the Profiles and Settings pages.
+- The day timeline fills the leftover height: `.view`, `.calendar-stage` and `.timeline-card` grow (`flex: 1 1 auto`), and `.timeline-scroll` is `flex: 1` with no pixel `max-height`; scrolling happens inside the timeline card only.
+- `.timeline-card` keeps a `min-height` (240 px, 190 px on very short screens). If the chrome cannot fit — very high browser zoom or a short landscape window — `.app-main` scrolls the page area while the footer stays pinned at the bottom of the screen.
+- Short viewports (`max-height: 700px / 640px / 560px / 480px`) compress the chrome: brand mark and subtitle shrink, gaps tighten, the profile bar becomes one horizontally scrolling row, the date label stops wrapping, and the hour height drops.
+- The toast sits `56px` above the bottom so it clears the footer.
+
 ## 22.9 Phase 2 — Time Blocking (direct manipulation)
 
 **New modules:**
@@ -732,7 +742,7 @@ Decision: Focus mode is **temporary UI state**, held in memory only. It is delib
 - Tap a block or its pencil button → opens event editor dialog (title, participants checkboxes, notes). Save/Delete actions live here.
 - All gestures use **Pointer Events** (mouse, touch, pen, stylus). `touch-action: none` scoped to `.event-block` so page scrolling elsewhere is unaffected.
 - During gesture: block gets `is-gesturing` class (shadow, z-index), resize handles visible, edit button hidden, live time label updates.
-- Click suppression: `suppressClickUntil` (500 ms after pointerup) prevents accidental editor open after drag.
+- Click suppression: `suppressClickUntil` (500 ms) is set only after a **real** move/resize, so a plain tap or mouse click still opens the editor.
 
 **Implementation details:**
 - Snap interval read from `settings.snapInterval` (candidates 5, 10, 15, 30; default 10) via `snapMinutes()` in `utils.js`.

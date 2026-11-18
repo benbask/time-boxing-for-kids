@@ -183,7 +183,9 @@ function startGesture(pointerEvent, block, mode) {
       return;
     }
 
-    suppressClickUntil = Date.now() + 500;
+    // Only a real move/resize swallows the follow-up click; a plain press must
+    // still open the editor (mouse users never get a long-press).
+    if (moved) suppressClickUntil = Date.now() + 500;
 
     if (previewStart === originalStart && previewEnd === originalEnd) {
       resetPreview();
