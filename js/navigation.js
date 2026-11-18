@@ -9,6 +9,7 @@ import {
   addDays,
   formatLongDate,
   isDateKey,
+  parseDateKey,
   relativeDayLabel,
   todayKey,
 } from './utils.js';
@@ -36,8 +37,10 @@ export function setView(viewId) {
 }
 
 export function dateHeadline(dateKey) {
+  const date = parseDateKey(dateKey);
   return {
     label: formatLongDate(dateKey),
     sub: relativeDayLabel(dateKey) || 'Tampilan hari',
+    short: `${date.toLocaleDateString('id-ID', { weekday: 'short' })}, ${date.getDate()} ${date.toLocaleDateString('id-ID', { month: 'short' })}`,
   };
 }

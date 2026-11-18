@@ -54,12 +54,34 @@
     font-size: 0.85rem;
   }
 
-  .view-switch {
+  .toolbar-actions {
     width: 100%;
-    order: 2;
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .view-switch {
+    flex: 1;
+    width: auto;
   }
 
   .seg-btn { flex: 1; min-height: 44px; }
+
+  .focus-bar {
+    gap: 6px;
+    padding: 6px max(10px, env(safe-area-inset-left)) 6px max(10px, env(safe-area-inset-right));
+  }
+
+  .focus-date { font-size: 0.84rem; }
+
+  .focus-actions { gap: 4px; }
+  .focus-actions .mini-btn { padding: 0 8px; }
+
+  .icon-btn-sm {
+    width: 34px;
+    height: 34px;
+    font-size: 1.1rem;
+  }
 
   .profile-bar {
     align-items: stretch;
@@ -142,6 +164,8 @@
   .nav-btn { font-size: 0.8rem; padding: 0 6px; }
   .seg-btn { min-width: 0; }
   .date-nav > .btn-ghost { padding: 0 8px; }
+  .focus-toggle { padding: 0 10px; }
+  .focus-toggle [data-focus-label] { display: none; }
 }
 
 /* Larger screens: roomier timeline and toolbar */

@@ -63,10 +63,29 @@
             <button type="button" class="btn btn-ghost" data-action="go-today">Hari ini</button>
           </div>
 
-          <div class="view-switch" role="group" aria-label="Pilih tampilan kalender">
-            <button type="button" class="seg-btn" data-action="set-view" data-view="day">Hari</button>
-            <button type="button" class="seg-btn" data-action="set-view" data-view="week">Minggu</button>
-            <button type="button" class="seg-btn" data-action="set-view" data-view="month">Bulan</button>
+          <div class="toolbar-actions">
+            <div class="view-switch" role="group" aria-label="Pilih tampilan kalender">
+              <button type="button" class="seg-btn" data-action="set-view" data-view="day">Hari</button>
+              <button type="button" class="seg-btn" data-action="set-view" data-view="week">Minggu</button>
+              <button type="button" class="seg-btn" data-action="set-view" data-view="month">Bulan</button>
+            </div>
+            <button type="button" class="focus-toggle" data-action="toggle-focus" aria-pressed="false"
+              title="Sembunyikan panel dan tampilkan kalender penuh">
+              <span aria-hidden="true">⛶</span>
+              <span data-focus-label>Fokus</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="focusBar" class="focus-bar" hidden>
+          <div class="focus-date-nav">
+            <button type="button" class="icon-btn icon-btn-sm" data-action="shift-date" data-days="-1" aria-label="Tanggal sebelumnya">‹</button>
+            <span id="focusDate" class="focus-date">Hari ini</span>
+            <button type="button" class="icon-btn icon-btn-sm" data-action="shift-date" data-days="1" aria-label="Tanggal berikutnya">›</button>
+          </div>
+          <div class="focus-actions">
+            <button type="button" class="mini-btn" data-action="go-today">Hari ini</button>
+            <button type="button" class="mini-btn focus-exit" data-action="toggle-focus" aria-label="Keluar mode fokus">Keluar fokus</button>
           </div>
         </div>
 

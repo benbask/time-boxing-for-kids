@@ -47,6 +47,11 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
 - **Indikator waktu sekarang** pada tampilan hari ini.
 - **Penyimpanan otomatis** ke LocalStorage setiap perubahan berhasil.
 - **Empat tema**: Sky & Mint, Candy, Lavender, Nature.
+- **Mode Fokus**: satu tombol menyembunyikan header, toolbar, dan pemilih
+  profil sehingga timeline memenuhi layar. Tetap ada tombol tanggal, "Hari ini",
+  dan "Keluar fokus" yang mengambang di bar atas. Tekan `Esc` untuk keluar.
+  Mode ini sementara (tidak disimpan) dan otomatis batal saat berpindah ke
+  halaman Profil/Pengaturan.
 - **Peringatan penyimpanan lokal** dan informasi ukuran data.
 - Tampilan **mobile-first** dengan target sentuh besar; pemilih profil tetap
   dapat diakses tanpa membuka halaman lain.
@@ -139,6 +144,10 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 19 | Dialog profil menolak nama kosong | Lulus |
 | 20 | Kondisi 0 profil tidak membuat aplikasi error | Lulus |
 | 21 | Deploy GitHub Pages dan aplikasi berjalan dari subpath repositori | Lulus (5 profil, 7 kegiatan, tanpa error console) |
+| 22 | Mode Fokus di desktop 1440×900: header/toolbar/profil/legend tersembunyi, timeline mengisi tinggi layar, tanpa scroll halaman | Lulus |
+| 23 | Mode Fokus di 390×844: bar fokus muat tanpa overflow horizontal, tanggal ‹ › dan "Hari ini" berfungsi | Lulus |
+| 24 | Keluar mode fokus lewat tombol dan `Esc`; layout serta posisi scroll timeline kembali normal | Lulus |
+| 25 | Reload saat mode fokus aktif: aplikasi kembali ke tampilan normal (mode tidak disimpan) | Lulus |
 
 **Batasan yang belum diverifikasi:**
 

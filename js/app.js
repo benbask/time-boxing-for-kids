@@ -33,6 +33,8 @@ const els = {
   profileList: document.getElementById('profileList'),
   dateLabel: document.getElementById('dateLabel'),
   dateSub: document.getElementById('dateSub'),
+  focusBar: document.getElementById('focusBar'),
+  focusDate: document.getElementById('focusDate'),
   themeGrid: document.getElementById('themeGrid'),
   storageStats: document.getElementById('storageStats'),
   profileDialog: document.getElementById('profileDialog'),
@@ -44,10 +46,36 @@ const els = {
 };
 
 /* ------------------------------------------------------------------ render --- */
+// Focus mode is temporary UI state: deliberately not written to settings or
+// exported, and it resets on reload.
+let focusMode = false;
+
 function renderHeadline(data) {
-  const { label, sub } = dateHeadline(data.settings.selectedDate);
+  const { label, sub, short } = dateHeadline(data.settings.selectedDate);
   els.dateLabel.textContent = label;
   els.dateSub.textContent = sub;
+  els.focusDate.textContent = short;
+}
+
+function applyChrome(data) {
+  const view = data.settings.currentView;
+  const isCalendar = view === 'day' || view === 'week' || view === 'month';
+  if (!isCalendar) focusMode = false;
+
+  const active = focusMode && isCalendar;
+  document.body.classList.toggle('is-focus', active);
+  els.focusBar.hidden = !active;
+
+  document.querySelectorAll('.focus-toggle, .focus-exit').forEach((button) => {
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+
+function toggleFocus() {
+  const view = getData().settings.currentView;
+  if (view !== 'day' && view !== 'week' && view !== 'month') return;
+  focusMode = !focusMode;
+  applyChrome(getData());
 }
 
 function renderNav(data) {
@@ -122,6 +150,8 @@ function renderAll() {
   if (view === 'day' || view === 'week' || view === 'month') {
     renderCalendar(els.calendarStage, data);
   }
+
+  applyChrome(data);
 }
 
 /* ------------------------------------------------------------------ mutate --- */
@@ -296,6 +326,9 @@ async function handleActionClick(event) {
     case 'go-today':
       goToToday();
       break;
+    case 'toggle-focus':
+      toggleFocus();
+      break;
     case 'toggle-profile':
       toggleProfile(actionTarget.dataset.profileId);
       break;
@@ -367,6 +400,12 @@ function bindEvents() {
   });
 
   initConfirmDialog();
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !focusMode) return;
+    if (document.querySelector('dialog[open]')) return;
+    toggleFocus();
+  });
 
   window.addEventListener('focus', () => refreshNowIndicator(getData()));
   document.addEventListener('visibilitychange', () => {

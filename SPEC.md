@@ -643,7 +643,7 @@ These notes document the decisions taken for the Phase 1 build. They are part of
 
 ## 22.1 Scope of this build
 
-Implemented: application shell and navigation, family profile CRUD, per-profile visibility, show all / hide all, one shared vertical day timeline, profile-coloured event blocks (shared events rendered once with all participants), current-time indicator, reading of existing events from storage, four themes, LocalStorage persistence with automatic save.
+Implemented: application shell and navigation, family profile CRUD, per-profile visibility, show all / hide all, one shared vertical day timeline, profile-coloured event blocks (shared events rendered once with all participants), current-time indicator, reading of existing events from storage, four themes, LocalStorage persistence with automatic save, and a temporary full-screen Focus mode for the calendar.
 
 Explicitly deferred (per Section 21): event creation, move, resize, edit/delete UI (Phase 2); overlap lane assignment and conflict warnings (Phase 3); week/month views, special days, zoom and time-range presets (Phase 4); prayer times (Phase 5); JSON export/import and reset (Phase 6). Placeholders are labelled in the UI instead of pretending to work.
 
@@ -696,7 +696,7 @@ Key: `timeboxing-kids:data`
 
 `createdAt`/`updatedAt` audit timestamps use ISO 8601 UTC because they are metadata, never used for calendar placement. Prayer settings are present as placeholders with `null` values: **no parameter has been invented and no prayer time is calculated in Phase 1.**
 
-On first run the store is seeded with five profiles (Ayah, Ibu, Anak 1–3) and six sample activities for the current day, including one shared activity with two participants. Seed data is written only when the key is absent. If the stored JSON cannot be parsed, the raw text is copied to `timeboxing-kids:data:corrupt-backup` before a fresh store is created, so nothing is silently destroyed.
+On first run the store is seeded with five profiles (Ayah, Ibu, Anak 1–3) and seven sample activities for the current day, including one shared activity with multiple participants. Seed data is written only when the key is absent. If the stored JSON cannot be parsed, the raw text is copied to `timeboxing-kids:data:corrupt-backup` before a fresh store is created, so nothing is silently destroyed.
 
 ## 22.5 Shared timeline rules (Phase 1)
 
@@ -711,7 +711,13 @@ On first run the store is seeded with five profiles (Ayah, Ibu, Anak 1–3) and 
 
 CSS custom properties on `[data-theme]` in `css/themes.css`. Themes: `sky-mint`, `candy`, `lavender`, `nature`. Theme choice is stored in settings and applied before first paint by a small inline bootstrap in `index.html` to avoid a flash.
 
-## 22.7 Known risks
+## 22.7 Focus mode (layout enhancement)
+
+A single "Fokus" button in the calendar toolbar toggles a temporary full-screen layout: the app header, calendar toolbar, profile bar, footer and timeline legend are hidden, and the timeline card grows to fill `100dvh` with page scrolling disabled. A compact bar at the top keeps date navigation (‹ ›), "Hari ini", and "Keluar fokus"; `Esc` also exits.
+
+Decision: Focus mode is **temporary UI state**, held in memory only. It is deliberately not written to `settings`, not included in the LocalStorage schema, and not exported. A reload starts unfocused, and switching to the Profiles or Settings page exits Focus mode automatically. Only the calendar views (Day, and later Week/Month) can be focused.
+
+## 22.8 Known risks
 
 1. **Lane algorithm on narrow screens** — Phase 3 must keep blocks >= 44 px wide; planned: minimum lane width with horizontal overflow inside the event layer only.
 2. **Prayer-time accuracy** — Phase 5 must document Kemenag parameters and compare against SIHAT output for several cities/dates; results must not be presented as verified before that comparison exists.

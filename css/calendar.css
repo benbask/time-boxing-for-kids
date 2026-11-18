@@ -337,3 +337,62 @@
   color: var(--text-muted);
   font-size: 0.86rem;
 }
+
+/* ------------------------------------------------------------ focus mode --- */
+/* One button hides the chrome so the timeline can dominate the screen.
+   Focus mode is temporary UI state and is not persisted. */
+
+body.is-focus {
+  overflow: hidden;
+}
+
+body.is-focus .app {
+  height: 100dvh;
+  min-height: 0;
+}
+
+body.is-focus .app-header,
+body.is-focus .app-footer,
+body.is-focus .calendar-toolbar,
+body.is-focus .profile-bar,
+body.is-focus .timeline-legend {
+  display: none;
+}
+
+body.is-focus .app-main {
+  max-width: none;
+  padding: 0;
+  gap: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+body.is-focus .view,
+body.is-focus .calendar-stage {
+  flex: 1;
+  min-height: 0;
+  gap: 0;
+}
+
+body.is-focus .calendar-stage {
+  overflow-y: auto;
+}
+
+body.is-focus .calendar-stage > .notice {
+  margin: 8px 12px 0;
+}
+
+body.is-focus .timeline-card {
+  flex: 1;
+  min-height: 0;
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+body.is-focus .timeline-scroll {
+  flex: 1;
+  max-height: none;
+  min-height: 0;
+}
