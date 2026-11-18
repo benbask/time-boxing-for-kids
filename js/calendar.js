@@ -176,8 +176,9 @@ function restoreScroll(stage, dateKey) {
   if (previousDateKey === dateKey && previousScrollTop !== null) {
     container.scrollTop = previousScrollTop;
   } else if (dateKey === todayKey()) {
-    const currentHour = new Date().getHours();
-    container.scrollTop = Math.max(0, (Math.max(0, currentHour - 1) + 0.5) * hourHeight);
+    // Keep the current time ~1.75 hours below the top so the ongoing block is
+    // fully visible with a little context above it.
+    container.scrollTop = Math.max(0, (nowMinutes() / 60 - 1.75) * hourHeight);
   } else {
     container.scrollTop = 5.5 * hourHeight;
   }
