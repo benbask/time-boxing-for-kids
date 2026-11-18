@@ -643,11 +643,11 @@ These notes document the decisions taken for the Phase 1 build. They are part of
 
 ## 22.1 Scope of this build
 
-Implemented: application shell and navigation, family profile CRUD, per-profile visibility, show all / hide all, one shared vertical day timeline, profile-coloured event blocks (shared events rendered once with all participants), current-time indicator, reading of existing events from storage, four themes, LocalStorage persistence with automatic save, and a temporary full-screen Focus mode for the calendar.
+Implemented: application shell and navigation, family profile CRUD, per-profile visibility, show all / hide all, one shared vertical day timeline, profile-coloured event blocks (shared events rendered once with all participants), current-time indicator, reading of existing events from storage, four themes, LocalStorage persistence with automatic save, a temporary full-screen Focus mode for the calendar, and **Phase 2 direct manipulation (create, move, resize, edit, delete events with 10-minute snapping and Pointer Events touch support).**
 
-Explicitly deferred (per Section 21): event creation, move, resize, edit/delete UI (Phase 2); overlap lane assignment and conflict warnings (Phase 3); week/month views, special days, zoom and time-range presets (Phase 4); prayer times (Phase 5); JSON export/import and reset (Phase 6). Placeholders are labelled in the UI instead of pretending to work.
+Explicitly deferred (per Section 21): overlap lane assignment and conflict warnings (Phase 3); week/month views, special days, zoom and time-range presets (Phase 4); prayer times (Phase 5); JSON export/import and reset (Phase 6). Placeholders are labelled in the UI instead of pretending to work.
 
-## 22.2 Module structure (Phase 1)
+## 22.2 Module structure (Phase 1 + 2)
 
 - `js/app.js` — bootstrap, delegated UI events, dialogs, toasts, cross-module wiring.
 - `js/state.js` — single in-memory store, save-after-mutation, subscribe/notify.
@@ -659,6 +659,8 @@ Explicitly deferred (per Section 21): event creation, move, resize, edit/delete 
 - `js/themes.js` — theme registry and application.
 - `js/ui.js` — small helpers: toast, confirm dialog, escape-safe HTML.
 - `js/utils.js` — date/time/colour helpers (no timezone conversion).
+- `js/event-editor.js` — lightweight editor dialog for one activity (title, participants, notes). Times edited on timeline, not here.
+- `js/event-interactions.js` — pointer-based gestures for day timeline: create on empty tap, drag to move, handles to resize, tap to edit. Uses Pointer Events; `touch-action: none` scoped to blocks.
 
 Files reserved for later phases are not created yet, so no dead code ships.
 
@@ -717,7 +719,35 @@ A single "Fokus" button in the calendar toolbar toggles a temporary full-screen 
 
 Decision: Focus mode is **temporary UI state**, held in memory only. It is deliberately not written to `settings`, not included in the LocalStorage schema, and not exported. A reload starts unfocused, and switching to the Profiles or Settings page exits Focus mode automatically. Only the calendar views (Day, and later Week/Month) can be focused.
 
-## 22.8 Known risks
+## 22.9 Phase 2 — Time Blocking (direct manipulation)
+
+**New modules:**
+- `js/event-editor.js` — lightweight editor dialog (title, participants, notes). Times are NOT edited here; they are manipulated directly on the timeline.
+- `js/event-interactions.js` — all pointer-based gestures for the day timeline.
+
+**Interaction model (SPEC.md §6):**
+- Tap/click empty area on the time canvas → creates a 30-minute block at the snapped time (10-min interval from settings, default 10). Minimum duration 10 min.
+- Drag middle of a block → move (preserves duration). Snaps to interval.
+- Drag top/bottom resize handle → change start or end. Snaps to interval, enforces 10-min minimum.
+- Tap a block or its pencil button → opens event editor dialog (title, participants checkboxes, notes). Save/Delete actions live here.
+- All gestures use **Pointer Events** (mouse, touch, pen, stylus). `touch-action: none` scoped to `.event-block` so page scrolling elsewhere is unaffected.
+- During gesture: block gets `is-gesturing` class (shadow, z-index), resize handles visible, edit button hidden, live time label updates.
+- Click suppression: `suppressClickUntil` (500 ms after pointerup) prevents accidental editor open after drag.
+
+**Implementation details:**
+- Snap interval read from `settings.snapInterval` (candidates 5, 10, 15, 30; default 10) via `snapMinutes()` in `utils.js`.
+- New block ID via `uid('evt')`; times stored as local wall-clock strings `YYYY-MM-DDTHH:mm` (no timezone).
+- Updates go through `state.update()` → immediate LocalStorage persist → subscribers re-render.
+- Editor dialog (`#eventDialog`) uses the existing confirm/toast infrastructure from `ui.js`.
+- No modal for creation — the block appears instantly and is editable in place.
+
+**UI affordances added:**
+- Resize handles (`.event-resize-start`, `.event-resize-end`) appear on hover and during gesture.
+- Edit button (`.event-edit`, pencil icon) top-right of each block.
+- Legend hint: "Ketuk area kosong untuk menambah · geser blok untuk memindah".
+- Empty-day notice changed to prompt creation: "Ketuk area kosong di timeline untuk membuat kegiatan 30 menit."
+
+## 22.10 Known risks
 
 1. **Lane algorithm on narrow screens** — Phase 3 must keep blocks >= 44 px wide; planned: minimum lane width with horizontal overflow inside the event layer only.
 2. **Prayer-time accuracy** — Phase 5 must document Kemenag parameters and compare against SIHAT output for several cities/dates; results must not be presented as verified before that comparison exists.

@@ -75,6 +75,10 @@ function renderBlock(block) {
 
   return `
     <article class="${classes}" data-event-id="${escapeHtml(block.id)}" style="${style}" aria-label="${escapeHtml(label)}">
+      <span class="event-resize event-resize-start" data-resize="start" aria-hidden="true"></span>
+      <span class="event-resize event-resize-end" data-resize="end" aria-hidden="true"></span>
+      <button type="button" class="event-edit" data-edit-event="${escapeHtml(block.id)}"
+        aria-label="Ubah kegiatan ${escapeHtml(block.title)}" title="Ubah kegiatan">✏️</button>
       ${note}
       <div class="event-time">${escapeHtml(block.timeLabel)}</div>
       <div class="event-title">${escapeHtml(block.title)}</div>
@@ -102,8 +106,8 @@ function dayNotices(data, layout) {
     });
   } else if (layout.totalCount === 0) {
     messages.push({
-      icon: '🗓️',
-      html: '<strong>Belum ada kegiatan pada tanggal ini.</strong> Membuat dan menggeser blok kegiatan tersedia pada Fase 2.',
+      icon: '✏️',
+      html: '<strong>Belum ada kegiatan pada tanggal ini.</strong> Ketuk area kosong di timeline untuk membuat kegiatan 30 menit.',
     });
   } else if (layout.hiddenCount > 0) {
     messages.push({
@@ -140,6 +144,7 @@ function dayViewMarkup(data, layout) {
         <div class="legend-items">
           <span class="legend-item"><span class="dot" style="--dot-color:var(--now)"></span> Waktu sekarang</span>
           <span class="legend-item"><span class="shared-marks" aria-hidden="true">👥</span> Kegiatan bersama tampil satu kali</span>
+          <span class="legend-item legend-hint">Ketuk area kosong untuk menambah · geser blok untuk memindah</span>
         </div>
         <span>${layout.visibleCount} kegiatan</span>
       </div>

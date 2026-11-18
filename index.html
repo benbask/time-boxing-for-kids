@@ -182,6 +182,42 @@
     </form>
   </dialog>
 
+  <!-- Lightweight activity editor (time is edited directly on the timeline) -->
+  <dialog id="eventDialog" class="dialog event-dialog" aria-labelledby="eventDialogTitle">
+    <form id="eventForm" class="dialog-body" novalidate>
+      <div>
+        <h2 id="eventDialogTitle" class="dialog-title">Ubah kegiatan</h2>
+        <p id="eventDialogTime" class="event-dialog-time"></p>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Nama kegiatan</span>
+        <input class="input" id="eventTitle" type="text" name="title" maxlength="80" required autocomplete="off">
+      </label>
+
+      <fieldset class="field">
+        <legend class="field-label">Peserta</legend>
+        <div id="eventProfiles" class="event-profiles"></div>
+        <p class="field-hint">Kosongkan jika peserta belum ditentukan. Kegiatan tanpa peserta tampil abu-abu.</p>
+      </fieldset>
+
+      <label class="field">
+        <span class="field-label">Catatan (opsional)</span>
+        <textarea class="input input-textarea" id="eventNote" name="note" rows="2" maxlength="500"></textarea>
+      </label>
+
+      <p id="eventFormError" class="form-error" role="alert" hidden></p>
+
+      <div class="dialog-actions dialog-actions-split">
+        <button type="button" class="btn btn-danger-ghost" id="eventDelete">Hapus</button>
+        <div class="dialog-actions-right">
+          <button type="button" class="btn btn-ghost" id="eventCancel">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
   <!-- Confirmation dialog for destructive actions -->
   <dialog id="confirmDialog" class="dialog" aria-labelledby="confirmTitle">
     <div class="dialog-body">

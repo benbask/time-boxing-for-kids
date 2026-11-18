@@ -5,6 +5,8 @@
  */
 
 import { renderCalendar, refreshNowIndicator } from './calendar.js';
+import { initEventEditor } from './event-editor.js';
+import { initCalendarInteractions } from './event-interactions.js';
 import {
   dateHeadline,
   goToToday,
@@ -400,6 +402,8 @@ function bindEvents() {
   });
 
   initConfirmDialog();
+  initEventEditor();
+  initCalendarInteractions(els.calendarStage);
 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape' || !focusMode) return;

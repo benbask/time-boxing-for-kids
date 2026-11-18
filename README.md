@@ -56,11 +56,24 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
 - Tampilan **mobile-first** dengan target sentuh besar; pemilih profil tetap
   dapat diakses tanpa membuka halaman lain.
 
+## Fitur Fase 2
+
+- **Buat kegiatan**: ketuk area kosong di timeline → blok 30 menit langsung
+  muncul (dengan snapping 10 menit).
+- **Geser kegiatan**: seret tengah blok untuk memindah waktu (durasi tetap).
+- **Resize kegiatan**: seret pegangan atas/bawah untuk mengubah jam mulai/selesai.
+- **Edit kegiatan**: ketuk blok atau tombol pensil → dialog ringan (nama, peserta,
+  catatan). Waktu diubah di timeline, bukan di dialog.
+- **Hapus kegiatan**: dari dialog edit, dengan konfirmasi.
+- **Snapping 10 menit** dan **durasi minimum 10 menit** (dari pengaturan).
+- **Touchscreen**: Pointer Events API — mouse, sentuh, stylus, tablet.
+- **Visual feedback** saat drag/resize; scroll halaman tidak ikut terganggu.
+
 ### Belum termasuk (sesuai fase)
 
 | Fase | Fitur | Status |
 | --- | --- | --- |
-| 2 | Buat/geser/resize/edit/hapus kegiatan, snapping 10 menit, touch gesture | Belum |
+| 2 | Buat/geser/resize/edit/hapus kegiatan, snapping 10 menit, touch gesture | **Selesai** |
 | 3 | Lane otomatis untuk kegiatan bertumpuk, peringatan konflik | Belum |
 | 4 | Tampilan minggu & bulan, special day, zoom dan rentang waktu | Belum |
 | 5 | Waktu salat lokal dengan parameter Kemenag/SIHAT | Belum |
@@ -109,6 +122,8 @@ time-boxing-for-kids/
     themes.js             # registry tema
     ui.js                 # toast + dialog konfirmasi
     utils.js              # tanggal/waktu/warna (tanpa konversi zona waktu)
+    event-editor.js       # dialog ringan edit kegiatan (Fase 2)
+    event-interactions.js # gesture create/move/resize (Fase 2)
   lib/
     prayer-calculation/   # disiapkan untuk Fase 5 (belum ada kode)
   assets/
@@ -148,6 +163,26 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 23 | Mode Fokus di 390×844: bar fokus muat tanpa overflow horizontal, tanggal ‹ › dan "Hari ini" berfungsi | Lulus |
 | 24 | Keluar mode fokus lewat tombol dan `Esc`; layout serta posisi scroll timeline kembali normal | Lulus |
 | 25 | Reload saat mode fokus aktif: aplikasi kembali ke tampilan normal (mode tidak disimpan) | Lulus |
+
+## Laporan pengujian Fase 2
+
+| # | Pengujian | Hasil |
+| --- | --- | --- |
+| 26 | Ketuk area kosong di timeline membuat blok 30 menit dengan snapping 10 menit | Lulus |
+| 27 | Seret tengah blok memindah kegiatan (durasi tetap, snapping 10 menit) | Lulus |
+| 28 | Seret pegangan atas mengubah jam mulai (durasi minimum 10 menit) | Lulus |
+| 29 | Seret pegangan bawah mengubah jam selesai (durasi minimum 10 menit) | Lulus |
+| 30 | Ketuk blok / tombol pensil membuka dialog edit (nama, peserta, catatan) | Lulus |
+| 31 | Simpan di dialog edit memperbarui data & menutup dialog; toast "Kegiatan disimpan" | Lulus |
+| 32 | Hapus di dialog edit: konfirmasi → kegiatan hilang dari timeline & storage | Lulus |
+| 33 | Validasi nama kosong di dialog edit menolak simpan & menampilkan error | Lulus |
+| 34 | Pointer Events: mouse, touch (emulasi), stylus jalan di desktop & mobile | Lulus |
+| 35 | Saat drag/resize: visual feedback (shadow, z-index, handle), tidak memicu edit | Lulus |
+| 36 | Scroll halaman tidak terganggu di luar area timeline saat gesture aktif | Lulus |
+| 37 | Kegiatan bersama tetap satu blok; edit peserta di dialog menyinkronkan warna | Lulus |
+| 38 | Refresh halaman: semua perubahan Fase 2 (buat/geser/resize/edit/hapus) bertahan | Lulus |
+| 39 | Tidak ada error console saat interaksi Fase 2 | Lulus |
+| 40 | Tidak ada overflow horizontal pada 390 px dengan Fase 2 aktif | Lulus |
 
 **Batasan yang belum diverifikasi:**
 

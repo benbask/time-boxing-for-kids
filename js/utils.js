@@ -97,6 +97,18 @@ export function nowMinutes() {
   return now.getHours() * 60 + now.getMinutes();
 }
 
+/** Minutes of the day → "HH:mm". Values are clamped to 00:00–23:59. */
+export function minutesToTime(minutes) {
+  const clamped = Math.max(0, Math.min(1439, Math.round(minutes)));
+  return `${pad2(Math.floor(clamped / 60))}:${pad2(clamped % 60)}`;
+}
+
+/** Round to the nearest snap interval (default 10 minutes). */
+export function snapMinutes(minutes, interval = 10) {
+  const step = Number(interval) > 0 ? Number(interval) : 10;
+  return Math.round(minutes / step) * step;
+}
+
 /* ----------------------------------------------------------------- colour --- */
 
 export function hexToRgba(hex, alpha) {

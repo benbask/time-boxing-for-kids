@@ -216,6 +216,13 @@ button { cursor: pointer; }
 }
 .btn-danger:hover { filter: brightness(0.94); }
 
+.btn-danger-ghost {
+  background: transparent;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.btn-danger-ghost:hover { background: var(--danger-soft); }
+
 .icon-btn {
   display: grid;
   place-items: center;
@@ -767,6 +774,95 @@ button { cursor: pointer; }
   justify-content: flex-end;
   gap: 8px;
   margin-top: 4px;
+}
+
+.dialog-actions-split {
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.dialog-actions-right {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.event-dialog { width: min(480px, calc(100vw - 32px)); }
+
+.event-dialog-time {
+  margin-top: 2px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.event-profiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.event-profile-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 6px 12px 6px 8px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 12px;
+  background: var(--surface-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  max-width: 100%;
+}
+
+.event-profile-option input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--person-color);
+}
+
+.event-profile-option:has(input:checked) {
+  border-color: var(--person-color);
+  background: var(--surface);
+  box-shadow: 0 0 0 1px var(--person-color);
+}
+
+.event-profile-emoji {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: 0 0 0 1.5px var(--person-color);
+  font-size: 0.76rem;
+}
+
+.event-profile-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event-profiles-empty {
+  font-size: 0.83rem;
+  color: var(--text-muted);
+}
+
+.field-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.input-textarea {
+  min-height: 70px;
+  padding: 10px 12px;
+  resize: vertical;
 }
 
 .field {

@@ -77,6 +77,8 @@
   .focus-actions { gap: 4px; }
   .focus-actions .mini-btn { padding: 0 8px; }
 
+  .legend-hint { display: none; }
+
   .icon-btn-sm {
     width: 34px;
     height: 34px;
