@@ -330,16 +330,16 @@ button { cursor: pointer; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  width: 44px;
+  height: 44px;
   min-height: 44px;
-  padding: 0 14px;
+  padding: 0;
   border: 1px solid var(--border-strong);
-  border-radius: 999px;
+  border-radius: 50%;
   background: var(--surface);
   color: var(--text);
-  font-size: 0.84rem;
-  font-weight: 600;
-  white-space: nowrap;
+  font-size: 1.2rem;
+  line-height: 1;
 }
 .focus-toggle:hover { background: var(--surface-2); }
 
@@ -348,6 +348,23 @@ button { cursor: pointer; }
   border-color: var(--primary);
   color: var(--primary-contrast);
 }
+
+.focus-exit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1;
+}
+.focus-exit:hover { background: var(--surface-2); }
 
 /* ------------------------------------------------------------ focus bar --- */
 

@@ -70,9 +70,8 @@
               <button type="button" class="seg-btn" data-action="set-view" data-view="month">Bulan</button>
             </div>
             <button type="button" class="focus-toggle" data-action="toggle-focus" aria-pressed="false"
-              title="Sembunyikan panel dan tampilkan kalender penuh">
+              aria-label="Mode fokus (sembunyikan panel)" title="Mode fokus">
               <span aria-hidden="true">⛶</span>
-              <span data-focus-label>Fokus</span>
             </button>
           </div>
         </div>
@@ -85,7 +84,9 @@
           </div>
           <div class="focus-actions">
             <button type="button" class="mini-btn" data-action="go-today">Hari ini</button>
-            <button type="button" class="mini-btn focus-exit" data-action="toggle-focus" aria-label="Keluar mode fokus">Keluar fokus</button>
+            <button type="button" class="mini-btn focus-exit" data-action="toggle-focus" aria-label="Keluar mode fokus" title="Keluar fokus">
+              <span aria-hidden="true">✕</span>
+            </button>
           </div>
         </div>
 
