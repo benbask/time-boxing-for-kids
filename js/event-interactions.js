@@ -27,7 +27,7 @@ import {
 const DAY_MINUTES = 1440;
 const DEFAULT_DURATION = 30;
 const MIN_DURATION = 10;
-const DRAG_THRESHOLD_PX = 4;
+const DRAG_THRESHOLD_PX = 12;
 const MAX_END = 1439; // storage sanitizer requires end > start on the same day
 
 let stage = null;
@@ -103,7 +103,10 @@ function startGesture(pointerEvent, block, mode) {
     if (moveEvent.pointerId !== pointerId) return;
     const deltaPixels = moveEvent.clientY - startY;
     if (!moved && Math.abs(deltaPixels) < DRAG_THRESHOLD_PX) return;
-    moved = true;
+    if (!moved) {
+      moved = true;
+      moveEvent.preventDefault(); // Prevent scroll once drag starts
+    }
 
     const deltaMinutes = deltaPixels / pixelsPerMinute;
     if (mode === 'move') {
@@ -152,7 +155,7 @@ function startGesture(pointerEvent, block, mode) {
     cleanup();
 
     if (!moved) {
-      openEventEditor(eventId);
+      // Let the click handler open the dialog
       return;
     }
 
@@ -186,7 +189,7 @@ function startGesture(pointerEvent, block, mode) {
   block.addEventListener('pointermove', onMove);
   block.addEventListener('pointerup', onUp);
   block.addEventListener('pointercancel', onCancel);
-  pointerEvent.preventDefault();
+  // Don't preventDefault here - let click event fire for taps
 }
 
 /* ---------------------------------------------------------------- create --- */
