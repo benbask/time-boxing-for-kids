@@ -63,17 +63,27 @@
 .timeline {
   --hour-height: 60px;
   --gutter-width: 62px;
+  --scroll-zone: 24px;
   display: grid;
-  grid-template-columns: var(--gutter-width) minmax(0, 1fr);
+  grid-template-columns: var(--gutter-width) minmax(0, 1fr) var(--scroll-zone);
   padding-bottom: 18px;
 }
 
 /* hour labels */
 
 .time-gutter {
-  position: relative;
+  position: sticky;
+  left: 0;
+  z-index: 5;
   border-right: 1px solid var(--border);
   background: var(--surface-2);
+}
+
+/* scroll zone on the right for vertical scrolling when events are dense */
+.scroll-zone {
+  position: relative;
+  min-width: var(--scroll-zone);
+  background: transparent;
 }
 
 .hour-label {
@@ -128,7 +138,7 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
-  padding: 5px 10px 5px 28px;
+  padding: 5px 10px 5px 16px;
   border: 1px solid var(--ev-border);
   border-radius: 12px;
   background: var(--ev-bg);
@@ -140,31 +150,6 @@
   user-select: none;
   -webkit-user-select: none;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset;
-}
-
-.event-grip {
-  position: absolute;
-  left: 6px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 28px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 2px;
-  color: var(--text-muted);
-  opacity: 0.5;
-  pointer-events: none;
-  font-size: 0.55rem;
-  line-height: 1;
-  user-select: none;
-}
-
-.event-block:hover .event-grip,
-.event-block.is-gesturing .event-grip {
-  opacity: 0.85;
 }
 
 .event-block.is-gesturing {
