@@ -28,6 +28,7 @@ const DAY_MINUTES = 1440;
 const DEFAULT_DURATION = 30;
 const MIN_DURATION = 10;
 const DRAG_THRESHOLD_PX = 12;
+const LONG_PRESS_DELAY_MS = 180;
 const MAX_END = 1439; // storage sanitizer requires end > start on the same day
 
 let stage = null;
@@ -81,6 +82,7 @@ function startGesture(pointerEvent, block, mode) {
   const originalEnd = eventEndMinutes(original);
   const duration = originalEnd - originalStart;
   const startY = pointerEvent.clientY;
+  const startX = pointerEvent.clientX;
   const originalTop = block.style.top;
   const originalHeight = block.style.height;
   const timeEl = block.querySelector('.event-time');
@@ -90,6 +92,8 @@ function startGesture(pointerEvent, block, mode) {
   let previewStart = originalStart;
   let previewEnd = originalEnd;
   let moved = false;
+  let gestureStarted = false;
+  let longPressTimer = null;
 
   const step = snapInterval();
 
@@ -99,16 +103,37 @@ function startGesture(pointerEvent, block, mode) {
     if (timeEl) timeEl.textContent = originalTimeText;
   };
 
+  const beginGesture = () => {
+    if (gestureStarted) return;
+    gestureStarted = true;
+    longPressTimer = null;
+    block.classList.add('is-gesturing');
+    block.classList.toggle('is-resize-start', mode === 'start');
+    block.classList.toggle('is-resize-end', mode === 'end');
+    block.classList.toggle('is-moving', mode === 'move');
+    document.body.classList.add('is-gesturing');
+  };
+
   const onMove = (moveEvent) => {
     if (moveEvent.pointerId !== pointerId) return;
-    const deltaPixels = moveEvent.clientY - startY;
-    if (!moved && Math.abs(deltaPixels) < DRAG_THRESHOLD_PX) return;
+    const deltaX = moveEvent.clientX - startX;
+    const deltaY = moveEvent.clientY - startY;
+    const distance = Math.hypot(deltaX, deltaY);
+
+    if (!gestureStarted) {
+      if (distance < DRAG_THRESHOLD_PX) return;
+      // Movement exceeded threshold before long-press: start gesture immediately
+      beginGesture();
+    }
+
+    if (!gestureStarted) return;
+
     if (!moved) {
       moved = true;
       moveEvent.preventDefault(); // Prevent scroll once drag starts
     }
 
-    const deltaMinutes = deltaPixels / pixelsPerMinute;
+    const deltaMinutes = deltaY / pixelsPerMinute;
     if (mode === 'move') {
       const start = clamp(
         snapMinutes(originalStart + deltaMinutes, step),
@@ -133,15 +158,14 @@ function startGesture(pointerEvent, block, mode) {
       );
     }
 
-    block.classList.add('is-gesturing');
-    block.classList.toggle('is-resize-start', mode === 'start');
-    block.classList.toggle('is-resize-end', mode === 'end');
-    block.classList.toggle('is-moving', mode === 'move');
-    document.body.classList.add('is-gesturing');
     applyPreview(block, previewStart, previewEnd);
   };
 
   const cleanup = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
     block.removeEventListener('pointermove', onMove);
     block.removeEventListener('pointerup', onUp);
     block.removeEventListener('pointercancel', onCancel);
@@ -154,8 +178,8 @@ function startGesture(pointerEvent, block, mode) {
     if (upEvent.pointerId !== pointerId) return;
     cleanup();
 
-    if (!moved) {
-      // Let the click handler open the dialog
+    if (!gestureStarted) {
+      // Tap without long-press or significant movement: let click handler open dialog
       return;
     }
 
@@ -185,11 +209,21 @@ function startGesture(pointerEvent, block, mode) {
     resetPreview();
   };
 
+  // Detect pointer type for long-press delay
+  const isTouch = pointerEvent.pointerType === 'touch' || pointerEvent.pointerType === 'pen';
+  const delay = isTouch ? LONG_PRESS_DELAY_MS : 0;
+
+  if (delay > 0) {
+    longPressTimer = setTimeout(beginGesture, delay);
+  } else {
+    // Mouse: start gesture immediately but wait for movement threshold
+    beginGesture();
+  }
+
   block.setPointerCapture?.(pointerId);
   block.addEventListener('pointermove', onMove);
   block.addEventListener('pointerup', onUp);
   block.addEventListener('pointercancel', onCancel);
-  // Don't preventDefault here - let click event fire for taps
 }
 
 /* ---------------------------------------------------------------- create --- */
