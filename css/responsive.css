@@ -1,0 +1,191 @@
+/* ==========================================================================
+   Responsive adjustments (mobile-first priorities: Android phone/tablet)
+   ========================================================================== */
+
+@media (max-width: 860px) {
+  .app-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .brand-text p { display: none; }
+
+  .main-nav {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
+    overflow-x: auto;
+  }
+
+  .nav-btn {
+    flex: 1 0 auto;
+    padding: 0 10px;
+    font-size: 0.86rem;
+  }
+}
+
+@media (max-width: 620px) {
+  body { font-size: 15px; }
+
+  .app-main {
+    padding-top: 12px;
+    gap: 0;
+  }
+
+  .calendar-toolbar {
+    gap: 8px;
+  }
+
+  .date-nav {
+    width: 100%;
+    gap: 6px;
+  }
+
+  .date-display { flex: 1; }
+
+  .date-label {
+    font-size: 0.98rem;
+    white-space: normal;
+    line-height: 1.25;
+  }
+
+  .date-nav > .btn-ghost {
+    padding: 0 12px;
+    font-size: 0.85rem;
+  }
+
+  .view-switch {
+    width: 100%;
+    order: 2;
+  }
+
+  .seg-btn { flex: 1; min-height: 44px; }
+
+  .profile-bar {
+    align-items: stretch;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .profile-chips {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+    padding-bottom: 2px;
+  }
+
+  .profile-chip {
+    min-height: 38px;
+    font-size: 0.82rem;
+  }
+
+  .profile-bar-actions { justify-content: flex-end; }
+
+  .mini-btn {
+    min-height: 34px;
+    font-size: 0.74rem;
+    padding: 0 10px;
+  }
+
+  .timeline {
+    --hour-height: 56px;
+    --gutter-width: 54px;
+  }
+
+  .timeline-scroll {
+    max-height: 58dvh;
+    min-height: 260px;
+  }
+
+  .event-block {
+    left: 4px;
+    right: 6px;
+    padding-left: 13px;
+    border-radius: 10px;
+  }
+
+  .event-block::before { width: 5px; }
+
+  .event-title { font-size: 0.83rem; }
+
+  .hour-label { font-size: 0.68rem; right: 6px; }
+
+  .profile-row {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "avatar identity"
+      "controls controls";
+    row-gap: 8px;
+  }
+
+  .profile-avatar { grid-area: avatar; }
+  .profile-identity { grid-area: identity; }
+  .profile-controls {
+    grid-area: controls;
+    justify-content: space-between;
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+  }
+
+  .switch { flex: 1; justify-content: center; }
+
+  .card { padding: 14px; }
+
+  .page-head h2 { font-size: 1.2rem; }
+}
+
+@media (max-width: 380px) {
+  .brand-mark { display: none; }
+  .brand-text h1 { font-size: 0.98rem; }
+  .nav-btn { font-size: 0.8rem; padding: 0 6px; }
+  .seg-btn { min-width: 0; }
+  .date-nav > .btn-ghost { padding: 0 8px; }
+}
+
+/* Larger screens: roomier timeline and toolbar */
+
+@media (min-width: 900px) {
+  .timeline {
+    --hour-height: 68px;
+    --gutter-width: 70px;
+  }
+
+  .timeline-scroll { max-height: min(66dvh, 780px); }
+
+  .event-title { font-size: 0.92rem; }
+}
+
+/* Short landscape screens (phones on their side) */
+
+@media (max-height: 560px) and (orientation: landscape) {
+  .timeline-scroll {
+    max-height: calc(100dvh - 190px);
+    min-height: 200px;
+  }
+
+  .app-footer { display: none; }
+}
+
+/* Touch devices: no hover-only affordances */
+
+@media (hover: none) {
+  .nav-btn:hover,
+  .icon-btn:hover,
+  .mini-btn:hover,
+  .btn-ghost:hover { background: inherit; }
+
+  .profile-chip { min-height: 44px; }
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="sky-mint">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Time Boxing for Kids</title>
+  <meta name="description" content="Jadwal keluarga sederhana dalam satu garis waktu visual. Tanpa login, tanpa server.">
+  <meta name="theme-color" content="#1f9d8f">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/calendar.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <!-- Apply the stored theme before first paint (no flash of the default theme). -->
+  <script>
+    try {
+      var saved = localStorage.getItem('timeboxing-kids:data');
+      if (saved) {
+        var parsed = JSON.parse(saved);
+        var theme = parsed && parsed.settings && parsed.settings.activeTheme;
+        if (['sky-mint', 'candy', 'lavender', 'nature'].indexOf(theme) !== -1) {
+          document.documentElement.setAttribute('data-theme', theme);
+        }
+      }
+    } catch (error) { /* first run or unreadable storage: keep the default theme */ }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#calendarStage">Lewati ke kalender</a>
+
+  <div class="app">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">⏰</span>
+        <div class="brand-text">
+          <h1>Time Boxing for Kids</h1>
+          <p>Jadwal keluarga dalam satu garis waktu</p>
+        </div>
+      </div>
+
+      <nav class="main-nav" aria-label="Navigasi utama">
+        <button type="button" class="nav-btn" data-action="set-view" data-view="day">Hari</button>
+        <button type="button" class="nav-btn" data-action="set-view" data-view="week">Minggu</button>
+        <button type="button" class="nav-btn" data-action="set-view" data-view="month">Bulan</button>
+        <button type="button" class="nav-btn" data-action="set-view" data-view="profiles">Profil</button>
+        <button type="button" class="nav-btn" data-action="set-view" data-view="settings">Pengaturan</button>
+      </nav>
+    </header>
+
+    <main class="app-main">
+      <!-- ============ CALENDAR VIEW ============ -->
+      <section id="calendarView" class="view" aria-labelledby="calendarHeading">
+        <h2 id="calendarHeading" class="visually-hidden">Kalender keluarga</h2>
+
+        <div class="calendar-toolbar">
+          <div class="date-nav">
+            <button type="button" class="icon-btn" data-action="shift-date" data-days="-1" aria-label="Tanggal sebelumnya">‹</button>
+            <div class="date-display">
+              <span id="dateLabel" class="date-label">Hari ini</span>
+              <span id="dateSub" class="date-sub"></span>
+            </div>
+            <button type="button" class="icon-btn" data-action="shift-date" data-days="1" aria-label="Tanggal berikutnya">›</button>
+            <button type="button" class="btn btn-ghost" data-action="go-today">Hari ini</button>
+          </div>
+
+          <div class="view-switch" role="group" aria-label="Pilih tampilan kalender">
+            <button type="button" class="seg-btn" data-action="set-view" data-view="day">Hari</button>
+            <button type="button" class="seg-btn" data-action="set-view" data-view="week">Minggu</button>
+            <button type="button" class="seg-btn" data-action="set-view" data-view="month">Bulan</button>
+          </div>
+        </div>
+
+        <div class="profile-bar">
+          <div id="profileChips" class="profile-chips" role="group" aria-label="Tampilkan atau sembunyikan profil"></div>
+          <div class="profile-bar-actions">
+            <button type="button" class="mini-btn" data-action="show-all-profiles">Tampilkan semua</button>
+            <button type="button" class="mini-btn" data-action="hide-all-profiles">Sembunyikan semua</button>
+          </div>
+        </div>
+
+        <div id="calendarStage" class="calendar-stage" tabindex="-1"></div>
+      </section>
+
+      <!-- ============ PROFILES VIEW ============ -->
+      <section id="profilesView" class="view" hidden aria-labelledby="profilesHeading">
+        <div class="page-head">
+          <div>
+            <h2 id="profilesHeading">Profil keluarga</h2>
+            <p class="page-sub">Setiap anggota punya warna sendiri. Semua kegiatan tetap berada di satu garis waktu yang sama.</p>
+          </div>
+          <button type="button" class="btn btn-primary" data-action="new-profile">+ Tambah profil</button>
+        </div>
+
+        <div id="profileList" class="profile-list"></div>
+        <p class="hint">Menyembunyikan profil hanya menyembunyikan kegiatannya dari kalender. Data tetap tersimpan.</p>
+      </section>
+
+      <!-- ============ SETTINGS VIEW ============ -->
+      <section id="settingsView" class="view" hidden aria-labelledby="settingsHeading">
+        <div class="page-head">
+          <div>
+            <h2 id="settingsHeading">Pengaturan</h2>
+            <p class="page-sub">Tema dan informasi penyimpanan data.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Tema</h3>
+          <p class="card-sub">Pilih suasana warna yang paling nyaman untuk keluarga.</p>
+          <div id="themeGrid" class="theme-grid" role="radiogroup" aria-label="Tema aplikasi"></div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Penyimpanan data</h3>
+          <p class="card-warning" role="note">
+            Data tersimpan di browser perangkat ini. Untuk memindahkan data ke perangkat lain, gunakan Ekspor dan Impor JSON.
+          </p>
+          <dl id="storageStats" class="stats"></dl>
+          <p class="card-sub">Ekspor dan impor JSON tersedia pada Fase 6. Sampai saat itu, data hanya hidup di perangkat ini.</p>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Tentang</h3>
+          <p class="card-sub">
+            Time Boxing for Kids versi 0.1.0 (Fase 1). Aplikasi statis tanpa login, tanpa server, dan tanpa database online.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span>Data tersimpan di browser perangkat ini.</span>
+    </footer>
+  </div>
+
+  <!-- Profile editor (profiles are allowed to use a dialog) -->
+  <dialog id="profileDialog" class="dialog" aria-labelledby="profileDialogTitle">
+    <form id="profileForm" class="dialog-body" novalidate>
+      <h2 id="profileDialogTitle" class="dialog-title">Tambah profil</h2>
+      <input type="hidden" name="profileId" value="">
+
+      <label class="field">
+        <span class="field-label">Nama</span>
+        <input class="input" type="text" name="name" maxlength="20" required autocomplete="off" placeholder="Contoh: Ayah">
+      </label>
+
+      <label class="field">
+        <span class="field-label">Emoji</span>
+        <select class="input" name="emoji" id="emojiSelect"></select>
+      </label>
+
+      <fieldset class="field">
+        <legend class="field-label">Warna</legend>
+        <div id="colorPicker" class="color-picker"></div>
+      </fieldset>
+
+      <p id="profileFormError" class="form-error" role="alert" hidden></p>
+
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-ghost" data-action="close-profile-dialog">Batal</button>
+        <button type="submit" class="btn btn-primary">Simpan</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Confirmation dialog for destructive actions -->
+  <dialog id="confirmDialog" class="dialog" aria-labelledby="confirmTitle">
+    <div class="dialog-body">
+      <h2 id="confirmTitle" class="dialog-title">Hapus profil?</h2>
+      <p id="confirmMessage" class="dialog-text"></p>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-ghost" data-action="cancel-confirm">Batal</button>
+        <button type="button" class="btn btn-danger" data-action="accept-confirm">Hapus</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <noscript>
+    <p class="noscript">Aplikasi ini membutuhkan JavaScript. Aktifkan JavaScript di browser untuk melanjutkan.</p>
+  </noscript>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
