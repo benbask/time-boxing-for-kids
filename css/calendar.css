@@ -72,7 +72,7 @@
   --scroll-zone: 10%;
   display: grid;
   grid-template-columns: var(--gutter-width) minmax(0, 1fr) var(--scroll-zone);
-  padding-bottom: 80px;
+  padding-bottom: 0;
   /* Horizontal grid lines across full width (including scroll zone) */
   background-image:
     repeating-linear-gradient(
@@ -82,7 +82,7 @@
       var(--grid-line) calc(var(--hour-height) - 1px),
       var(--grid-line) var(--hour-height)
     );
-  background-position: 0 calc(var(--hour-height) * -1);
+  background-position: 0 0;
   background-size: 100% var(--hour-height);
 }
 
@@ -90,14 +90,10 @@
 
 .time-gutter {
   position: sticky;
-  top: 0;
   left: 0;
   z-index: 5;
   border-right: 1px solid var(--border);
   background: var(--surface-2);
-  height: 100%;
-  max-height: 100vh;
-  overflow: hidden;
 }
 
 /* scroll zone on the right for vertical scrolling when events are dense */
@@ -108,43 +104,18 @@
 }
 
 .hour-label {
-  position: sticky;
-  top: 0;
+  position: absolute;
   right: 8px;
   transform: translateY(-50%);
   font-size: 0.72rem;
   font-variant-numeric: tabular-nums;
   color: var(--text-muted);
   white-space: nowrap;
-  z-index: 6;
 }
 
-/* Individual sticky positions for each hour label */
-.hour-label:nth-child(1) { top: calc(var(--hour-height) * 0); }
-.hour-label:nth-child(2) { top: calc(var(--hour-height) * 1); }
-.hour-label:nth-child(3) { top: calc(var(--hour-height) * 2); }
-.hour-label:nth-child(4) { top: calc(var(--hour-height) * 3); }
-.hour-label:nth-child(5) { top: calc(var(--hour-height) * 4); }
-.hour-label:nth-child(6) { top: calc(var(--hour-height) * 5); }
-.hour-label:nth-child(7) { top: calc(var(--hour-height) * 6); }
-.hour-label:nth-child(8) { top: calc(var(--hour-height) * 7); }
-.hour-label:nth-child(9) { top: calc(var(--hour-height) * 8); }
-.hour-label:nth-child(10) { top: calc(var(--hour-height) * 9); }
-.hour-label:nth-child(11) { top: calc(var(--hour-height) * 10); }
-.hour-label:nth-child(12) { top: calc(var(--hour-height) * 11); }
-.hour-label:nth-child(13) { top: calc(var(--hour-height) * 12); }
-.hour-label:nth-child(14) { top: calc(var(--hour-height) * 13); }
-.hour-label:nth-child(15) { top: calc(var(--hour-height) * 14); }
-.hour-label:nth-child(16) { top: calc(var(--hour-height) * 15); }
-.hour-label:nth-child(17) { top: calc(var(--hour-height) * 16); }
-.hour-label:nth-child(18) { top: calc(var(--hour-height) * 17); }
-.hour-label:nth-child(19) { top: calc(var(--hour-height) * 18); }
-.hour-label:nth-child(20) { top: calc(var(--hour-height) * 19); }
-.hour-label:nth-child(21) { top: calc(var(--hour-height) * 20); }
-.hour-label:nth-child(22) { top: calc(var(--hour-height) * 21); }
-.hour-label:nth-child(23) { top: calc(var(--hour-height) * 22); }
-.hour-label:nth-child(24) { top: calc(var(--hour-height) * 23); }
-
+/* Labels sit exactly on their hour line and scroll with the canvas.
+   The offset per label comes from an inline `top` so it always matches the
+   current --hour-height. */
 .hour-label:first-child { transform: translateY(2px); }
 
 /* canvas */
@@ -152,9 +123,6 @@
 .time-canvas {
   position: relative;
   min-width: 0;
-  /* Offset the canvas content to align with grid lines */
-  margin-top: calc(var(--hour-height) * -1);
-  padding-top: var(--hour-height);
 }
 
 .hour-row {
@@ -181,9 +149,6 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* Offset to align with grid lines */
-  margin-top: calc(var(--hour-height) * -1);
-  padding-top: var(--hour-height);
 }
 
 /* --------------------------------------------------------------- event --- */

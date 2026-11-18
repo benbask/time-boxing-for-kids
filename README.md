@@ -194,6 +194,10 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 44 | Emulasi zoom 1,5× (viewport 260×563): footer terlihat, timeline 235 px, tanpa scroll halaman | Lulus |
 | 45 | Emulasi zoom 2× (viewport 195×422): footer terlihat, area utama scroll, kartu timeline minimal 190 px | Lulus |
 | 46 | Klik mouse pada blok kegiatan membuka dialog edit; drag tetap tidak membuka dialog | Lulus |
+| 47 | Label jam duduk tepat di garis jamnya dan ikut tergulir (tidak bertumpuk lagi) | Lulus |
+| 48 | Blok kegiatan, garis jam, dan label jam memakai geometri 24 jam yang sama (selisih ≤1 px) | Lulus |
+| 49 | Kanvas tidak punya padding bawah; 23:00 tetap terjangkau dan tidak ada ruang kosong di bawah kanvas | Lulus |
+| 50 | Ketuk area kosong memakai tinggi kanvas yang tepat (24 jam) sehingga waktu yang dibuat sesuai posisi ketukan | Lulus |
 
 **Batasan yang belum diverifikasi:**
 

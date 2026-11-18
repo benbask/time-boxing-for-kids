@@ -118,7 +118,6 @@
   .timeline {
     --hour-height: 56px;
     --gutter-width: 54px;
-    padding-bottom: 100px;
   }
 
   .timeline-legend {

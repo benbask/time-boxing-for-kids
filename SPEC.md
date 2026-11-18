@@ -729,6 +729,15 @@ The app is a single viewport-height column: `.app` is `height: 100dvh` with `ove
 - Short viewports (`max-height: 700px / 640px / 560px / 480px`) compress the chrome: brand mark and subtitle shrink, gaps tighten, the profile bar becomes one horizontally scrolling row, the date label stops wrapping, and the hour height drops.
 - The toast sits `56px` above the bottom so it clears the footer.
 
+## 22.9 Timeline geometry (hour lines, labels, blocks)
+
+One coordinate system for the whole day: the canvas is exactly 24 × `--hour-height` tall with no top or bottom padding. `.event-layer` covers that same box, so block `top`/`height` percentages map 1:1 to minutes and blocks land exactly between their hour lines.
+
+- Hour labels are `position: absolute` at `top: calc(var(--hour-height) * hour)` inside the gutter; they scroll with the canvas and always sit on their own line, never piling up.
+- The grid background starts at `background-position: 0 0`, so the 00:00 line is the very top of the canvas.
+- No `padding-bottom` on `.timeline`: the canvas ends at 24:00. The last label (23:00) stays reachable because the 23:00–24:00 row still scrolls into view.
+- Tap-to-create uses `canvas.getBoundingClientRect().height` (exactly 24 hours), so a tap lands on the minute it points at.
+
 ## 22.9 Phase 2 — Time Blocking (direct manipulation)
 
 **New modules:**

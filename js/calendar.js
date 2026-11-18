@@ -23,7 +23,7 @@ const HOUR_LABEL_COUNT = 24;
 
 function hourLabels() {
   return Array.from({ length: HOUR_LABEL_COUNT }, (_, hour) => (
-    `<span class="hour-label">${pad2(hour)}:00</span>`
+    `<span class="hour-label" style="top:calc(var(--hour-height) * ${hour})">${pad2(hour)}:00</span>`
   )).join('');
 }
 
