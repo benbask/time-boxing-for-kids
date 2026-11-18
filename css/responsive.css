@@ -17,10 +17,10 @@
     overflow-x: auto;
   }
 
-  .nav-btn {
-    flex: 1 0 auto;
-    padding: 0 10px;
-    font-size: 0.86rem;
+  .nav-icon-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 1.4rem;
   }
 }
 
@@ -116,10 +116,11 @@
   .timeline {
     --hour-height: 56px;
     --gutter-width: 54px;
+    padding-bottom: 100px;
   }
 
   .timeline-scroll {
-    max-height: 58dvh;
+    max-height: min(80dvh, 900px);
     min-height: 260px;
   }
 
