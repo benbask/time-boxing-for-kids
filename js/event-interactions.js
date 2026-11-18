@@ -150,12 +150,13 @@ function startGesture(pointerEvent, block, mode) {
   const onUp = (upEvent) => {
     if (upEvent.pointerId !== pointerId) return;
     cleanup();
-    suppressClickUntil = Date.now() + 500;
 
     if (!moved) {
       openEventEditor(eventId);
       return;
     }
+
+    suppressClickUntil = Date.now() + 500;
 
     if (previewStart === originalStart && previewEnd === originalEnd) {
       resetPreview();
