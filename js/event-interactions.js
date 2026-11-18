@@ -18,6 +18,7 @@ import { showToast } from './ui.js';
 import {
   eventEndMinutes,
   eventStartMinutes,
+  formatDurationLabel,
   minutesToTime,
   pad2,
   snapMinutes,
@@ -27,8 +28,12 @@ import {
 const DAY_MINUTES = 1440;
 const DEFAULT_DURATION = 30;
 const MIN_DURATION = 10;
-const DRAG_THRESHOLD_PX = 12;
-const LONG_PRESS_DELAY_MS = 180;
+/** Finger travel that proves the user means to drag (after the long press). */
+const DRAG_THRESHOLD_PX = 8;
+/** Finger travel allowed while waiting for the long press; more means "swipe". */
+const LONG_PRESS_TOLERANCE_PX = 10;
+const LONG_PRESS_DELAY_MS = 380;
+const SWIPE_CLICK_SUPPRESS_MS = 400;
 const MAX_END = 1439; // storage sanitizer requires end > start on the same day
 
 let stage = null;
@@ -54,10 +59,13 @@ function applyPreview(block, startMinutes, endMinutes) {
   const duration = Math.max(1, endMinutes - startMinutes);
   block.style.top = `calc(${((startMinutes / DAY_MINUTES) * 100).toFixed(4)}% + 1px)`;
   block.style.height = `calc(${((duration / DAY_MINUTES) * 100).toFixed(4)}% - 2px)`;
-  const time = block.querySelector('.event-time');
+  const time = block.querySelector('.event-time-text');
   if (time) {
     time.textContent = `${pad2(Math.floor(startMinutes / 60))}:${pad2(startMinutes % 60)} – ${minutesToTime(endMinutes)}`;
   }
+  block.querySelectorAll('.event-duration').forEach((label) => {
+    label.textContent = formatDurationLabel(duration);
+  });
 }
 
 /* --------------------------------------------------------------- gesture --- */
@@ -81,59 +89,108 @@ function startGesture(pointerEvent, block, mode) {
   const originalStart = eventStartMinutes(original);
   const originalEnd = eventEndMinutes(original);
   const duration = originalEnd - originalStart;
-  const startY = pointerEvent.clientY;
   const startX = pointerEvent.clientX;
+  const startY = pointerEvent.clientY;
   const originalTop = block.style.top;
   const originalHeight = block.style.height;
-  const timeEl = block.querySelector('.event-time');
+  const timeEl = block.querySelector('.event-time-text');
   const originalTimeText = timeEl ? timeEl.textContent : '';
 
-  let pointerId = pointerEvent.pointerId;
+  const pointerId = pointerEvent.pointerId;
+  // Touch and pen must hold still before anything moves; a mouse drags at once.
+  const touchLike = pointerEvent.pointerType !== 'mouse';
   let previewStart = originalStart;
   let previewEnd = originalEnd;
   let moved = false;
   let gestureStarted = false;
+  let anchorY = startY;
   let longPressTimer = null;
 
   const step = snapInterval();
+
+  /* Touch scrolling is driven by touchmove, so a non-passive preventDefault is
+     the reliable way to keep the page still once the drag owns the finger. */
+  const holdPageStill = (event) => {
+    if (event.cancelable) event.preventDefault();
+  };
 
   const resetPreview = () => {
     block.style.top = originalTop;
     block.style.height = originalHeight;
     if (timeEl) timeEl.textContent = originalTimeText;
+    block.querySelectorAll('.event-duration').forEach((label) => {
+      label.textContent = formatDurationLabel(duration);
+    });
   };
 
-  const beginGesture = () => {
+  const armDrag = () => {
     if (gestureStarted) return;
-    gestureStarted = true;
     longPressTimer = null;
+    gestureStarted = true;
     block.classList.add('is-gesturing');
     block.classList.toggle('is-resize-start', mode === 'start');
     block.classList.toggle('is-resize-end', mode === 'end');
     block.classList.toggle('is-moving', mode === 'move');
     document.body.classList.add('is-gesturing');
+    if (touchLike) {
+      window.addEventListener('touchmove', holdPageStill, { passive: false });
+      try {
+        block.setPointerCapture?.(pointerId);
+      } catch {
+        /* capture is best-effort */
+      }
+      try {
+        navigator.vibrate?.(10);
+      } catch {
+        /* haptics are best-effort */
+      }
+    }
+  };
+
+  const cleanup = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = null;
+    }
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+    window.removeEventListener('pointercancel', onCancel);
+    window.removeEventListener('touchmove', holdPageStill);
+    block.classList.remove('is-gesturing', 'is-resize-start', 'is-resize-end', 'is-moving');
+    document.body.classList.remove('is-gesturing');
+    if (block.hasPointerCapture?.(pointerId)) block.releasePointerCapture(pointerId);
+  };
+
+  /* The finger travels before the hold completes: this is a scroll, not a drag.
+     Hand it back to the browser and make sure the release is not read as a tap. */
+  const abandon = () => {
+    cleanup();
+    resetPreview();
+    suppressClickUntil = Date.now() + SWIPE_CLICK_SUPPRESS_MS;
   };
 
   const onMove = (moveEvent) => {
     if (moveEvent.pointerId !== pointerId) return;
     const deltaX = moveEvent.clientX - startX;
     const deltaY = moveEvent.clientY - startY;
-    const distance = Math.hypot(deltaX, deltaY);
 
     if (!gestureStarted) {
-      if (distance < DRAG_THRESHOLD_PX) return;
-      // Movement exceeded threshold before long-press: start gesture immediately
-      beginGesture();
+      if (Math.hypot(deltaX, deltaY) > LONG_PRESS_TOLERANCE_PX) abandon();
+      return;
     }
-
-    if (!gestureStarted) return;
 
     if (!moved) {
+      if (Math.abs(deltaY) < DRAG_THRESHOLD_PX) return;
+      // Anchor at the activation point so the first snapped step cannot jump.
       moved = true;
-      moveEvent.preventDefault(); // Prevent scroll once drag starts
+      anchorY = moveEvent.clientY;
     }
 
-    const deltaMinutes = deltaY / pixelsPerMinute;
+    if (moveEvent.cancelable) moveEvent.preventDefault();
+    updatePreview((moveEvent.clientY - anchorY) / pixelsPerMinute);
+  };
+
+  const updatePreview = (deltaMinutes) => {
     if (mode === 'move') {
       const start = clamp(
         snapMinutes(originalStart + deltaMinutes, step),
@@ -161,30 +218,25 @@ function startGesture(pointerEvent, block, mode) {
     applyPreview(block, previewStart, previewEnd);
   };
 
-  const cleanup = () => {
-    if (longPressTimer) {
-      clearTimeout(longPressTimer);
-      longPressTimer = null;
-    }
-    block.removeEventListener('pointermove', onMove);
-    block.removeEventListener('pointerup', onUp);
-    block.removeEventListener('pointercancel', onCancel);
-    block.classList.remove('is-gesturing', 'is-resize-start', 'is-resize-end', 'is-moving');
-    document.body.classList.remove('is-gesturing');
-    if (block.hasPointerCapture?.(pointerId)) block.releasePointerCapture(pointerId);
-  };
-
   const onUp = (upEvent) => {
     if (upEvent.pointerId !== pointerId) return;
-    cleanup();
 
-    if (!gestureStarted) {
-      // Tap without long-press or significant movement: let click handler open dialog
-      return;
+    // A fast flick can arrive as one coalesced move followed by pointerup; apply
+    // that movement before deciding whether anything changed.
+    if (gestureStarted && !moved) {
+      const deltaY = upEvent.clientY - startY;
+      if (Math.abs(deltaY) >= DRAG_THRESHOLD_PX) {
+        moved = true;
+        updatePreview((deltaY - Math.sign(deltaY) * DRAG_THRESHOLD_PX) / pixelsPerMinute);
+      }
     }
 
-    // Only a real move/resize swallows the follow-up click; a plain press must
-    // still open the editor (mouse users never get a long-press).
+    cleanup();
+
+    // A plain press or tap: let the click handler open the editor.
+    if (!gestureStarted) return;
+
+    // Only a real move/resize swallows the follow-up click.
     if (moved) suppressClickUntil = Date.now() + 500;
 
     if (previewStart === originalStart && previewEnd === originalEnd) {
@@ -211,25 +263,15 @@ function startGesture(pointerEvent, block, mode) {
     resetPreview();
   };
 
-  // Detect pointer type for long-press delay
-  // pointerType can be 'touch', 'pen', 'mouse'. In some browsers/emulation, 
-  // touch may report as 'mouse'. We also check for isPrimary and touch context.
-  const isTouch = pointerEvent.pointerType === 'touch' 
-    || pointerEvent.pointerType === 'pen'
-    || (pointerEvent.pointerType === 'mouse' && navigator.maxTouchPoints > 0);
-  const delay = isTouch ? LONG_PRESS_DELAY_MS : 0;
-
-  if (delay > 0) {
-    longPressTimer = setTimeout(beginGesture, delay);
+  if (touchLike) {
+    longPressTimer = setTimeout(armDrag, LONG_PRESS_DELAY_MS);
   } else {
-    // Mouse: start gesture immediately but wait for movement threshold
-    beginGesture();
+    armDrag();
   }
 
-  block.setPointerCapture?.(pointerId);
-  block.addEventListener('pointermove', onMove);
-  block.addEventListener('pointerup', onUp);
-  block.addEventListener('pointercancel', onCancel);
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup', onUp);
+  window.addEventListener('pointercancel', onCancel);
 }
 
 /* ---------------------------------------------------------------- create --- */

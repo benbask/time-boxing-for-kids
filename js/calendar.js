@@ -10,6 +10,7 @@
 import { buildDayLayout } from './layout-engine.js';
 import {
   escapeHtml,
+  formatDurationLabel,
   nowMinutes,
   pad2,
   relativeDayLabel,
@@ -67,11 +68,14 @@ function renderBlock(block) {
   const label = [
     block.title,
     block.timeLabel,
+    formatDurationLabel(block.durationMinutes),
     block.participants.length
       ? block.participants.map((profile) => profile.name).join(', ')
       : 'Tanpa peserta',
     block.note ? `Catatan: ${block.note}` : '',
   ].filter(Boolean).join('. ');
+
+  const duration = formatDurationLabel(block.durationMinutes);
 
   return `
     <article class="${classes}" data-event-id="${escapeHtml(block.id)}" style="${style}" aria-label="${escapeHtml(label)}">
@@ -80,8 +84,9 @@ function renderBlock(block) {
       <button type="button" class="event-edit" data-edit-event="${escapeHtml(block.id)}"
         aria-label="Ubah kegiatan ${escapeHtml(block.title)}" title="Ubah kegiatan">✏️</button>
       ${note}
-      <div class="event-time">${escapeHtml(block.timeLabel)}</div>
+      <div class="event-time"><span class="event-time-text">${escapeHtml(block.timeLabel)}</span><span class="event-duration event-duration-inline" aria-hidden="true">${duration}</span></div>
       <div class="event-title">${escapeHtml(block.title)}</div>
+      <span class="event-duration event-duration-chip" aria-hidden="true">${duration}</span>
       ${renderParticipants(block.participants)}
     </article>`;
 }
@@ -145,7 +150,7 @@ function dayViewMarkup(data, layout) {
         <div class="legend-items">
           <span class="legend-item"><span class="dot" style="--dot-color:var(--now)"></span> Waktu sekarang</span>
           <span class="legend-item"><span class="shared-marks" aria-hidden="true">👥</span> Kegiatan bersama tampil satu kali</span>
-          <span class="legend-item legend-hint">Ketuk area kosong untuk menambah · geser blok untuk memindah</span>
+          <span class="legend-item legend-hint">Ketuk area kosong untuk menambah · tahan blok untuk memindah</span>
         </div>
         <span>${layout.visibleCount} kegiatan</span>
       </div>

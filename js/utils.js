@@ -92,6 +92,16 @@ export function formatEventRange(event) {
   return `${start} – ${end}`;
 }
 
+/** Human duration for a block: "30 mnt", "1 j", "1 j 30 mnt". */
+export function formatDurationLabel(minutes) {
+  const total = Math.max(0, Math.round(Number(minutes) || 0));
+  const hours = Math.floor(total / 60);
+  const rest = total % 60;
+  if (hours === 0) return `${rest} mnt`;
+  if (rest === 0) return `${hours} j`;
+  return `${hours} j ${rest} mnt`;
+}
+
 export function nowMinutes() {
   const now = new Date();
   return now.getHours() * 60 + now.getMinutes();

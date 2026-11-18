@@ -660,7 +660,7 @@ Explicitly deferred (per Section 21): overlap lane assignment and conflict warni
 - `js/ui.js` — small helpers: toast, confirm dialog, escape-safe HTML.
 - `js/utils.js` — date/time/colour helpers (no timezone conversion).
 - `js/event-editor.js` — lightweight editor dialog for one activity (title, participants, notes). Times edited on timeline, not here.
-- `js/event-interactions.js` — pointer-based gestures for day timeline: create on empty tap, drag to move, handles to resize, tap to edit. Uses Pointer Events; `touch-action: none` scoped to blocks.
+- `js/event-interactions.js` - pointer-based gestures for day timeline: create on empty tap, hold-and-drag to move, handles to resize, tap to edit. Uses Pointer Events; `touch-action: pan-y pinch-zoom` on blocks so a swipe still scrolls.
 
 Files reserved for later phases are not created yet, so no dead code ships.
 
@@ -738,7 +738,7 @@ One coordinate system for the whole day: the canvas is exactly 24 × `--hour-hei
 - No `padding-bottom` on `.timeline`: the canvas ends at 24:00. The last label (23:00) stays reachable because the 23:00–24:00 row still scrolls into view.
 - Tap-to-create uses `canvas.getBoundingClientRect().height` (exactly 24 hours), so a tap lands on the minute it points at.
 
-## 22.9 Phase 2 — Time Blocking (direct manipulation)
+## 22.10 Phase 2 — Time Blocking (direct manipulation)
 
 **New modules:**
 - `js/event-editor.js` — lightweight editor dialog (title, participants, notes). Times are NOT edited here; they are manipulated directly on the timeline.
@@ -749,9 +749,9 @@ One coordinate system for the whole day: the canvas is exactly 24 × `--hour-hei
 - Drag middle of a block → move (preserves duration). Snaps to interval.
 - Drag top/bottom resize handle → change start or end. Snaps to interval, enforces 10-min minimum.
 - Tap a block or its pencil button → opens event editor dialog (title, participants checkboxes, notes). Save/Delete actions live here.
-- All gestures use **Pointer Events** (mouse, touch, pen, stylus). `touch-action: none` scoped to `.event-block` so page scrolling elsewhere is unaffected.
-- During gesture: block gets `is-gesturing` class (shadow, z-index), resize handles visible, edit button hidden, live time label updates.
-- Click suppression: `suppressClickUntil` (500 ms) is set only after a **real** move/resize, so a plain tap or mouse click still opens the editor.
+- All gestures use **Pointer Events** (mouse, touch, pen, stylus). `touch-action: pan-y pinch-zoom` on `.event-block` and `.event-resize`, so a vertical swipe over a block still scrolls the timeline and page pinch-zoom stays available.
+- During gesture: block gets `is-gesturing` class (shadow, z-index), resize handles visible, edit button hidden, live time and duration labels update.
+- Click suppression: `suppressClickUntil` (500 ms) is set only after a **real** move/resize (or after a swipe is recognised), so a plain tap or mouse click still opens the editor.
 
 **Implementation details:**
 - Snap interval read from `settings.snapInterval` (candidates 5, 10, 15, 30; default 10) via `snapMinutes()` in `utils.js`.
@@ -763,10 +763,29 @@ One coordinate system for the whole day: the canvas is exactly 24 × `--hour-hei
 **UI affordances added:**
 - Resize handles (`.event-resize-start`, `.event-resize-end`) appear on hover and during gesture.
 - Edit button (`.event-edit`, pencil icon) top-right of each block.
-- Legend hint: "Ketuk area kosong untuk menambah · geser blok untuk memindah".
+- Duration label inside each block: `.event-duration-inline` after the time range for blocks ≥ 60 min, `.event-duration-chip` beside the title for compact blocks (< 60 min, where the time line is hidden). Format: `30 mnt`, `1 j`, `1 j 30 mnt`.
+- Legend hint: "Ketuk area kosong untuk menambah · tahan blok untuk memindah".
 - Empty-day notice changed to prompt creation: "Ketuk area kosong di timeline untuk membuat kegiatan 30 menit."
 
-## 22.10 Known risks
+## 22.11 Gesture arbitration (swipe vs. hold)
+
+The first Phase 2 build started a drag as soon as the finger moved 12 px, so scrolling the timeline by swiping over a block moved the block instead. The revised model separates the two intents:
+
+| Pointer | Down | Move before hold completes | Hold completes (380 ms) | Move after hold | Release |
+| --- | --- | --- | --- | --- | --- |
+| Touch / pen | starts a 380 ms timer, no visual change | > 10 px travel → **swipe**: timer cancelled, native scroll takes over, click suppressed 400 ms | `is-gesturing` armed (+10 ms vibration), `touchmove` made non-passive and cancelled | block follows the finger vertically, snapped to the interval | saves once, then suppresses the click 500 ms |
+| Mouse | armed immediately | — | — | same as above | same as above |
+
+Implementation notes:
+- `LONG_PRESS_TOLERANCE_PX = 10` (a swipe) and `LONG_PRESS_DELAY_MS = 380` (a hold) in `js/event-interactions.js`; `DRAG_THRESHOLD_PX = 8` is the dead zone after the hold so the block does not jump on the first snapped step.
+- The drag anchors at the activation point and only then applies `deltaY`, so the first move event cannot shift the block.
+- A fast flick that arrives as one coalesced move is handled on `pointerup`: the pending delta is applied before saving.
+- While a drag is active, `window` gets a non-passive `touchmove` listener that calls `preventDefault()`, so the page cannot scroll under the finger.
+- A native scroll makes the browser fire `pointercancel`; the preview is reset and nothing is saved.
+- Pointer listeners live on `window` (filtered by `pointerId`) so the finger may leave the block; pointer capture is requested only once the hold completes, and is best-effort.
+- `navigator.vibrate(10)` gives a haptic cue when the hold completes (Android); failures are ignored.
+
+## 22.12 Known risks
 
 1. **Lane algorithm on narrow screens** — Phase 3 must keep blocks >= 44 px wide; planned: minimum lane width with horizontal overflow inside the event layer only.
 2. **Prayer-time accuracy** — Phase 5 must document Kemenag parameters and compare against SIHAT output for several cities/dates; results must not be presented as verified before that comparison exists.

@@ -60,13 +60,17 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
 
 - **Buat kegiatan**: ketuk area kosong di timeline → blok 30 menit langsung
   muncul (dengan snapping 10 menit).
-- **Geser kegiatan**: seret tengah blok untuk memindah waktu (durasi tetap).
-- **Resize kegiatan**: seret pegangan atas/bawah untuk mengubah jam mulai/selesai.
+- **Geser kegiatan**: tahan blok ±0,4 detik, lalu geser untuk memindah waktu
+  (durasi tetap). Geser tanpa menahan akan menggulir timeline, bukan memindah.
+- **Resize kegiatan**: tahan pegangan atas/bawah lalu geser untuk mengubah jam
+  mulai/selesai.
 - **Edit kegiatan**: ketuk blok atau tombol pensil → dialog ringan (nama, peserta,
   catatan). Waktu diubah di timeline, bukan di dialog.
 - **Hapus kegiatan**: dari dialog edit, dengan konfirmasi.
 - **Snapping 10 menit** dan **durasi minimum 10 menit** (dari pengaturan).
-- **Touchscreen**: Pointer Events API — mouse, sentuh, stylus, tablet.
+- **Durasi terlihat di dalam blok**: `30 mnt`, `1 j`, `1 j 30 mnt`.
+- **Touchscreen**: Pointer Events API — mouse, sentuh, stylus, tablet. Swipe
+  vertikal di mana saja (kanvas maupun blok) menggulir jadwal.
 - **Visual feedback** saat drag/resize; scroll halaman tidak ikut terganggu.
 
 ### Belum termasuk (sesuai fase)
@@ -199,9 +203,21 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 49 | Kanvas tidak punya padding bawah; 23:00 tetap terjangkau dan tidak ada ruang kosong di bawah kanvas | Lulus |
 | 50 | Ketuk area kosong memakai tinggi kanvas yang tepat (24 jam) sehingga waktu yang dibuat sesuai posisi ketukan | Lulus |
 
+### Perbaikan gestur & keterbacaan
+
+| # | Pengujian | Hasil |
+| --- | --- | --- |
+| 51 | Swipe vertikal di atas blok kegiatan menggulir timeline (tidak memindah blok) | Perlu uji HP |
+| 52 | Tahan ±0,4 detik tanpa bergeser lalu geser: blok ikut jari, snapping 10 menit tetap | Lulus (emulasi) |
+| 53 | Geser sedikit sebelum tahan berakhir (≤10 px) tetap dianggap swipe, bukan drag | Lulus (emulasi) |
+| 54 | Saat drag aktif halaman tidak ikut tergulir (touchmove non-pasif ditahan) | Perlu uji HP |
+| 55 | Durasi tampil di dalam blok compact (`30 mnt`) dan blok tinggi (`1 j 30 mnt`) | Lulus |
+| 56 | Selama drag, label waktu dan durasi ikut diperbarui | Lulus (emulasi) |
+
 **Batasan yang belum diverifikasi:**
 
-- Drag/resize dan snapping (Fase 2) belum ada.
+- Konfirmasi long-press di perangkat Android asli masih perlu dicoba pengguna;
+  emulasi browser tidak bisa mereproduksi tahan-jari sungguhan.
 - Lane otomatis/konflik (Fase 3) belum ada; kegiatan yang bertumpuk saat ini
   saling menimpa secara visual.
 - Waktu salat belum dihitung sama sekali (Fase 5). Tidak ada angka salat yang
