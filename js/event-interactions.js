@@ -210,7 +210,11 @@ function startGesture(pointerEvent, block, mode) {
   };
 
   // Detect pointer type for long-press delay
-  const isTouch = pointerEvent.pointerType === 'touch' || pointerEvent.pointerType === 'pen';
+  // pointerType can be 'touch', 'pen', 'mouse'. In some browsers/emulation, 
+  // touch may report as 'mouse'. We also check for isPrimary and touch context.
+  const isTouch = pointerEvent.pointerType === 'touch' 
+    || pointerEvent.pointerType === 'pen'
+    || (pointerEvent.pointerType === 'mouse' && navigator.maxTouchPoints > 0);
   const delay = isTouch ? LONG_PRESS_DELAY_MS : 0;
 
   if (delay > 0) {

@@ -471,6 +471,11 @@ body.is-focus .app-main {
   gap: 0;
   flex: 1;
   min-height: 0;
+  padding-bottom: 0;
+}
+
+body.is-focus .app-footer {
+  display: none;
 }
 
 body.is-focus .view,
