@@ -63,10 +63,21 @@
 .timeline {
   --hour-height: 60px;
   --gutter-width: 62px;
-  --scroll-zone: 15%;
+  --scroll-zone: 10%;
   display: grid;
   grid-template-columns: var(--gutter-width) minmax(0, 1fr) var(--scroll-zone);
   padding-bottom: 18px;
+  /* Horizontal grid lines across full width (including scroll zone) */
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent calc(var(--hour-height) - 1px),
+      var(--grid-line) calc(var(--hour-height) - 1px),
+      var(--grid-line) var(--hour-height)
+    );
+  background-position: 0 calc(var(--hour-height) * -1);
+  background-size: 100% var(--hour-height);
 }
 
 /* hour labels */
@@ -103,30 +114,38 @@
 .time-canvas {
   position: relative;
   min-width: 0;
+  /* Offset the canvas content to align with grid lines */
+  margin-top: calc(var(--hour-height) * -1);
+  padding-top: var(--hour-height);
 }
 
 .hour-row {
   position: relative;
   height: var(--hour-height);
-  border-top: 1px solid var(--grid-line);
+  /* No border - using timeline background instead */
 }
 
-.hour-row:first-child { border-top: 0; }
+.hour-row:first-child { /* no special case needed */ }
 
+/* 30-min dashed lines via pseudo on canvas rows */
 .hour-row::after {
   content: "";
   position: absolute;
   top: 50%;
   left: 0;
-  right: 0;
+  right: calc(var(--scroll-zone) * -1);
   border-top: 1px dashed var(--grid-line);
-  opacity: 0.8;
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .event-layer {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  /* Offset to align with grid lines */
+  margin-top: calc(var(--hour-height) * -1);
+  padding-top: var(--hour-height);
 }
 
 /* --------------------------------------------------------------- event --- */
