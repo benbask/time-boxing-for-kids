@@ -63,7 +63,7 @@
 .timeline {
   --hour-height: 60px;
   --gutter-width: 62px;
-  --scroll-zone: 3%;
+  --scroll-zone: 15%;
   display: grid;
   grid-template-columns: var(--gutter-width) minmax(0, 1fr) var(--scroll-zone);
   padding-bottom: 18px;
