@@ -10,6 +10,8 @@ perangkat.
 **Status saat ini: Fase 1 (Foundation) selesai, menunggu review.**
 Fase 2–7 belum diimplementasikan sesuai instruksi pengembangan bertahap.
 
+**Coba sekarang:** <https://benbask.github.io/time-boxing-for-kids/>
+
 ---
 
 ## Menjalankan aplikasi
@@ -136,6 +138,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 18 | Placeholder Minggu/Bulan dapat dibuka dan kembali ke Hari | Lulus |
 | 19 | Dialog profil menolak nama kosong | Lulus |
 | 20 | Kondisi 0 profil tidak membuat aplikasi error | Lulus |
+| 21 | Deploy GitHub Pages dan aplikasi berjalan dari subpath repositori | Lulus (5 profil, 7 kegiatan, tanpa error console) |
 
 **Batasan yang belum diverifikasi:**
 
@@ -150,6 +153,10 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 
 Repositori: `time-boxing-for-kids`, URL target:
 `https://<username>.github.io/time-boxing-for-kids/`.
+
+Status deploy: **aktif** di <https://benbask.github.io/time-boxing-for-kids/>
+(branch `main`, folder root). Langkah berikut dapat dipakai untuk deploy ulang
+atau memindahkan repositori.
 
 1. Buat repositori GitHub baru bernama `time-boxing-for-kids` (kosong, tanpa
    README).
