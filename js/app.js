@@ -45,12 +45,32 @@ const els = {
   profileFormError: document.getElementById('profileFormError'),
   emojiSelect: document.getElementById('emojiSelect'),
   colorPicker: document.getElementById('colorPicker'),
+  gestureHint: document.getElementById('gestureHint'),
 };
 
 /* ------------------------------------------------------------------ render --- */
 // Focus mode is temporary UI state: deliberately not written to settings or
 // exported, and it resets on reload.
 let focusMode = false;
+
+const GESTURE_HINT_KEY = 'timeboxing-kids:gesture-hint-dismissed';
+
+function maybeShowGestureHint(data) {
+  const view = data.settings.currentView;
+  const isCalendar = view === 'day' || view === 'week' || view === 'month';
+  if (!isCalendar) return;
+  if (localStorage.getItem(GESTURE_HINT_KEY)) return;
+  if (els.gestureHint) {
+    els.gestureHint.hidden = false;
+  }
+}
+
+function dismissGestureHint() {
+  localStorage.setItem(GESTURE_HINT_KEY, 'true');
+  if (els.gestureHint) {
+    els.gestureHint.hidden = true;
+  }
+}
 
 function renderHeadline(data) {
   const { label, sub, short } = dateHeadline(data.settings.selectedDate);
@@ -154,6 +174,8 @@ function renderAll() {
   }
 
   applyChrome(data);
+
+  maybeShowGestureHint(data);
 }
 
 /* ------------------------------------------------------------------ mutate --- */
@@ -357,6 +379,9 @@ async function handleActionClick(event) {
     case 'set-theme':
       mutate((draft) => { draft.settings.activeTheme = actionTarget.dataset.themeId; });
       els.themeGrid.querySelector('.theme-card[aria-checked="true"]')?.focus();
+      break;
+    case 'dismiss-gesture-hint':
+      dismissGestureHint();
       break;
     default:
       break;

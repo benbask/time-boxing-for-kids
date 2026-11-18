@@ -75,6 +75,7 @@ function renderBlock(block) {
 
   return `
     <article class="${classes}" data-event-id="${escapeHtml(block.id)}" style="${style}" aria-label="${escapeHtml(label)}">
+      <span class="event-grip" aria-hidden="true" title="Seret untuk memindah"></span>
       <span class="event-resize event-resize-start" data-resize="start" aria-hidden="true"></span>
       <span class="event-resize event-resize-end" data-resize="end" aria-hidden="true"></span>
       <button type="button" class="event-edit" data-edit-event="${escapeHtml(block.id)}"

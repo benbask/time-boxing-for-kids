@@ -128,7 +128,7 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
-  padding: 5px 10px 5px 16px;
+  padding: 5px 10px 5px 28px;
   border: 1px solid var(--ev-border);
   border-radius: 12px;
   background: var(--ev-bg);
@@ -140,6 +140,31 @@
   user-select: none;
   -webkit-user-select: none;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset;
+}
+
+.event-grip {
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  color: var(--text-muted);
+  opacity: 0.5;
+  pointer-events: none;
+  font-size: 0.55rem;
+  line-height: 1;
+  user-select: none;
+}
+
+.event-block:hover .event-grip,
+.event-block.is-gesturing .event-grip {
+  opacity: 0.85;
 }
 
 .event-block.is-gesturing {
@@ -473,3 +498,74 @@ body.is-focus .timeline-scroll {
   max-height: none;
   min-height: 0;
 }
+
+/* ----------------------------------------------------------- gesture hint --- */
+
+.gesture-hint {
+  position: fixed;
+  left: 50%;
+  bottom: calc(100px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow);
+  max-width: min(360px, calc(100vw - 32px));
+  animation: gestureHintIn 0.3s ease-out;
+}
+
+.gesture-hint[hidden] { display: none; }
+
+@keyframes gestureHintIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.gesture-hint-content {
+  flex: 1;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.gesture-hint-content p { margin: 0; }
+
+.gesture-hint-content strong { color: var(--primary-strong); }
+
+.gesture-hint-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.gesture-hint-close:hover { background: var(--surface-3); color: var(--text); }
+
+@media (max-width: 480px) {
+  .gesture-hint {
+    left: 12px;
+    right: 12px;
+    bottom: calc(90px + env(safe-area-inset-bottom));
+    transform: none;
+    max-width: none;
+  }
+  @keyframes gestureHintIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+body.is-focus .gesture-hint { display: none; }
