@@ -146,15 +146,25 @@ function dayNotices(data, layout) {
 function conflictNotice(layout) {
   if (layout.conflictCount === 0) return '';
 
-  const first = layout.conflictPairs[0];
-  const more = layout.conflictCount > 1 ? ` (+${layout.conflictCount - 1} lainnya)` : '';
   const people = [...new Set(layout.conflictPairs.flatMap((pair) => pair.profileNames))];
+  const details = layout.conflictPairs.map((pair) => `
+    <li>
+      ${escapeHtml(pair.aTitle)} (${escapeHtml(pair.aTime)}) &amp;
+      ${escapeHtml(pair.bTitle)} (${escapeHtml(pair.bTime)})${pair.profileNames.length ? ` — ${escapeHtml(pair.profileNames.join(', '))}` : ''}
+    </li>`).join('');
 
   return `
-    <p class="notice notice-warning">
-      <span class="notice-icon" aria-hidden="true">⚠️</span>
-      <span><strong>${layout.conflictCount} jadwal bentrok.</strong> ${escapeHtml(first.aTitle)} &amp; ${escapeHtml(first.bTitle)}${more}${people.length ? ` — ${escapeHtml(people.join(', '))}` : ''}. Blok bergaris putus-putus perlu dicek.</span>
-    </p>`;
+    <div class="notice notice-warning notice-collapsible" data-conflict-notice>
+      <button type="button" class="notice-summary" data-action="toggle-conflict-notice" aria-expanded="false">
+        <span class="notice-icon" aria-hidden="true">⚠️</span>
+        <span class="notice-text"><strong>${layout.conflictCount} jadwal bentrok</strong>${people.length ? ` · ${escapeHtml(people.join(', '))}` : ''}</span>
+        <span class="notice-chevron" aria-hidden="true">›</span>
+      </button>
+      <div class="notice-detail" hidden>
+        <p>Blok bergaris putus-putus perlu dicek. Data tidak dihapus dan tidak diblokir.</p>
+        <ul>${details}</ul>
+      </div>
+    </div>`;
 }
 
 function dayViewMarkup(data, layout) {
@@ -181,8 +191,8 @@ function dayViewMarkup(data, layout) {
       <div class="timeline-legend">
         <div class="legend-items">
           <span class="legend-item"><span class="dot" style="--dot-color:var(--now)"></span> Waktu sekarang</span>
-          <span class="legend-item"><span class="shared-marks" aria-hidden="true">👥</span> Kegiatan bersama tampil satu kali</span>
-          ${layout.conflictCount > 0 ? '<span class="legend-item legend-conflict"><span aria-hidden="true">⚠</span> Peserta bentrok</span>' : ''}
+          <span class="legend-item"><span class="shared-marks" aria-hidden="true">👥</span> <span class="legend-long">Kegiatan bersama tampil satu kali</span><span class="legend-short">Kegiatan bersama</span></span>
+          ${layout.conflictCount > 0 ? '<span class="legend-item legend-conflict"><span aria-hidden="true">⚠</span> <span class="legend-long">Peserta bentrok</span><span class="legend-short">Bentrok</span></span>' : ''}
           <span class="legend-item legend-hint">Ketuk area kosong untuk menambah · tahan blok untuk memindah</span>
         </div>
         <span>${layout.visibleCount} kegiatan</span>

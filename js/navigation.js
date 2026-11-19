@@ -42,5 +42,6 @@ export function dateHeadline(dateKey) {
     label: formatLongDate(dateKey),
     sub: relativeDayLabel(dateKey) || 'Tampilan hari',
     short: `${date.toLocaleDateString('id-ID', { weekday: 'short' })}, ${date.getDate()} ${date.toLocaleDateString('id-ID', { month: 'short' })}`,
+    tiny: `${date.getDate()} ${date.toLocaleDateString('id-ID', { month: 'short' })}`,
   };
 }

@@ -643,7 +643,7 @@ These notes document the decisions taken for the Phase 1 build. They are part of
 
 ## 22.1 Scope of this build
 
-Implemented: application shell and navigation, family profile CRUD, per-profile visibility, show all / hide all, one shared vertical day timeline, profile-coloured event blocks (shared events rendered once with all participants), current-time indicator, reading of existing events from storage, four themes, LocalStorage persistence with automatic save, a temporary full-screen Focus mode for the calendar, **Phase 2 direct manipulation (create, move, resize, edit, delete events with 10-minute snapping and Pointer Events touch support)**, and **Phase 3 overlap lanes plus participant conflict warnings.**
+Implemented: application shell and navigation, family profile CRUD, per-profile visibility, show all / hide all, one shared vertical day timeline, profile-coloured event blocks (shared events rendered once with all participants), current-time indicator, reading of existing events from storage, four themes, LocalStorage persistence with automatic save, a temporary full-screen Focus mode for the calendar, **Phase 2 direct manipulation (create, move, resize, edit, delete events with 10-minute snapping and Pointer Events touch support)**, **Phase 3 overlap lanes plus participant conflict warnings**, and the **compact single-row chrome described in §22.13**.
 
 Explicitly deferred (per Section 21): week/month views, special days, zoom and time-range presets (Phase 4); prayer times (Phase 5); JSON export/import and reset (Phase 6). Placeholders are labelled in the UI instead of pretending to work.
 
@@ -716,7 +716,7 @@ CSS custom properties on `[data-theme]` in `css/themes.css`. Themes: `sky-mint`,
 
 ## 22.7 Focus mode (layout enhancement)
 
-A single "Fokus" button in the calendar toolbar toggles a temporary full-screen layout: the app header, calendar toolbar, profile bar, footer and timeline legend are hidden, and the timeline card grows to fill `100dvh` with page scrolling disabled. A compact bar at the top keeps date navigation (‹ ›), "Hari ini", and "Keluar fokus"; `Esc` also exits.
+A "Mode fokus" item in the profile bar's `⋯` menu (see §22.13) toggles a temporary full-screen layout: the app header, calendar toolbar, profile bar, footer and timeline legend are hidden, and the timeline card grows to fill `100dvh` with page scrolling disabled. A compact bar at the top keeps date navigation (‹ ›), "Hari ini", and "Keluar fokus"; `Esc` also exits.
 
 Decision: Focus mode is **temporary UI state**, held in memory only. It is deliberately not written to `settings`, not included in the LocalStorage schema, and not exported. A reload starts unfocused, and switching to the Profiles or Settings page exits Focus mode automatically. Only the calendar views (Day, and later Week/Month) can be focused.
 
@@ -810,7 +810,18 @@ Implementation notes:
 - 3+ lanes switch to a single row (title + duration) and hide the pencil; 4+ lanes also hide the duration.
 - Five lanes at 390 px give ≈47 px per block — above the 44 px touch minimum — and long titles clamp to two lines.
 
-## 22.13 Known risks
+## 22.13 Compact chrome above the canvas
+
+The panels above the timeline are intentionally compressed so the canvas keeps most of the viewport; the footer stays in normal flow.
+
+- **Header** is one row on every width: 36 px brand mark on phones, tagline hidden below 860 px, mobile padding reduced to 6 px (≈55 px tall at 390 px).
+- **Toolbar** is one row on phones: previous/next, the date headline, a text **Hari ini** button and a native `<select>` (`Hari ▾`). The headline renders three ways from the same data — long (`Rabu, 18 November 2026`), short (`Rab, 18 Nov`) ≤ 620 px and tiny (`18 Nov`) ≤ 300 px — switched purely with CSS, so no resize listener exists. From 621 px up the original segmented Hari/Minggu/Bulan switch is shown instead of the select.
+- **Profile bar** is one row: the chip strip is the only horizontally scrolling part and the `⋯` trigger stays pinned. `Tampilkan semua profil`, `Sembunyikan semua profil`, `Hari ini` and `Mode fokus` live in that `<details>` menu. The menu closes when an item is used, when the tap lands outside it, or when focus mode hides the bar.
+- **Conflict notice** collapses to one 40 px row (`⚠ 2 jadwal bentrok · Anak 1, Anak 2 ›`). Tapping it toggles every conflicting pair inline; the state is transient and resets on the next render.
+- **Narrow fallbacks**: ≤ 345 px moves "Hari ini" into the menu (the date keeps its space); ≤ 250 px wraps the view picker onto its own row. The "Hari ini" entry in the menu remains available at every width, so the shortcut is never lost.
+- Notices use `flex: none` so the flexible timeline card can never squeeze them; measured at 390×844 the panels total ≈231 px and the scrollable canvas is ≈539 px (was 387 px).
+
+## 22.14 Known risks
 
 1. **Lane algorithm on narrow screens** - Phase 3 keeps every lane tappable (5 lanes ≈ 47 px at 390 px) by dropping secondary content per lane density; long titles clamp instead of widening the lane. Horizontal lane overflow is deliberately not implemented.
 2. **Prayer-time accuracy** — Phase 5 must document Kemenag parameters and compare against SIHAT output for several cities/dates; results must not be presented as verified before that comparison exists.

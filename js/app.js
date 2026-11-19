@@ -34,7 +34,11 @@ const els = {
   profileChips: document.getElementById('profileChips'),
   profileList: document.getElementById('profileList'),
   dateLabel: document.getElementById('dateLabel'),
+  dateLabelLong: document.getElementById('dateLabelLong'),
+  dateLabelShort: document.getElementById('dateLabelShort'),
+  dateLabelTiny: document.getElementById('dateLabelTiny'),
   dateSub: document.getElementById('dateSub'),
+  viewSelect: document.getElementById('viewSelect'),
   focusBar: document.getElementById('focusBar'),
   focusDate: document.getElementById('focusDate'),
   themeGrid: document.getElementById('themeGrid'),
@@ -73,8 +77,13 @@ function dismissGestureHint() {
 }
 
 function renderHeadline(data) {
-  const { label, sub, short } = dateHeadline(data.settings.selectedDate);
-  els.dateLabel.textContent = label;
+  const { label, sub, short, tiny } = dateHeadline(data.settings.selectedDate);
+  // Three spans share the same accessible label; CSS picks long, short or tiny
+  // by viewport width, so no resize listener is needed.
+  els.dateLabelLong.textContent = label;
+  els.dateLabelShort.textContent = short;
+  els.dateLabelTiny.textContent = tiny;
+  els.dateLabel.setAttribute('aria-label', label);
   els.dateSub.textContent = sub;
   els.focusDate.textContent = short;
 }
@@ -88,8 +97,9 @@ function applyChrome(data) {
   document.body.classList.toggle('is-focus', active);
   els.focusBar.hidden = !active;
 
-  document.querySelectorAll('.focus-toggle, .focus-exit').forEach((button) => {
+  document.querySelectorAll('.focus-toggle, .focus-exit, .focus-menu-item').forEach((button) => {
     button.setAttribute('aria-pressed', String(active));
+    button.classList.toggle('is-active', active);
   });
 }
 
@@ -115,6 +125,8 @@ function renderNav(data) {
     button.classList.toggle('is-active', isActive);
     button.setAttribute('aria-pressed', String(isActive));
   });
+
+  if (els.viewSelect) els.viewSelect.value = view;
 }
 
 function renderViews(data) {
@@ -383,6 +395,16 @@ async function handleActionClick(event) {
     case 'dismiss-gesture-hint':
       dismissGestureHint();
       break;
+    case 'toggle-conflict-notice': {
+      const notice = actionTarget.closest('.notice-collapsible');
+      const detail = notice?.querySelector('.notice-detail');
+      if (!notice || !detail) break;
+      const opening = detail.hidden;
+      detail.hidden = !opening;
+      notice.classList.toggle('is-open', opening);
+      actionTarget.setAttribute('aria-expanded', String(opening));
+      break;
+    }
     default:
       break;
   }
@@ -392,10 +414,22 @@ async function handleActionClick(event) {
 
 function bindEvents() {
   document.addEventListener('click', (event) => {
+    // A menu closes as soon as one of its actions is used, and when the tap
+    // lands anywhere outside it.
+    const openMenu = event.target.closest('.overflow-menu[open]');
+    if (openMenu && event.target.closest('[data-action]')) openMenu.open = false;
+    document.querySelectorAll('.overflow-menu[open]').forEach((menu) => {
+      if (!menu.contains(event.target)) menu.open = false;
+    });
+
     handleActionClick(event).catch((error) => {
       console.error('[app] Aksi gagal.', error);
       showToast('Terjadi kesalahan. Coba lagi.');
     });
+  });
+
+  els.viewSelect?.addEventListener('change', (event) => {
+    setView(event.target.value);
   });
 
   els.profileForm.addEventListener('submit', handleProfileSubmit);

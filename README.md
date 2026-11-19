@@ -7,8 +7,8 @@ berwarna sesuai profil, dan kegiatan bersama hanya tampil satu kali.
 Tanpa login, tanpa server, tanpa database online. Data tersimpan di LocalStorage
 perangkat.
 
-**Status saat ini: Fase 1 (Foundation) selesai, menunggu review.**
-Fase 2–7 belum diimplementasikan sesuai instruksi pengembangan bertahap.
+**Status saat ini: Fase 1–3 selesai dan sudah live.**
+Fase 4–7 belum diimplementasikan sesuai instruksi pengembangan bertahap.
 
 **Coba sekarang:** <https://benbask.github.io/time-boxing-for-kids/>
 
@@ -47,11 +47,11 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
 - **Indikator waktu sekarang** pada tampilan hari ini.
 - **Penyimpanan otomatis** ke LocalStorage setiap perubahan berhasil.
 - **Empat tema**: Sky & Mint, Candy, Lavender, Nature.
-- **Mode Fokus**: satu tombol menyembunyikan header, toolbar, dan pemilih
-  profil sehingga timeline memenuhi layar. Tetap ada tombol tanggal, "Hari ini",
-  dan "Keluar fokus" yang mengambang di bar atas. Tekan `Esc` untuk keluar.
-  Mode ini sementara (tidak disimpan) dan otomatis batal saat berpindah ke
-  halaman Profil/Pengaturan.
+- **Mode Fokus**: dari menu `⋯` di bar profil, satu ketukan menyembunyikan
+  header, toolbar, dan pemilih profil sehingga timeline memenuhi layar. Tetap
+  ada tombol tanggal, "Hari ini", dan "Keluar fokus" yang mengambang di bar
+  atas. Tekan `Esc` untuk keluar. Mode ini sementara (tidak disimpan) dan
+  otomatis batal saat berpindah ke halaman Profil/Pengaturan.
 - **Peringatan penyimpanan lokal** dan informasi ukuran data.
 - Tampilan **mobile-first** dengan target sentuh besar; pemilih profil tetap
   dapat diakses tanpa membuka halaman lain.
@@ -88,6 +88,26 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
   atau saat profil disembunyikan/ditampilkan.
 - **Tetap terbaca di layar sempit**: blok 2 lane menyembunyikan avatar dan
   durasi inline di ponsel; 3 lane atau lebih memakai satu baris judul + durasi.
+
+## Panel atas yang ringkas
+
+Panel di atas kanvas dibuat seringkas mungkin agar timeline dapat ruang:
+
+- **Header** satu baris (subjudul hanya di layar lebar).
+- **Toolbar satu baris**: `‹` tanggal `›` + tombol **Hari ini** + pemilih
+  tampilan ringkas (`Hari ▾`). Di layar lebar pemilih tampil sebagai segmented
+  Hari/Minggu/Bulan.
+- **Bar profil satu baris**: chip profil digeser ke samping, sedangkan
+  "Tampilkan semua", "Sembunyikan semua", "Hari ini", dan "Mode fokus" ada di
+  menu `⋯`.
+- **Ringkasan bentrok satu baris**: `⚠ 2 jadwal bentrok · Anak 1, Anak 2 ›`.
+  Ketuk untuk melihat rincian setiap pasangan.
+- Di layar sangat sempit (≤345 px) tombol "Hari ini" pindah ke menu `⋯`; di
+  bawah 300 px tanggal memakai bentuk pendek (`18 Nov`), dan di bawah 250 px
+  pemilih tampilan turun ke baris sendiri.
+
+Hasil terukur pada 390×844: tinggi panel turun dari ±360 px menjadi ±231 px,
+sehingga kanvas bertambah dari 387 px menjadi ±539 px (±+39%).
 
 ### Belum termasuk (sesuai fase)
 
@@ -242,6 +262,11 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 63 | Sembunyikan profil: kegiatan hilang, lane dan bentrok dihitung ulang | Lulus |
 | 64 | Tambah/geser/resize/hapus kegiatan: lane dan bentrok dihitung ulang setelah render | Lulus |
 | 65 | Lebar 360–390 px: 2 lane tetap terbaca (judul + jam), tanpa overflow horizontal | Lulus |
+| 66 | Toolbar satu baris di 390/360 px: tanggal, "Hari ini", dan pemilih tampilan tidak terpotong | Lulus |
+| 67 | Menu `⋯`: Hari ini, tampilkan/sembunyikan semua, mode fokus; menutup setelah aksi dan saat diketuk di luar | Lulus |
+| 68 | Ringkasan bentrok satu baris; ketuk membuka rincian semua pasangan, ketuk lagi menutup | Lulus |
+| 69 | 195×422 dan 260×563: footer terlihat penuh, tanggal tetap terbaca, tanpa overflow horizontal | Lulus |
+| 70 | Desktop 1440×900: segmented Hari/Minggu/Bulan tampil, toolbar dan bar profil tetap satu baris | Lulus |
 
 **Batasan yang belum diverifikasi:**
 

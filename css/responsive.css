@@ -6,8 +6,17 @@
   .app-header {
     flex-wrap: wrap;
     gap: 8px;
-    padding: 8px max(12px, env(safe-area-inset-left)) 8px max(12px, env(safe-area-inset-right));
+    padding: 6px max(12px, env(safe-area-inset-left)) 6px max(12px, env(safe-area-inset-right));
   }
+
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    font-size: 18px;
+  }
+
+  .brand-text h1 { font-size: 1rem; }
 
   .brand-text p { display: none; }
 
@@ -17,7 +26,7 @@
     width: auto;
     justify-content: flex-end;
     gap: 4px;
-    padding: 0;
+    padding: 3px;
     background: transparent;
     border-radius: 0;
   }
@@ -27,42 +36,62 @@
   body { font-size: 15px; }
 
   .app-main {
-    padding-top: 12px;
+    padding-top: 8px;
     gap: 0;
   }
 
+  .view { gap: 8px; }
+
+  /* One toolbar row: ‹ date › "Hari ini" + compact view picker. */
   .calendar-toolbar {
-    gap: 8px;
-  }
-
-  .date-nav {
-    width: 100%;
-    gap: 6px;
-  }
-
-  .date-display { flex: 1; }
-
-  .date-label {
-    font-size: 0.98rem;
-    white-space: normal;
-    line-height: 1.25;
-  }
-
-  .date-nav > .btn-ghost {
-    padding: 0 12px;
-    font-size: 0.85rem;
-  }
-
-  .toolbar-actions {
-    width: 100%;
     flex-wrap: nowrap;
     gap: 6px;
   }
 
-  .view-switch {
-    flex: 1;
+  .date-nav {
+    flex: 1 1 auto;
     width: auto;
+    min-width: 0;
+    gap: 6px;
   }
+
+  .date-display {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0 2px;
+  }
+
+  .date-label {
+    font-size: 0.9rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .date-long { display: none; }
+  .date-short { display: inline; }
+
+  .date-sub {
+    font-size: 0.68rem;
+    line-height: 1.2;
+  }
+
+  .today-btn {
+    min-height: 40px;
+    padding: 0 9px;
+    font-size: 0.75rem;
+  }
+
+  .toolbar-actions {
+    width: auto;
+    flex: none;
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .view-switch { display: none; }
+  .view-select-wrap { display: inline-flex; }
 
   .seg-btn { flex: 1; min-height: 44px; }
 
@@ -78,36 +107,47 @@
 
   .legend-hint { display: none; }
 
+  .legend-long { display: none; }
+  .legend-short { display: inline; }
+
+  /* The event counter is the first thing to go: the blocks already show it. */
+  .timeline-legend > span { display: none; }
+
   .icon-btn-sm {
     width: 34px;
     height: 34px;
     font-size: 1.1rem;
   }
 
+  /* One profile row: chips scroll sideways, the ⋯ menu stays pinned. */
   .profile-bar {
-    align-items: stretch;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
     flex-wrap: nowrap;
     gap: 6px;
-    padding: 6px;
+    padding: 5px;
   }
 
   .profile-chips {
-    flex: 0 0 auto;
-    width: 100%;
-    max-width: 100%;
-    padding-bottom: 2px;
+    flex: 1 1 auto;
+    width: auto;
+    max-width: none;
+    padding-bottom: 0;
     scrollbar-width: none;
   }
 
   .profile-chips::-webkit-scrollbar { display: none; }
 
   .profile-chip {
-    min-height: 38px;
-    font-size: 0.82rem;
+    min-height: 40px;
+    font-size: 0.8rem;
+    padding: 0 10px 0 7px;
   }
 
-  .profile-bar-actions { justify-content: flex-end; }
+  .menu-trigger {
+    width: 40px;
+    height: 40px;
+  }
 
   .mini-btn {
     min-height: 34px;
@@ -171,9 +211,38 @@
   .brand-text h1 { font-size: 0.98rem; }
   .nav-btn { font-size: 0.8rem; padding: 0 6px; }
   .seg-btn { min-width: 0; }
-  .date-nav > .btn-ghost { padding: 0 8px; }
-  .focus-toggle { width: 38px; height: 38px; font-size: 1rem; }
+  .today-btn { padding: 0 6px; font-size: 0.72rem; }
+  .date-nav .icon-btn { width: 38px; height: 38px; min-height: 38px; }
+  .view-select { padding: 0 22px 0 9px; font-size: 0.76rem; }
+  .view-select-wrap::after { right: 8px; }
   .focus-exit { width: 38px; height: 38px; font-size: 0.85rem; }
+}
+
+/* Very narrow windows: the date keeps its own space; "Hari ini" stays one tap
+   away in the ⋯ menu. */
+@media (max-width: 345px) {
+  .today-btn { display: none; }
+}
+
+@media (max-width: 300px) {
+  .date-short { display: none; }
+  .date-tiny { display: inline; }
+}
+
+/* Extremely narrow (high browser zoom): keep the date readable and let the
+   view picker take its own row. */
+@media (max-width: 250px) {
+  .calendar-toolbar { flex-wrap: wrap; }
+
+  .date-nav {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .toolbar-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 
 /* Larger screens: roomier timeline and toolbar */
@@ -227,24 +296,15 @@
 
 @media (max-height: 640px) {
   .profile-bar {
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: nowrap;
     gap: 6px;
-    padding: 6px;
-    overflow-x: auto;
-    scrollbar-width: none;
+    padding: 5px;
   }
 
-  .profile-bar::-webkit-scrollbar { display: none; }
-
   .profile-chips {
-    flex: 0 0 auto;
+    flex: 1 1 auto;
     width: auto;
     padding-bottom: 0;
   }
-
-  .profile-bar-actions { flex: none; }
 
   /* Long dates stay on one line so the toolbar cannot eat the timeline. */
   .date-label {
@@ -265,7 +325,7 @@
   .mini-btn { min-height: 30px; }
 
   .date-nav .icon-btn,
-  .date-nav > .btn-ghost { min-height: 38px; }
+  .today-btn { min-height: 38px; }
 
   .seg-btn,
   .btn { min-height: 38px; }

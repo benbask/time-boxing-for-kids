@@ -328,6 +328,17 @@ button { cursor: pointer; }
   color: var(--text-muted);
 }
 
+/* The same headline renders long on wide screens, short on phones and tiny on
+   very narrow viewports. */
+.date-short { display: none; }
+.date-tiny { display: none; }
+
+.today-btn {
+  flex: none;
+  padding: 0 14px;
+  font-size: 0.85rem;
+}
+
 .view-switch {
   display: flex;
   gap: 4px;
@@ -336,35 +347,43 @@ button { cursor: pointer; }
   background: var(--surface-3);
 }
 
+/* Native select: compact replacement for the segmented switch on phones. */
+.view-select-wrap {
+  position: relative;
+  display: none;
+  flex: none;
+}
+
+.view-select-wrap::after {
+  content: "▾";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.view-select {
+  appearance: none;
+  -webkit-appearance: none;
+  min-height: 44px;
+  padding: 0 28px 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
 .toolbar-actions {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
   justify-content: flex-end;
-}
-
-.focus-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  min-height: 44px;
-  padding: 0;
-  border: 1px solid var(--border-strong);
-  border-radius: 50%;
-  background: var(--surface);
-  color: var(--text);
-  font-size: 1.2rem;
-  line-height: 1;
-}
-.focus-toggle:hover { background: var(--surface-2); }
-
-.focus-toggle[aria-pressed="true"] {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: var(--primary-contrast);
 }
 
 .focus-exit {
@@ -437,10 +456,10 @@ button { cursor: pointer; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
+  flex-wrap: nowrap;
   flex: none;
-  padding: 8px;
+  padding: 6px;
   border: 1px solid var(--border);
   border-radius: 16px;
   background: var(--surface);
@@ -507,10 +526,70 @@ button { cursor: pointer; }
 
 .profile-chip[aria-pressed="false"] .chip-name { text-decoration: line-through; }
 
-.profile-bar-actions {
-  display: flex;
-  gap: 6px;
+/* ---------------------------------------------------------- overflow menu --- */
+
+.overflow-menu {
+  position: relative;
   flex: none;
+}
+
+.menu-trigger {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  list-style: none;
+}
+
+.menu-trigger::-webkit-details-marker { display: none; }
+
+.overflow-menu[open] .menu-trigger {
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+.menu-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 216px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.menu-item {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.menu-item:hover { background: var(--surface-2); }
+
+.menu-item.is-active {
+  color: var(--primary-strong);
+  background: var(--surface-3);
 }
 
 /* ------------------------------------------------------------- page head --- */
