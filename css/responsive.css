@@ -132,8 +132,6 @@
   .legend-items { flex-wrap: nowrap; }
 
   .event-block {
-    left: 4px;
-    right: 6px;
     padding-left: 13px;
     border-radius: 10px;
   }

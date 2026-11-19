@@ -73,20 +73,35 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
   vertikal di mana saja (kanvas maupun blok) menggulir jadwal.
 - **Visual feedback** saat drag/resize; scroll halaman tidak ikut terganggu.
 
+## Fitur Fase 3
+
+- **Lane otomatis**: kegiatan yang waktunya bertumpuk ditata berdampingan di
+  dalam satu timeline bersama. Jumlah lane mengikuti kebutuhan (2, 3, 4, 5 …),
+  dan lane hanyalah tata letak visual — bukan kolom per profil.
+- **Lane minimal**: kelompok kegiatan yang saling bertumpuk memakai jumlah lane
+  paling sedikit yang memungkinkan; satu kegiatan tetap satu blok.
+- **Bentrok peserta**: blok bergaris putus-putus oranye + tanda ⚠ saat dua
+  kegiatan bertumpuk dan berbagi minimal satu peserta.
+- **Ringkasan bentrok** di atas timeline, misalnya "2 jadwal bentrok", beserta
+  nama pesertanya. Peringatan bersifat visual dan tidak memblokir apa pun.
+- **Hitung ulang otomatis** saat kegiatan dibuat, digeser, di-resize, dihapus,
+  atau saat profil disembunyikan/ditampilkan.
+- **Tetap terbaca di layar sempit**: blok 2 lane menyembunyikan avatar dan
+  durasi inline di ponsel; 3 lane atau lebih memakai satu baris judul + durasi.
+
 ### Belum termasuk (sesuai fase)
 
 | Fase | Fitur | Status |
 | --- | --- | --- |
 | 2 | Buat/geser/resize/edit/hapus kegiatan, snapping 10 menit, touch gesture | **Selesai** |
-| 3 | Lane otomatis untuk kegiatan bertumpuk, peringatan konflik | Belum |
+| 3 | Lane otomatis untuk kegiatan bertumpuk, peringatan konflik | **Selesai** |
 | 4 | Tampilan minggu & bulan, special day, zoom dan rentang waktu | Belum |
 | 5 | Waktu salat lokal dengan parameter Kemenag/SIHAT | Belum |
 | 6 | Ekspor/impor JSON, reset aplikasi | Belum |
 | 7 | Uji perangkat Android, performance, deployment GitHub Pages | Belum |
 
 Tampilan Minggu dan Bulan sengaja menampilkan placeholder berlabel **Fase 4**
-agar tidak terlihat seperti fitur yang sudah berfungsi. Overlap saat ini masih
-satu lane; lane otomatis adalah Fase 3.
+agar tidak terlihat seperti fitur yang sudah berfungsi.
 
 ## Data dan privasi
 
@@ -214,12 +229,28 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 55 | Durasi tampil di dalam blok compact (`30 mnt`) dan blok tinggi (`1 j 30 mnt`) | Lulus |
 | 56 | Selama drag, label waktu dan durasi ikut diperbarui | Lulus (emulasi) |
 
+### Fase 3: lane otomatis & bentrok
+
+| # | Pengujian | Hasil |
+| --- | --- | --- |
+| 57 | Dua kegiatan bertumpuk tampil berdampingan (2 lane), tidak saling menimpa | Lulus |
+| 58 | Tiga–lima kegiatan bertumpuk memakai lane seminimal mungkin; blok 5 lane tetap ≥44 px dan bisa diketuk | Lulus |
+| 59 | Lane bukan kolom profil: kegiatan bersama tetap satu blok dan hanya muncul sekali | Lulus |
+| 60 | Bentrok hanya muncul bila peserta beririsan; kegiatan bersamaan dengan peserta berbeda tidak ditandai | Lulus |
+| 61 | Blok bentrok bergaris putus-putus + ⚠, dan `aria-label`/tooltip menyebut lawan bentrok serta pesertanya | Lulus |
+| 62 | Ringkasan "N jadwal bentrok" muncul/hilang sesuai data dan menyebut peserta | Lulus |
+| 63 | Sembunyikan profil: kegiatan hilang, lane dan bentrok dihitung ulang | Lulus |
+| 64 | Tambah/geser/resize/hapus kegiatan: lane dan bentrok dihitung ulang setelah render | Lulus |
+| 65 | Lebar 360–390 px: 2 lane tetap terbaca (judul + jam), tanpa overflow horizontal | Lulus |
+
 **Batasan yang belum diverifikasi:**
 
 - Konfirmasi long-press di perangkat Android asli masih perlu dicoba pengguna;
   emulasi browser tidak bisa mereproduksi tahan-jari sungguhan.
-- Lane otomatis/konflik (Fase 3) belum ada; kegiatan yang bertumpuk saat ini
-  saling menimpa secara visual.
+- Pada 5 lane di ponsel (lebar ±47 px) judul terpotong menjadi beberapa huruf;
+  detail lengkap tetap tersedia lewat ketuk (dialog) dan `aria-label`.
+- Lane otomatis/konflik (Fase 3) sudah ada; kegiatan yang bertumpuk tidak lagi
+  saling menimpa, tetapi lane tidak bisa digeser horizontal.
 - Waktu salat belum dihitung sama sekali (Fase 5). Tidak ada angka salat yang
   ditampilkan atau dikarang.
 - Pengujian pada Android Chrome fisik, tablet, dan stylus belum dilakukan.

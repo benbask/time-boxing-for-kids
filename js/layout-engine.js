@@ -1,15 +1,16 @@
 /**
- * Layout engine — Phase 1 scope.
+ * Layout engine — Phase 1 + Phase 3.
  *
  * Produces the visual model for one day on the shared timeline: which events are
- * visible, their vertical position, and their participant colours.
+ * visible, their vertical position, their participant colours, the horizontal
+ * lane that keeps overlaps readable, and the participant conflicts on top of it.
  *
- * Phase 1 draws one event per row (single lane). The interval-based lane
- * assignment and conflict detection described in SPEC.md §5/§7 are Phase 3 and
- * will replace `assignLanes` only; the block model below is already shaped for
- * it (lane / laneCount).
+ * Lanes are a visual arrangement only, never profile columns (SPEC.md §5).
+ * Hidden profiles remove their events from both the layout and the conflict
+ * calculation, so showing/hiding a profile recalculates everything.
  */
 
+import { findConflicts } from './conflicts.js';
 import {
   eventEndMinutes,
   eventStartMinutes,
@@ -54,11 +55,67 @@ function stripeFor(colors) {
 }
 
 /**
- * Phase 1 lane assignment: one lane for every block.
- * Phase 3 replaces this with the interval cluster algorithm.
+ * Interval lane assignment (SPEC.md §5, §20.1).
+ *
+ * 1. Events already sorted by start time are grouped into clusters: a new
+ *    cluster begins when an event starts at or after the latest end so far, so
+ *    clusters never overlap each other.
+ * 2. Inside a cluster every event takes the first lane whose last event has
+ *    already ended. This first-fit-by-start-time pass uses the minimum number of
+ *    lanes for an interval graph.
+ * 3. All members of a cluster share the same lane count, so the visual columns
+ *    stay aligned; each block gets its left offset and width as percentages of
+ *    the canvas. Lane maths never assumes a profile column.
  */
 function assignLanes(blocks) {
-  return blocks.map((block) => ({ ...block, lane: 0, laneCount: 1 }));
+  const sorted = [...blocks].sort((a, b) => (
+    a.startMinutes - b.startMinutes
+    || b.endMinutes - a.endMinutes
+    || a.id.localeCompare(b.id)
+  ));
+
+  const placed = [];
+  let cluster = [];
+  let clusterEnd = 0;
+
+  const flushCluster = () => {
+    if (cluster.length === 0) return;
+    const laneEnds = [];
+
+    const assignments = cluster.map((block) => {
+      let lane = laneEnds.findIndex((end) => end <= block.startMinutes);
+      if (lane === -1) {
+        lane = laneEnds.length;
+        laneEnds.push(block.endMinutes);
+      } else {
+        laneEnds[lane] = block.endMinutes;
+      }
+      return { block, lane };
+    });
+
+    const laneCount = Math.max(1, laneEnds.length);
+    assignments.forEach(({ block, lane }) => {
+      placed.push({
+        ...block,
+        lane,
+        laneCount,
+        leftPercent: (lane / laneCount) * 100,
+        widthPercent: 100 / laneCount,
+      });
+    });
+
+    cluster = [];
+    clusterEnd = 0;
+  };
+
+  sorted.forEach((block) => {
+    if (cluster.length > 0 && block.startMinutes >= clusterEnd) flushCluster();
+    cluster.push(block);
+    clusterEnd = Math.max(clusterEnd, block.endMinutes);
+  });
+  flushCluster();
+
+  return placed;
 }
 
 export function buildDayLayout(data, dateKey) {
@@ -88,6 +145,7 @@ export function buildDayLayout(data, dateKey) {
         durationMinutes,
         topPercent: (startMinutes / DAY_MINUTES) * 100,
         heightPercent: (durationMinutes / DAY_MINUTES) * 100,
+        participantIds: participants.map((profile) => profile.id),
         participants,
         isShared: participants.length > 1,
         isNeutral: participants.length === 0,
@@ -97,15 +155,46 @@ export function buildDayLayout(data, dateKey) {
         border: baseColor ? hexToRgba(baseColor, 0.38) : null,
         lane: 0,
         laneCount: 1,
+        leftPercent: 0,
+        widthPercent: 100,
+        conflicts: [],
       };
     })
     .sort((a, b) => (
       a.startMinutes - b.startMinutes || b.durationMinutes - a.durationMinutes
     ));
 
+  const laneBlocks = assignLanes(blocks);
+  const { byEvent, pairs } = findConflicts(laneBlocks);
+
+  const conflictPairs = pairs.map(({ a, b, sharedProfileIds }) => ({
+    aId: a.id,
+    aTitle: a.title,
+    aTime: a.timeLabel,
+    bId: b.id,
+    bTitle: b.title,
+    bTime: b.timeLabel,
+    profileNames: sharedProfileIds
+      .map((profileId) => profileMap.get(profileId)?.name)
+      .filter(Boolean),
+  }));
+
+  const blocksWithConflicts = laneBlocks.map((block) => {
+    const conflicts = byEvent.get(block.id) || [];
+    return {
+      ...block,
+      conflicts,
+      conflictProfiles: [...new Set(conflicts.flatMap((entry) => entry.sharedProfileIds))]
+        .map((profileId) => profileMap.get(profileId)?.name)
+        .filter(Boolean),
+    };
+  });
+
   return {
     dateKey,
-    blocks: assignLanes(blocks),
+    blocks: blocksWithConflicts,
+    conflictCount: conflictPairs.length,
+    conflictPairs,
     totalCount: allEvents.length,
     visibleCount: visibleEvents.length,
     hiddenCount: allEvents.length - visibleEvents.length,

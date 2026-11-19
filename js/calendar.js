@@ -46,16 +46,24 @@ function renderParticipants(participants) {
 function renderBlock(block) {
   const compact = block.durationMinutes < 60;
   const tall = block.durationMinutes >= 120;
+  const narrow = block.laneCount >= 3;
+  const tiny = block.laneCount >= 4;
+  const hasConflict = block.conflicts.length > 0;
   const classes = [
     'event-block',
     compact ? 'is-compact' : '',
     tall ? 'is-tall' : '',
+    narrow ? 'is-narrow' : '',
+    tiny ? 'is-tiny' : '',
     block.isNeutral ? 'is-neutral' : '',
+    hasConflict ? 'is-conflict' : '',
   ].filter(Boolean).join(' ');
 
   const style = [
     `top:calc(${block.topPercent.toFixed(4)}% + 1px)`,
     `height:calc(${block.heightPercent.toFixed(4)}% - 2px)`,
+    `--ev-left:${block.leftPercent.toFixed(4)}%`,
+    `--ev-width:${block.widthPercent.toFixed(4)}%`,
     `--ev-stripe:${block.stripe}`,
     block.tint ? `--ev-bg:${block.tint}` : '',
     block.border ? `--ev-border:${block.border}` : '',
@@ -63,6 +71,13 @@ function renderBlock(block) {
 
   const note = block.note
     ? `<span class="event-note-icon" title="${escapeHtml(block.note)}" aria-hidden="true">📝</span>`
+    : '';
+
+  const conflictText = block.conflicts
+    .map((entry) => `${entry.title} (${entry.timeLabel})`)
+    .join(', ');
+  const conflictLabel = hasConflict
+    ? `Bentrok dengan ${conflictText}${block.conflictProfiles.length ? ` untuk ${block.conflictProfiles.join(', ')}` : ''}.`
     : '';
 
   const label = [
@@ -73,12 +88,13 @@ function renderBlock(block) {
       ? block.participants.map((profile) => profile.name).join(', ')
       : 'Tanpa peserta',
     block.note ? `Catatan: ${block.note}` : '',
+    conflictLabel,
   ].filter(Boolean).join('. ');
 
   const duration = formatDurationLabel(block.durationMinutes);
 
   return `
-    <article class="${classes}" data-event-id="${escapeHtml(block.id)}" style="${style}" aria-label="${escapeHtml(label)}">
+    <article class="${classes}" data-event-id="${escapeHtml(block.id)}" data-lanes="${block.laneCount}" style="${style}" aria-label="${escapeHtml(label)}"${hasConflict ? ` title="${escapeHtml(conflictLabel)}"` : ''}>
       <span class="event-resize event-resize-start" data-resize="start" aria-hidden="true"></span>
       <span class="event-resize event-resize-end" data-resize="end" aria-hidden="true"></span>
       <button type="button" class="event-edit" data-edit-event="${escapeHtml(block.id)}"
@@ -87,6 +103,7 @@ function renderBlock(block) {
       <div class="event-time"><span class="event-time-text">${escapeHtml(block.timeLabel)}</span><span class="event-duration event-duration-inline" aria-hidden="true">${duration}</span></div>
       <div class="event-title">${escapeHtml(block.title)}</div>
       <span class="event-duration event-duration-chip" aria-hidden="true">${duration}</span>
+      ${hasConflict ? `<span class="event-conflict-mark" aria-hidden="true" title="${escapeHtml(conflictLabel)}">⚠</span>` : ''}
       ${renderParticipants(block.participants)}
     </article>`;
 }
@@ -126,12 +143,27 @@ function dayNotices(data, layout) {
   )).join('');
 }
 
+function conflictNotice(layout) {
+  if (layout.conflictCount === 0) return '';
+
+  const first = layout.conflictPairs[0];
+  const more = layout.conflictCount > 1 ? ` (+${layout.conflictCount - 1} lainnya)` : '';
+  const people = [...new Set(layout.conflictPairs.flatMap((pair) => pair.profileNames))];
+
+  return `
+    <p class="notice notice-warning">
+      <span class="notice-icon" aria-hidden="true">⚠️</span>
+      <span><strong>${layout.conflictCount} jadwal bentrok.</strong> ${escapeHtml(first.aTitle)} &amp; ${escapeHtml(first.bTitle)}${more}${people.length ? ` — ${escapeHtml(people.join(', '))}` : ''}. Blok bergaris putus-putus perlu dicek.</span>
+    </p>`;
+}
+
 function dayViewMarkup(data, layout) {
   const dateKey = data.settings.selectedDate;
   const relative = relativeDayLabel(dateKey);
 
   return `
     ${dayNotices(data, layout)}
+    ${conflictNotice(layout)}
     <div class="timeline-card">
       <div class="timeline-scroll" id="timelineScroll" role="region" aria-label="Garis waktu ${escapeHtml(relative || dateKey)}" tabindex="0">
         <div class="timeline">
@@ -150,6 +182,7 @@ function dayViewMarkup(data, layout) {
         <div class="legend-items">
           <span class="legend-item"><span class="dot" style="--dot-color:var(--now)"></span> Waktu sekarang</span>
           <span class="legend-item"><span class="shared-marks" aria-hidden="true">👥</span> Kegiatan bersama tampil satu kali</span>
+          ${layout.conflictCount > 0 ? '<span class="legend-item legend-conflict"><span aria-hidden="true">⚠</span> Peserta bentrok</span>' : ''}
           <span class="legend-item legend-hint">Ketuk area kosong untuk menambah · tahan blok untuk memindah</span>
         </div>
         <span>${layout.visibleCount} kegiatan</span>

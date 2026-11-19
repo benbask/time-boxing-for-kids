@@ -23,6 +23,8 @@
   --accent: #56c7e8;
   --danger: #d64545;
   --danger-soft: #fdecec;
+  --warning: #a45f00;
+  --warning-soft: #fff3df;
   --header-bg: rgba(255, 255, 255, 0.82);
   --shadow-sm: 0 1px 2px rgba(18, 48, 57, 0.06), 0 4px 12px rgba(18, 48, 57, 0.06);
   --shadow: 0 12px 32px rgba(18, 48, 57, 0.12);
@@ -51,6 +53,8 @@
   --accent: #8b7bff;
   --danger: #d64545;
   --danger-soft: #fdecec;
+  --warning: #a45f00;
+  --warning-soft: #fff3df;
   --header-bg: rgba(255, 255, 255, 0.82);
   --shadow-sm: 0 1px 2px rgba(67, 35, 58, 0.06), 0 4px 12px rgba(67, 35, 58, 0.06);
   --shadow: 0 12px 32px rgba(67, 35, 58, 0.12);
@@ -79,6 +83,8 @@
   --accent: #b39bf2;
   --danger: #d64545;
   --danger-soft: #fdecec;
+  --warning: #a45f00;
+  --warning-soft: #fff3df;
   --header-bg: rgba(255, 255, 255, 0.82);
   --shadow-sm: 0 1px 2px rgba(44, 39, 72, 0.06), 0 4px 12px rgba(44, 39, 72, 0.06);
   --shadow: 0 12px 32px rgba(44, 39, 72, 0.14);
@@ -107,6 +113,8 @@
   --accent: #a9c98a;
   --danger: #c4453f;
   --danger-soft: #fdecea;
+  --warning: #9e5f08;
+  --warning-soft: #fff3dc;
   --header-bg: rgba(255, 255, 255, 0.82);
   --shadow-sm: 0 1px 2px rgba(34, 51, 29, 0.06), 0 4px 12px rgba(34, 51, 29, 0.06);
   --shadow: 0 12px 32px rgba(34, 51, 29, 0.12);

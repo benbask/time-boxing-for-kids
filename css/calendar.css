@@ -36,6 +36,14 @@
 
 .notice .notice-icon { flex: none; font-size: 1rem; line-height: 1.3; }
 
+.notice-warning {
+  background: var(--warning-soft);
+  border: 1px solid var(--warning);
+  color: var(--text);
+}
+
+.notice-warning .notice-icon { color: var(--warning); }
+
 /* -------------------------------------------------------- timeline card --- */
 
 .timeline-card {
@@ -155,8 +163,8 @@
 
 .event-block {
   position: absolute;
-  left: 6px;
-  right: 10px;
+  left: calc(var(--ev-left, 0%) + 3px);
+  width: calc(var(--ev-width, 100%) - 6px);
   display: flex;
   flex-direction: column;
   gap: 1px;
@@ -368,6 +376,87 @@
 .event-block.is-tall .event-title { -webkit-line-clamp: 2; }
 .event-block.is-tall .event-people { margin-top: 4px; }
 
+/* Conflict: dashed amber outline + marker, visual and non-blocking (SPEC §7). */
+.event-block.is-conflict {
+  border-style: dashed;
+  border-color: var(--warning);
+}
+
+.event-conflict-mark {
+  position: absolute;
+  bottom: 3px;
+  right: 6px;
+  font-size: 0.66rem;
+  line-height: 1;
+  color: var(--warning);
+  pointer-events: none;
+}
+
+/* The marker replaces the pencil on conflicted blocks; tapping the block still
+   opens the editor, so nothing is lost. */
+.event-block.is-conflict .event-edit { display: none; }
+.event-block.is-conflict .event-title { padding-right: 20px; }
+
+/* Narrow lanes (3+ simultaneous visible events): one compact row, no avatars. */
+.event-block.is-narrow {
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px 3px 10px;
+}
+
+.event-block.is-narrow .event-edit,
+.event-block.is-narrow .event-time,
+.event-block.is-narrow .event-people,
+.event-block.is-narrow .event-note-icon,
+.event-block.is-narrow .event-duration-inline { display: none; }
+
+.event-block.is-narrow .event-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-right: 0;
+  font-size: 0.72rem;
+  -webkit-line-clamp: 2;
+}
+
+.event-block.is-narrow .event-duration-chip {
+  display: inline-block;
+  flex: none;
+  margin-left: auto;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.event-block.is-compact .event-conflict-mark,
+.event-block.is-narrow .event-conflict-mark {
+  position: static;
+  flex: none;
+  font-size: 0.7rem;
+}
+
+/* Two lanes on a phone are ~half the canvas: keep the title, drop the extras. */
+@media (max-width: 720px) {
+  .event-block[data-lanes="2"]:not(.is-compact) .event-people,
+  .event-block[data-lanes="2"] .event-duration-inline,
+  .event-block[data-lanes="2"] .event-note-icon,
+  .event-block[data-lanes="2"].is-compact .event-duration-chip,
+  .event-block[data-lanes="2"].is-compact .event-conflict-mark { display: none; }
+
+  .event-block[data-lanes="2"]:not(.is-compact) .event-title {
+    -webkit-line-clamp: 2;
+    font-size: 0.8rem;
+    line-height: 1.15;
+  }
+  .event-block[data-lanes="2"] .event-time {
+    font-size: 0.64rem;
+    line-height: 1.2;
+  }
+}
+
+.event-block.is-tiny .event-duration-chip { display: none; }
+.event-block.is-tiny .event-title { font-size: 0.68rem; }
+
 .event-block.is-neutral {
   --ev-bg: var(--surface-3);
   --ev-border: var(--border-strong);
@@ -453,6 +542,11 @@
 }
 
 .legend-hint { font-style: italic; }
+
+.legend-conflict {
+  color: var(--warning);
+  font-weight: 600;
+}
 
 /* --------------------------------------------------- placeholder views --- */
 

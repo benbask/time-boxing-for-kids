@@ -643,18 +643,19 @@ These notes document the decisions taken for the Phase 1 build. They are part of
 
 ## 22.1 Scope of this build
 
-Implemented: application shell and navigation, family profile CRUD, per-profile visibility, show all / hide all, one shared vertical day timeline, profile-coloured event blocks (shared events rendered once with all participants), current-time indicator, reading of existing events from storage, four themes, LocalStorage persistence with automatic save, a temporary full-screen Focus mode for the calendar, and **Phase 2 direct manipulation (create, move, resize, edit, delete events with 10-minute snapping and Pointer Events touch support).**
+Implemented: application shell and navigation, family profile CRUD, per-profile visibility, show all / hide all, one shared vertical day timeline, profile-coloured event blocks (shared events rendered once with all participants), current-time indicator, reading of existing events from storage, four themes, LocalStorage persistence with automatic save, a temporary full-screen Focus mode for the calendar, **Phase 2 direct manipulation (create, move, resize, edit, delete events with 10-minute snapping and Pointer Events touch support)**, and **Phase 3 overlap lanes plus participant conflict warnings.**
 
-Explicitly deferred (per Section 21): overlap lane assignment and conflict warnings (Phase 3); week/month views, special days, zoom and time-range presets (Phase 4); prayer times (Phase 5); JSON export/import and reset (Phase 6). Placeholders are labelled in the UI instead of pretending to work.
+Explicitly deferred (per Section 21): week/month views, special days, zoom and time-range presets (Phase 4); prayer times (Phase 5); JSON export/import and reset (Phase 6). Placeholders are labelled in the UI instead of pretending to work.
 
-## 22.2 Module structure (Phase 1 + 2)
+## 22.2 Module structure (Phase 1 + 2 + 3)
 
 - `js/app.js` — bootstrap, delegated UI events, dialogs, toasts, cross-module wiring.
 - `js/state.js` — single in-memory store, save-after-mutation, subscribe/notify.
 - `js/storage.js` — LocalStorage read/write, defaults, seed data, schema version, normalization.
 - `js/profiles.js` — profile chip bar and Profiles page rendering.
 - `js/calendar.js` — shared day timeline rendering, now indicator.
-- `js/layout-engine.js` — Phase 1: day bounds and simple single-lane placement (Phase 3 replaces it with the interval lane algorithm).
+- `js/layout-engine.js` — day bounds, interval cluster lane assignment (Phase 3), block model with lane/laneCount/leftPercent/widthPercent and per-block conflicts.
+- `js/conflicts.js` — conflict detection: overlapping intervals plus at least one shared participant (SPEC §7).
 - `js/navigation.js` — date arithmetic, date label, view switching.
 - `js/themes.js` — theme registry and application.
 - `js/ui.js` — small helpers: toast, confirm dialog, escape-safe HTML.
@@ -707,7 +708,7 @@ On first run the store is seeded with five profiles (Ayah, Ibu, Anak 1–3) and 
 - A visible event is drawn when at least one participant profile is visible.
 - An event with no participants (possible after deleting a profile) stays visible as a neutral block.
 - Hiding all profiles hides all participant events and leaves data untouched.
-- Overlaps currently render in a single lane. The lane algorithm is Phase 3, as specified in Section 16.
+- Overlaps are arranged into temporary horizontal lanes by the Phase 3 algorithm in §22.12; lanes are never profile columns.
 
 ## 22.6 Theming
 
@@ -785,9 +786,33 @@ Implementation notes:
 - Pointer listeners live on `window` (filtered by `pointerId`) so the finger may leave the block; pointer capture is requested only once the hold completes, and is best-effort.
 - `navigator.vibrate(10)` gives a haptic cue when the hold completes (Android); failures are ignored.
 
-## 22.12 Known risks
+## 22.12 Phase 3 — overlap lanes and conflicts
 
-1. **Lane algorithm on narrow screens** — Phase 3 must keep blocks >= 44 px wide; planned: minimum lane width with horizontal overflow inside the event layer only.
+**Lane algorithm (`js/layout-engine.js`)**
+
+1. Visible events are sorted by start, then by longer duration, then by id.
+2. Clusters: a new cluster starts when an event begins at or after the latest end in the current cluster, so clusters never overlap.
+3. Inside a cluster each event takes the first lane whose last event ended at or before its start; if none is free, a new lane is added. First-fit by start time uses the minimum number of lanes for interval graphs.
+4. Every block in a cluster shares the same `laneCount`; `leftPercent = lane / laneCount * 100` and `widthPercent = 100 / laneCount`. Blocks are inset 3 px per side, giving 6 px between lanes.
+5. Recalculation is automatic: every state change re-renders the day, so create, move, resize, delete and profile show/hide all rebuild lanes.
+
+**Conflicts (`js/conflicts.js`)**
+
+- Overlap is strict (`start < otherEnd && otherStart < end`), so back-to-back events do not conflict.
+- A conflict also needs at least one shared profile id; neutral blocks without participants never conflict.
+- A shared event never conflicts with itself, and each pair is reported once per event.
+- Detection runs on visible blocks only, so hiding a profile also removes its conflicts.
+- Output is visual and non-blocking: dashed amber border plus a ⚠ marker (which replaces the pencil), a `title`/`aria-label` naming the conflicting event and shared participants, a day-level notice ("N jadwal bentrok"), and a legend entry. Nothing is rejected or deleted.
+
+**Narrow screens**
+
+- `data-lanes` is rendered on each block. On viewports ≤ 720 px a 2-lane block drops avatars, inline duration, note icon, and (when compact) the duration chip and ⚠, keeping the time and a two-line title.
+- 3+ lanes switch to a single row (title + duration) and hide the pencil; 4+ lanes also hide the duration.
+- Five lanes at 390 px give ≈47 px per block — above the 44 px touch minimum — and long titles clamp to two lines.
+
+## 22.13 Known risks
+
+1. **Lane algorithm on narrow screens** - Phase 3 keeps every lane tappable (5 lanes ≈ 47 px at 390 px) by dropping secondary content per lane density; long titles clamp instead of widening the lane. Horizontal lane overflow is deliberately not implemented.
 2. **Prayer-time accuracy** — Phase 5 must document Kemenag parameters and compare against SIHAT output for several cities/dates; results must not be presented as verified before that comparison exists.
 3. **LocalStorage capacity** — roughly 5 MB per origin; a few thousand events fit comfortably. Quota failures are surfaced as a toast.
 4. **Browser storage is per device** — permanent UI warning plus documented JSON transfer workflow.
