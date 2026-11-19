@@ -11,7 +11,6 @@
  */
 
 import { DEFAULT_THEME, isThemeId } from './themes.js';
-import { DEFAULT_ZOOM, normalizeZoom, presetForRange } from './time-range.js';
 import {
   dateKeyFromDate,
   isDateKey,
@@ -46,9 +45,8 @@ export function defaultSettings(selectedDate = todayKey()) {
     activeTheme: DEFAULT_THEME,
     currentView: 'day',
     selectedDate,
-    // Full-day range by default. Phase 4 adds presets and custom windows.
+    // Full-day range by default; presets arrive in Phase 4.
     visibleTimeRange: { start: '00:00', end: '24:00', preset: 'full' },
-    zoom: DEFAULT_ZOOM,
     snapInterval: 10,
     location: {
       name: '',
@@ -243,21 +241,17 @@ function sanitizeSettings(raw) {
   const snapCandidates = [5, 10, 15, 30];
   const snap = Number(raw.snapInterval);
 
-  const rangeStart = isTimeOfDay(range.start) ? range.start : defaults.visibleTimeRange.start;
-  const rangeEnd = range.end === '24:00'
-    ? '24:00'
-    : (isTimeOfDay(range.end) ? range.end : defaults.visibleTimeRange.end);
-
   return {
     activeTheme: isThemeId(raw.activeTheme) ? raw.activeTheme : defaults.activeTheme,
     currentView: VIEW_IDS.includes(raw.currentView) ? raw.currentView : defaults.currentView,
     selectedDate: isDateKey(raw.selectedDate) ? raw.selectedDate : defaults.selectedDate,
     visibleTimeRange: {
-      start: rangeStart,
-      end: rangeEnd,
-      preset: presetForRange(rangeStart, rangeEnd),
+      start: isTimeOfDay(range.start) ? range.start : defaults.visibleTimeRange.start,
+      end: range.end === '24:00'
+        ? '24:00'
+        : (isTimeOfDay(range.end) ? range.end : defaults.visibleTimeRange.end),
+      preset: asString(range.preset, defaults.visibleTimeRange.preset),
     },
-    zoom: normalizeZoom(raw.zoom),
     snapInterval: snapCandidates.includes(snap) ? snap : defaults.snapInterval,
     location: {
       name: asString(location.name).slice(0, 60),

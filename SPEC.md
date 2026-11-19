@@ -1,7 +1,7 @@
 # TIME BOXING FOR KIDS
 ## FINAL PRODUCT & TECHNICAL SPECIFICATION
 
-Version: 1.0 (implementation: Phase 4)
+Version: 1.0 (implementation: Phase 1)
 Status: Approved for Development
 Platform: Static Web Application
 Deployment: GitHub Pages
@@ -643,9 +643,9 @@ These notes document the decisions taken for the Phase 1 build. They are part of
 
 ## 22.1 Scope of this build
 
-Implemented: application shell and navigation, family profile CRUD, per-profile visibility, show all / hide all, one shared vertical day timeline, profile-coloured event blocks (shared events rendered once with all participants), current-time indicator, reading of existing events from storage, four themes, LocalStorage persistence with automatic save, a temporary full-screen Focus mode for the calendar, **Phase 2 direct manipulation (create, move, resize, edit, delete events with 10-minute snapping and Pointer Events touch support)**, **Phase 3 overlap lanes plus participant conflict warnings**, the **compact single-row chrome described in §22.13**, and **Phase 4 calendar navigation (day/week/month views, date navigation, visible time ranges and zoom, special days)**.
+Implemented: application shell and navigation, family profile CRUD, per-profile visibility, show all / hide all, one shared vertical day timeline, profile-coloured event blocks (shared events rendered once with all participants), current-time indicator, reading of existing events from storage, four themes, LocalStorage persistence with automatic save, a temporary full-screen Focus mode for the calendar, **Phase 2 direct manipulation (create, move, resize, edit, delete events with 10-minute snapping and Pointer Events touch support)**, **Phase 3 overlap lanes plus participant conflict warnings**, and the **compact single-row chrome described in §22.13**.
 
-Explicitly deferred (per Section 21): prayer times (Phase 5); JSON export/import and reset (Phase 6).
+Explicitly deferred (per Section 21): week/month views, special days, zoom and time-range presets (Phase 4); prayer times (Phase 5); JSON export/import and reset (Phase 6). Placeholders are labelled in the UI instead of pretending to work.
 
 ## 22.2 Module structure (Phase 1 + 2 + 3)
 

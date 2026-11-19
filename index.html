@@ -267,54 +267,6 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-  <!-- Rentang waktu (Fase 4) -->
-  <dialog id="rangeDialog" class="dialog" aria-labelledby="rangeDialogTitle">
-    <div class="dialog-body">
-      <h2 id="rangeDialogTitle" class="dialog-title">Rentang waktu</h2>
-      <p class="range-summary"></p>
-      <div class="range-presets" role="group" aria-label="Pilih rentang waktu"></div>
-      <div class="range-custom">
-        <label class="field">
-          <span class="field-label">Dari</span>
-          <input class="input" id="rangeCustomStart" type="time">
-        </label>
-        <label class="field">
-          <span class="field-label">Sampai</span>
-          <input class="input" id="rangeCustomEnd" type="time">
-        </label>
-        <p id="rangeCustomError" class="form-error" role="alert" hidden>Waktu tidak valid.</p>
-      </div>
-      <div class="dialog-actions dialog-actions-split">
-        <button type="button" class="btn btn-ghost" data-action="cancel-range">Batal</button>
-        <button type="button" class="btn btn-primary" data-action="save-range">Simpan</button>
-      </div>
-    </div>
-  </dialog>
-
-  <!-- Hari khusus (Fase 4) -->
-  <dialog id="specialDayDialog" class="dialog" aria-labelledby="specialDayDialogTitle">
-    <form id="specialDayForm" class="dialog-body" novalidate>
-      <h2 id="specialDayDialogTitle" class="dialog-title">Tambah hari khusus</h2>
-      <label class="field">
-        <span class="field-label">Tanggal</span>
-        <input class="input" id="specialDayDate" type="date" required>
-      </label>
-      <label class="field">
-        <span class="field-label">Nama</span>
-        <input class="input" id="specialDayTitle" type="text" name="title" maxlength="60" required autocomplete="off" placeholder="Contoh: Libur Nasional">
-      </label>
-      <label class="field">
-        <span class="field-label">Jenis</span>
-        <select class="input" id="specialDayType" name="type"></select>
-      </label>
-      <p id="specialDayError" class="form-error" role="alert" hidden>Isi tanggal dan nama.</p>
-      <div class="dialog-actions dialog-actions-split">
-        <button type="button" class="btn btn-ghost" data-action="cancel-special-day">Batal</button>
-        <button type="submit" class="btn btn-primary">Simpan</button>
-      </div>
-    </form>
-  </dialog>
-
   <noscript>
     <p class="noscript">Aplikasi ini membutuhkan JavaScript. Aktifkan JavaScript di browser untuk melanjutkan.</p>
   </noscript>

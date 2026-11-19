@@ -123,21 +123,13 @@ sehingga kanvas bertambah dari 387 px menjadi ±539 px (±+39%).
 | --- | --- | --- |
 | 2 | Buat/geser/resize/edit/hapus kegiatan, snapping 10 menit, touch gesture | **Selesai** |
 | 3 | Lane otomatis untuk kegiatan bertumpuk, peringatan konflik | **Selesai** |
-| 4 | Tampilan minggu & bulan, special day, zoom dan rentang waktu | **Selesai** |
+| 4 | Tampilan minggu & bulan, special day, zoom dan rentang waktu | Belum |
 | 5 | Waktu salat lokal dengan parameter Kemenag/SIHAT | Belum |
 | 6 | Ekspor/impor JSON, reset aplikasi | Belum |
 | 7 | Uji perangkat Android, performance, deployment GitHub Pages | Belum |
-## Fase 4 — tampilan minggu, bulan, dan rentang waktu
 
-Selain tampilan hari, kalender kini punya **tampilan minggu** dan **tampilan bulan**:
-
-- **Minggu**: tujuh baris hari (Senin–Minggu), masing-masing menunjukkan jumlah kegiatan, warna profil, tanda bentrok ⚠, dan ikon hari khusus. Ketik satu hari untuk membuka tampilan hari tersebut. Navigasi ‹/› bergeser satu minggu penuh.
-- **Bulan**: grid 7 kolom, setiap tanggal menunjukkan jumlah kegiatan, titik warna profil, tanda bentrok, dan ikon hari khusus. Ketik tanggal untuk membuka tampilan hari. Navigasi ‹/› bergeser satu bulan penuh.
-- **Hari khusus**: tambah/ubah libur, hari khusus, atau ulang tahun tanpa API kalender eksternal — semanya disimpan di browser.
-- **Rentang waktu**: pilih Sepanjang hari, Pagi (04–12), Siang (12–18), Sore–malam (18–24), atau rentang khusus (minimal 60 menit). Canvas menyesuaikan tinggi per jam, bukan mengecilkan blok. Kegiatan di luar rentang ditandai dengan pemberitahuan.
-- **Zoom**: tombol −/+% pada toolbar mengubah tinggi jam tanpa mengubah durasi yang tersimpan.
-
-Semua tampilan condiva satu layout engine, jadi profil yang disembunyikan, warna peserta, dan peringatan konflik tetap konsisten di hari, minggu, dan bulan.
+Tampilan Minggu dan Bulan sengaja menampilkan placeholder berlabel **Fase 4**
+agar tidak terlihat seperti fitur yang sudah berfungsi.
 
 ## Data dan privasi
 
