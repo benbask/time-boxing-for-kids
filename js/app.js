@@ -24,7 +24,7 @@ import { getData, initState, subscribe, update } from './state.js';
 import { getStorageStats } from './storage.js';
 import { THEMES, applyTheme } from './themes.js';
 import { confirmAction, initConfirmDialog, showToast } from './ui.js';
-import { escapeHtml, formatBytes, uid } from './utils.js';
+import { escapeHtml, formatBytes, formatLongDate, todayKey, uid } from './utils.js';
 
 const els = {
   calendarView: document.getElementById('calendarView'),
@@ -37,6 +37,8 @@ const els = {
   dateLabelLong: document.getElementById('dateLabelLong'),
   dateLabelShort: document.getElementById('dateLabelShort'),
   dateLabelTiny: document.getElementById('dateLabelTiny'),
+  todayIconDay: document.getElementById('todayIconDay'),
+  todayIconBtn: document.querySelector('.today-icon-btn'),
   dateSub: document.getElementById('dateSub'),
   viewSelect: document.getElementById('viewSelect'),
   focusBar: document.getElementById('focusBar'),
@@ -86,6 +88,21 @@ function renderHeadline(data) {
   els.dateLabel.setAttribute('aria-label', label);
   els.dateSub.textContent = sub;
   els.focusDate.textContent = short;
+  renderTodayIcon();
+}
+
+/** The toolbar icon always shows today, even while browsing another date. */
+function renderTodayIcon() {
+  const today = todayKey();
+  const day = String(Number(today.slice(8, 10)));
+  if (els.todayIconDay.textContent !== day) els.todayIconDay.textContent = day;
+
+  const long = formatLongDate(today);
+  const label = `Kembali ke hari ini, ${long}`;
+  if (els.todayIconBtn.getAttribute('aria-label') !== label) {
+    els.todayIconBtn.setAttribute('aria-label', label);
+    els.todayIconBtn.title = `Hari ini · ${long}`;
+  }
 }
 
 function applyChrome(data) {
@@ -480,6 +497,7 @@ function startClock() {
   window.setInterval(() => {
     if (document.hidden) return;
     refreshNowIndicator(getData());
+    renderTodayIcon();
   }, 30000);
 }
 

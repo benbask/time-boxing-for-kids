@@ -815,11 +815,17 @@ Implementation notes:
 The panels above the timeline are intentionally compressed so the canvas keeps most of the viewport; the footer stays in normal flow.
 
 - **Header** is one row on every width: 36 px brand mark on phones, tagline hidden below 860 px, mobile padding reduced to 6 px (≈55 px tall at 390 px).
-- **Toolbar** is one row on phones: previous/next, the date headline, a text **Hari ini** button and a native `<select>` (`Hari ▾`). The headline renders three ways from the same data — long (`Rabu, 18 November 2026`), short (`Rab, 18 Nov`) ≤ 620 px and tiny (`18 Nov`) ≤ 300 px — switched purely with CSS, so no resize listener exists. From 621 px up the original segmented Hari/Minggu/Bulan switch is shown instead of the select.
+- **Toolbar** is one row on phones: previous/next, the date headline, a **calendar icon whose centre shows today's date**, and a native `<select>` (`Hari ▾`). Tapping the icon returns to today; it always shows today even while browsing another date, and refreshes at midnight from the 30-second clock. The headline renders three ways from the same data — long (`Rabu, 18 November 2026`), short (`Rab, 18 Nov`) ≤ 620 px and tiny (`18 Nov`) ≤ 300 px — switched purely with CSS, so no resize listener exists. From 621 px up the original segmented Hari/Minggu/Bulan switch is shown instead of the select.
 - **Profile bar** is one row: the chip strip is the only horizontally scrolling part and the `⋯` trigger stays pinned. `Tampilkan semua profil`, `Sembunyikan semua profil`, `Hari ini` and `Mode fokus` live in that `<details>` menu. The menu closes when an item is used, when the tap lands outside it, or when focus mode hides the bar.
 - **Conflict notice** collapses to one 40 px row (`⚠ 2 jadwal bentrok · Anak 1, Anak 2 ›`). Tapping it toggles every conflicting pair inline; the state is transient and resets on the next render.
-- **Narrow fallbacks**: ≤ 345 px moves "Hari ini" into the menu (the date keeps its space); ≤ 250 px wraps the view picker onto its own row. The "Hari ini" entry in the menu remains available at every width, so the shortcut is never lost.
+- **Narrow fallbacks**: ≤ 300 px hides the today icon (the `⋯` menu keeps a "Hari ini" entry, so the shortcut is never lost); ≤ 250 px wraps the view picker onto its own row.
 - Notices use `flex: none` so the flexible timeline card can never squeeze them; measured at 390×844 the panels total ≈231 px and the scrollable canvas is ≈539 px (was 387 px).
+
+**Date icon**
+
+- No icon library ships a live date: Material Symbols `event` is a calendar with a fixed "17", and every `calendar-date` glyph in Iconify (Tabler, Lucide, Fluent, Solar, …) uses a dot or a generic mark. The glyph therefore follows the Lucide/Tabler calendar outline (MIT) and the day number is rendered as an SVG `<text>` node, keeping the app dependency-free and theme-aware.
+- The number is written by `renderTodayIcon()` in `js/app.js` from `todayKey()` and refreshed with the existing 30-second clock, so a tab left open across midnight stays correct. `aria-label`/`title` name the full date (`Kembali ke hari ini, Kamis, 19 November 2026`).
+- One- and two-digit days share the same font size; the number sits below the header band so it never collides with the binder rings.
 
 ## 22.14 Known risks
 

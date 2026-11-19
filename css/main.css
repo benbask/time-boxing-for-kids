@@ -333,10 +333,25 @@ button { cursor: pointer; }
 .date-short { display: none; }
 .date-tiny { display: none; }
 
-.today-btn {
+.today-icon-btn {
+  display: grid;
+  place-items: center;
   flex: none;
-  padding: 0 14px;
-  font-size: 0.85rem;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--primary-strong);
+}
+
+.today-icon-btn:hover { background: var(--surface-2); }
+
+.date-icon {
+  display: block;
+  width: 28px;
+  height: 28px;
 }
 
 .view-switch {

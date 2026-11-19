@@ -42,7 +42,7 @@
 
   .view { gap: 8px; }
 
-  /* One toolbar row: ‹ date › "Hari ini" + compact view picker. */
+  /* One toolbar row: ‹ date › today icon + compact view picker. */
   .calendar-toolbar {
     flex-wrap: nowrap;
     gap: 6px;
@@ -77,10 +77,14 @@
     line-height: 1.2;
   }
 
-  .today-btn {
-    min-height: 40px;
-    padding: 0 9px;
-    font-size: 0.75rem;
+  .today-icon-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .date-icon {
+    width: 25px;
+    height: 25px;
   }
 
   .toolbar-actions {
@@ -211,7 +215,8 @@
   .brand-text h1 { font-size: 0.98rem; }
   .nav-btn { font-size: 0.8rem; padding: 0 6px; }
   .seg-btn { min-width: 0; }
-  .today-btn { padding: 0 6px; font-size: 0.72rem; }
+  .today-icon-btn { width: 38px; height: 38px; }
+  .date-icon { width: 23px; height: 23px; }
   .date-nav .icon-btn { width: 38px; height: 38px; min-height: 38px; }
   .view-select { padding: 0 22px 0 9px; font-size: 0.76rem; }
   .view-select-wrap::after { right: 8px; }
@@ -220,11 +225,8 @@
 
 /* Very narrow windows: the date keeps its own space; "Hari ini" stays one tap
    away in the ⋯ menu. */
-@media (max-width: 345px) {
-  .today-btn { display: none; }
-}
-
 @media (max-width: 300px) {
+  .today-icon-btn { display: none; }
   .date-short { display: none; }
   .date-tiny { display: inline; }
 }
@@ -325,7 +327,7 @@
   .mini-btn { min-height: 30px; }
 
   .date-nav .icon-btn,
-  .today-btn { min-height: 38px; }
+  .today-icon-btn { min-height: 38px; }
 
   .seg-btn,
   .btn { min-height: 38px; }

@@ -94,17 +94,25 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
 Panel di atas kanvas dibuat seringkas mungkin agar timeline dapat ruang:
 
 - **Header** satu baris (subjudul hanya di layar lebar).
-- **Toolbar satu baris**: `‹` tanggal `›` + tombol **Hari ini** + pemilih
-  tampilan ringkas (`Hari ▾`). Di layar lebar pemilih tampil sebagai segmented
-  Hari/Minggu/Bulan.
+- **Toolbar satu baris**: `‹` tanggal `›` + **ikon kalender bertanggal hari
+  ini** (ketuk untuk kembali ke hari ini) + pemilih tampilan ringkas
+  (`Hari ▾`). Di layar lebar pemilih tampil sebagai segmented Hari/Minggu/Bulan.
+  Angka di tengah ikon selalu tanggal hari ini, bukan tanggal yang sedang
+  dibuka, dan diperbarui otomatis saat lewat tengah malam.
 - **Bar profil satu baris**: chip profil digeser ke samping, sedangkan
   "Tampilkan semua", "Sembunyikan semua", "Hari ini", dan "Mode fokus" ada di
   menu `⋯`.
 - **Ringkasan bentrok satu baris**: `⚠ 2 jadwal bentrok · Anak 1, Anak 2 ›`.
   Ketuk untuk melihat rincian setiap pasangan.
-- Di layar sangat sempit (≤345 px) tombol "Hari ini" pindah ke menu `⋯`; di
-  bawah 300 px tanggal memakai bentuk pendek (`18 Nov`), dan di bawah 250 px
-  pemilih tampilan turun ke baris sendiri.
+- Di layar sangat sempit (≤300 px) ikon hari ini disembunyikan agar tanggal
+  tetap terbaca; "Hari ini" tetap tersedia di menu `⋯`. Di bawah 300 px tanggal
+  memakai bentuk pendek (`18 Nov`), dan di bawah 250 px pemilih tampilan turun
+  ke baris sendiri.
+
+Catatan ikon: tidak ada library ikon yang menyediakan angka tanggal hidup
+(Material Symbols `event` memakai angka tetap 17). Bingkai kalender dibuat
+mengikuti pola Lucide/Tabler (lisensi MIT) dan angkanya dirender sebagai teks
+SVG, sehingga tanpa dependency tambahan dan ikut warna tema.
 
 Hasil terukur pada 390×844: tinggi panel turun dari ±360 px menjadi ±231 px,
 sehingga kanvas bertambah dari 387 px menjadi ±539 px (±+39%).
@@ -262,11 +270,14 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 63 | Sembunyikan profil: kegiatan hilang, lane dan bentrok dihitung ulang | Lulus |
 | 64 | Tambah/geser/resize/hapus kegiatan: lane dan bentrok dihitung ulang setelah render | Lulus |
 | 65 | Lebar 360–390 px: 2 lane tetap terbaca (judul + jam), tanpa overflow horizontal | Lulus |
-| 66 | Toolbar satu baris di 390/360 px: tanggal, "Hari ini", dan pemilih tampilan tidak terpotong | Lulus |
+| 66 | Toolbar satu baris di 390/360 px: tanggal, ikon hari ini, dan pemilih tampilan tidak terpotong | Lulus |
 | 67 | Menu `⋯`: Hari ini, tampilkan/sembunyikan semua, mode fokus; menutup setelah aksi dan saat diketuk di luar | Lulus |
 | 68 | Ringkasan bentrok satu baris; ketuk membuka rincian semua pasangan, ketuk lagi menutup | Lulus |
 | 69 | 195×422 dan 260×563: footer terlihat penuh, tanggal tetap terbaca, tanpa overflow horizontal | Lulus |
 | 70 | Desktop 1440×900: segmented Hari/Minggu/Bulan tampil, toolbar dan bar profil tetap satu baris | Lulus |
+| 71 | Ikon kalender di toolbar menampilkan tanggal hari ini (1–31) dan tetap sama saat membuka tanggal lain | Lulus |
+| 72 | Ketuk ikon kalender kembali ke hari ini; `aria-label` menyebut tanggal lengkap | Lulus |
+| 73 | Angka di ikon diperbarui otomatis saat lewat tengah malam tanpa reload | Lulus (logika 30 detik) |
 
 **Batasan yang belum diverifikasi:**
 
