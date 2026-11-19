@@ -8,6 +8,7 @@
  */
 
 import { buildDayLayout } from './layout-engine.js';
+import { weekHeadline, weekSummary } from './periods.js';
 import {
   escapeHtml,
   formatDurationLabel,
@@ -200,17 +201,64 @@ function dayViewMarkup(data, layout) {
     </div>`;
 }
 
-function placeholderMarkup(view) {
-  if (view === 'week') {
-    return `
-      <div class="placeholder-card">
-        <span class="placeholder-icon" aria-hidden="true">📅</span>
-        <span class="phase-tag">Fase 4</span>
-        <h3>Tampilan minggu</h3>
-        <p>Tujuh hari dengan indikator kegiatan akan hadir pada Fase 4. Sementara ini, gunakan tombol ‹ dan › untuk berpindah hari.</p>
-        <button type="button" class="btn btn-primary" data-action="set-view" data-view="day">Kembali ke tampilan hari</button>
-      </div>`;
-  }
+function weekRow(day) {
+  const classes = [
+    'week-row',
+    day.isToday ? 'is-today' : '',
+    day.isSelected ? 'is-selected' : '',
+    day.isWeekend ? 'is-weekend' : '',
+  ].filter(Boolean).join(' ');
+
+  const labels = [
+    `${day.weekdayLong}, ${day.dayNumber}`,
+    `${day.count} kegiatan`,
+    day.conflictCount ? `${day.conflictCount} bentrok` : '',
+    day.specialDays.map((entry) => entry.title).join(', '),
+    day.isToday ? 'hari ini' : '',
+  ].filter(Boolean).join('. ');
+
+  const dots = day.colors.map((color) => (
+    `<span class="week-dot" style="--dot-color:${escapeHtml(color)}"></span>`
+  )).join('');
+
+  return `
+    <button type="button" class="${classes}" data-action="open-day" data-date="${day.dateKey}" aria-label="${escapeHtml(labels)}">
+      <span class="week-day">
+        <span class="week-wd">${day.weekdayShort}</span>
+        <span class="week-num">${day.dayNumber}</span>
+      </span>
+      <span class="week-info">
+        <span class="week-count">${day.count} kegiatan</span>
+        ${dots ? `<span class="week-dots" aria-hidden="true">${dots}</span>` : ''}
+        ${day.conflictCount ? `<span class="week-conflict" aria-hidden="true">⚠ ${day.conflictCount}</span>` : ''}
+        ${day.specialDays.length ? `<span class="week-special" aria-hidden="true">${day.specialDays[0].type === 'birthday' ? '🎂' : day.specialDays[0].type === 'holiday' ? '🎉' : '⭐'}</span>` : ''}
+        ${day.isToday ? '<span class="week-today">Hari ini</span>' : ''}
+      </span>
+      <span class="week-chevron" aria-hidden="true">›</span>
+    </button>`;
+}
+
+function weekViewMarkup(data) {
+  const summary = weekSummary(data, data.settings.selectedDate);
+  const headline = weekHeadline(data.settings.selectedDate);
+
+  return `
+    <div class="period-card week-card">
+      <div class="period-head">
+        <div>
+          <h3 class="period-title">${escapeHtml(headline.label)}</h3>
+          <p class="period-sub">${summary.totalCount} kegiatan${summary.conflictCount ? ` · ${summary.conflictCount} bentrok` : ''}</p>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" data-action="go-today">Minggu ini</button>
+      </div>
+      <div class="week-list">
+        ${summary.days.map(weekRow).join('')}
+      </div>
+      <p class="period-hint">Ketuk hari untuk membuka tampilan hari.</p>
+    </div>`;
+}
+
+function placeholderMarkup() {
   return `
     <div class="placeholder-card">
       <span class="placeholder-icon" aria-hidden="true">🗓️</span>
@@ -261,8 +309,15 @@ export function renderCalendar(stage, data) {
   const view = data.settings.currentView;
   const dateKey = data.settings.selectedDate;
 
-  if (view === 'week' || view === 'month') {
-    stage.innerHTML = placeholderMarkup(view);
+  if (view === 'week') {
+    stage.innerHTML = weekViewMarkup(data);
+    previousDateKey = null;
+    previousScrollTop = null;
+    return;
+  }
+
+  if (view === 'month') {
+    stage.innerHTML = placeholderMarkup();
     previousDateKey = null;
     previousScrollTop = null;
     return;

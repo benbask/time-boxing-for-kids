@@ -10,7 +10,8 @@ import { initCalendarInteractions } from './event-interactions.js';
 import {
   dateHeadline,
   goToToday,
-  moveSelectedDate,
+  moveSelectedPeriod,
+  setSelectedDate,
   setView,
 } from './navigation.js';
 import {
@@ -63,8 +64,11 @@ const GESTURE_HINT_KEY = 'timeboxing-kids:gesture-hint-dismissed';
 
 function maybeShowGestureHint(data) {
   const view = data.settings.currentView;
-  const isCalendar = view === 'day' || view === 'week' || view === 'month';
-  if (!isCalendar) return;
+  // The hint only describes day-timeline gestures; it is noise in week/month.
+  if (view !== 'day') {
+    if (els.gestureHint) els.gestureHint.hidden = true;
+    return;
+  }
   if (localStorage.getItem(GESTURE_HINT_KEY)) return;
   if (els.gestureHint) {
     els.gestureHint.hidden = false;
@@ -79,7 +83,7 @@ function dismissGestureHint() {
 }
 
 function renderHeadline(data) {
-  const { label, sub, short, tiny } = dateHeadline(data.settings.selectedDate);
+  const { label, sub, short, tiny } = dateHeadline(data.settings.selectedDate, data.settings.currentView);
   // Three spans share the same accessible label; CSS picks long, short or tiny
   // by viewport width, so no resize listener is needed.
   els.dateLabelLong.textContent = label;
@@ -374,10 +378,14 @@ async function handleActionClick(event) {
       setView(actionTarget.dataset.view);
       break;
     case 'shift-date':
-      moveSelectedDate(Number(actionTarget.dataset.days) || 0);
+      moveSelectedPeriod(Number(actionTarget.dataset.days) || 0);
       break;
     case 'go-today':
       goToToday();
+      break;
+    case 'open-day':
+      setSelectedDate(actionTarget.dataset.date);
+      setView('day');
       break;
     case 'toggle-focus':
       toggleFocus();

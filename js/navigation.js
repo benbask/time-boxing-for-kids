@@ -4,6 +4,7 @@
  */
 
 import { getData, updateSettings } from './state.js';
+import { shiftWeekKey, weekHeadline } from './periods.js';
 import { VIEW_IDS } from './storage.js';
 import {
   addDays,
@@ -27,6 +28,18 @@ export function moveSelectedDate(days) {
   setSelectedDate(addDays(getSelectedDate(), days));
 }
 
+/** In week view the ‹/› buttons jump a whole week. */
+export function moveSelectedPeriod(direction) {
+  const data = getData();
+  const step = Number(direction) || 0;
+  if (!step) return;
+  if (data.settings.currentView === 'week') {
+    setSelectedDate(shiftWeekKey(data.settings.selectedDate, step));
+    return;
+  }
+  setSelectedDate(addDays(data.settings.selectedDate, step));
+}
+
 export function goToToday() {
   setSelectedDate(todayKey());
 }
@@ -36,7 +49,12 @@ export function setView(viewId) {
   updateSettings({ currentView: viewId });
 }
 
-export function dateHeadline(dateKey) {
+export function dateHeadline(dateKey, view = 'day') {
+  if (view === 'week') {
+    const h = weekHeadline(dateKey);
+    return { label: h.label, sub: h.sub, short: h.short, tiny: h.tiny };
+  }
+
   const date = parseDateKey(dateKey);
   return {
     label: formatLongDate(dateKey),
