@@ -118,7 +118,11 @@ function assignLanes(blocks) {
   return placed;
 }
 
-export function buildDayLayout(data, dateKey) {
+export function buildDayLayout(data, dateKey, window = null) {
+  const winStart = window?.startMin ?? 0;
+  const winEnd = window?.endMin ?? DAY_MINUTES;
+  const winMinutes = Math.max(1, winEnd - winStart);
+
   const profileMap = new Map(data.profiles.map((profile) => [profile.id, profile]));
   const allEvents = getDayEvents(data, dateKey);
   const visibleEvents = getVisibleDayEvents(data, dateKey);
@@ -134,6 +138,10 @@ export function buildDayLayout(data, dateKey) {
       const accentColors = participants.map((profile) => profile.color);
       const baseColor = accentColors[0] || null;
 
+      // Clip to the visible window; events entirely outside are not drawn.
+      const clippedStart = Math.max(startMinutes, winStart);
+      const clippedEnd = Math.min(endMinutes, winEnd);
+
       return {
         id: event.id,
         event,
@@ -143,8 +151,12 @@ export function buildDayLayout(data, dateKey) {
         startMinutes,
         endMinutes,
         durationMinutes,
-        topPercent: (startMinutes / DAY_MINUTES) * 100,
-        heightPercent: (durationMinutes / DAY_MINUTES) * 100,
+        clippedStart,
+        clippedEnd,
+        isClippedStart: startMinutes < winStart,
+        isClippedEnd: endMinutes > winEnd,
+        topPercent: ((clippedStart - winStart) / winMinutes) * 100,
+        heightPercent: (Math.max(0, clippedEnd - clippedStart) / winMinutes) * 100,
         participantIds: participants.map((profile) => profile.id),
         participants,
         isShared: participants.length > 1,
@@ -160,6 +172,7 @@ export function buildDayLayout(data, dateKey) {
         conflicts: [],
       };
     })
+    .filter((block) => block.clippedEnd > block.clippedStart)
     .sort((a, b) => (
       a.startMinutes - b.startMinutes || b.durationMinutes - a.durationMinutes
     ));
@@ -192,11 +205,14 @@ export function buildDayLayout(data, dateKey) {
 
   return {
     dateKey,
+    window: { startMin: winStart, endMin: winEnd, minutes: winMinutes },
     blocks: blocksWithConflicts,
     conflictCount: conflictPairs.length,
     conflictPairs,
     totalCount: allEvents.length,
     visibleCount: visibleEvents.length,
+    inWindowCount: blocksWithConflicts.length,
+    outsideWindowCount: visibleEvents.length - blocksWithConflicts.length,
     hiddenCount: allEvents.length - visibleEvents.length,
     participantCount: new Set(visibleEvents.flatMap((event) => event.profileIds)).size,
   };

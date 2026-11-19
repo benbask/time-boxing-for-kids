@@ -55,10 +55,14 @@ function findEvent(eventId) {
 
 /* --------------------------------------------------------------- preview --- */
 
-function applyPreview(block, startMinutes, endMinutes) {
+function applyPreview(block, startMinutes, endMinutes, window) {
+  const visibleStart = Math.max(startMinutes, window.startMin);
+  const visibleEnd = Math.min(endMinutes, window.endMin);
+  const topPercent = ((visibleStart - window.startMin) / window.minutes) * 100;
+  const heightPercent = (Math.max(0, visibleEnd - visibleStart) / window.minutes) * 100;
   const duration = Math.max(1, endMinutes - startMinutes);
-  block.style.top = `calc(${((startMinutes / DAY_MINUTES) * 100).toFixed(4)}% + 1px)`;
-  block.style.height = `calc(${((duration / DAY_MINUTES) * 100).toFixed(4)}% - 2px)`;
+  block.style.top = `calc(${topPercent.toFixed(4)}% + 1px)`;
+  block.style.height = `calc(${heightPercent.toFixed(4)}% - 2px)`;
   const time = block.querySelector('.event-time-text');
   if (time) {
     time.textContent = `${pad2(Math.floor(startMinutes / 60))}:${pad2(startMinutes % 60)} – ${minutesToTime(endMinutes)}`;
@@ -66,6 +70,18 @@ function applyPreview(block, startMinutes, endMinutes) {
   block.querySelectorAll('.event-duration').forEach((label) => {
     label.textContent = formatDurationLabel(duration);
   });
+}
+
+function canvasWindow(canvas) {
+  const startMin = Number(canvas.dataset.windowStart);
+  const endMin = Number(canvas.dataset.windowEnd);
+  const safeStart = Number.isFinite(startMin) ? startMin : 0;
+  const safeEnd = Number.isFinite(endMin) ? endMin : DAY_MINUTES;
+  return {
+    startMin: safeStart,
+    endMin: safeEnd,
+    minutes: Math.max(1, safeEnd - safeStart),
+  };
 }
 
 /* --------------------------------------------------------------- gesture --- */
@@ -81,9 +97,10 @@ function startGesture(pointerEvent, block, mode) {
   const canvas = stage.querySelector('.time-canvas');
   if (!canvas) return;
 
+  const window = canvasWindow(canvas);
   const canvasHeight = canvas.getBoundingClientRect().height;
   if (canvasHeight <= 0) return;
-  const pixelsPerMinute = canvasHeight / DAY_MINUTES;
+  const pixelsPerMinute = canvasHeight / window.minutes;
 
   const dateKey = String(original.start).slice(0, 10);
   const originalStart = eventStartMinutes(original);

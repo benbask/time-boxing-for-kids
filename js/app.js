@@ -11,6 +11,8 @@ import {
   dateHeadline,
   goToToday,
   moveSelectedDate,
+  moveSelectedPeriod,
+  setSelectedDate,
   setView,
 } from './navigation.js';
 import {
@@ -24,7 +26,16 @@ import { getData, initState, subscribe, update } from './state.js';
 import { getStorageStats } from './storage.js';
 import { THEMES, applyTheme } from './themes.js';
 import { confirmAction, initConfirmDialog, showToast } from './ui.js';
-import { escapeHtml, formatBytes, formatLongDate, todayKey, uid } from './utils.js';
+import {
+  escapeHtml,
+  formatBytes,
+  formatLongDate,
+  todayKey,
+  uid,
+} from './utils.js';
+import { ZOOM_LEVELS, RANGE_PRESETS, resolveTimeWindow } from './time-range.js';
+import { openRangeDialog, bindRangeDialog } from './range-dialog.js';
+import { openSpecialDayDialog, bindSpecialDayDialog } from './special-day.js';
 
 const els = {
   calendarView: document.getElementById('calendarView'),
@@ -52,6 +63,18 @@ const els = {
   emojiSelect: document.getElementById('emojiSelect'),
   colorPicker: document.getElementById('colorPicker'),
   gestureHint: document.getElementById('gestureHint'),
+  rangeDialog: document.getElementById('rangeDialog'),
+  rangePresetStart: document.getElementById('rangePresetStart'),
+  rangePresetEnd: document.getElementById('rangePresetEnd'),
+  rangeCustom: document.getElementById('rangeCustom'),
+  rangeCustomStart: document.getElementById('rangeCustomStart'),
+  rangeCustomEnd: document.getElementById('rangeCustomEnd'),
+  specialDayDialog: document.getElementById('specialDayDialog'),
+  specialDayDialogTitle: document.getElementById('specialDayDialogTitle'),
+  specialDayForm: document.getElementById('specialDayForm'),
+  specialDayDate: document.getElementById('specialDayDate'),
+  specialDayTitle: document.getElementById('specialDayTitle'),
+  specialDayType: document.getElementById('specialDayType'),
 };
 
 /* ------------------------------------------------------------------ render --- */
@@ -79,7 +102,7 @@ function dismissGestureHint() {
 }
 
 function renderHeadline(data) {
-  const { label, sub, short, tiny } = dateHeadline(data.settings.selectedDate);
+  const { label, sub, short, tiny } = dateHeadline(data.settings.selectedDate, data.settings.currentView);
   // Three spans share the same accessible label; CSS picks long, short or tiny
   // by viewport width, so no resize listener is needed.
   els.dateLabelLong.textContent = label;
@@ -374,11 +397,50 @@ async function handleActionClick(event) {
       setView(actionTarget.dataset.view);
       break;
     case 'shift-date':
-      moveSelectedDate(Number(actionTarget.dataset.days) || 0);
+      moveSelectedPeriod(Number(actionTarget.dataset.days) || 0);
       break;
     case 'go-today':
       goToToday();
       break;
+    case 'open-day':
+      setSelectedDate(actionTarget.dataset.date);
+      setView('day');
+      break;
+    case 'new-special-day':
+      openSpecialDayDialog(null);
+      break;
+    case 'edit-special-day': {
+      const data = getData();
+      const special = (data.specialDays || []).find((entry) => entry.id === actionTarget.dataset.id);
+      if (special) openSpecialDayDialog(special);
+      break;
+    }
+    case 'zoom-in':
+      mutate((draft) => {
+        const current = normalizeZoom(draft.settings.zoom);
+        const next = ZOOM_LEVELS[Math.min(ZOOM_LEVELS.length - 1, ZOOM_LEVELS.indexOf(current) + 1)];
+        draft.settings.zoom = next;
+      });
+      break;
+    case 'zoom-out':
+      mutate((draft) => {
+        const current = normalizeZoom(draft.settings.zoom);
+        const next = ZOOM_LEVELS[Math.max(0, ZOOM_LEVELS.indexOf(current) - 1)];
+        draft.settings.zoom = next;
+      });
+      break;
+    case 'open-range-dialog':
+      openRangeDialog();
+      break;
+    case 'set-range-preset': {
+      const preset = actionTarget.dataset.preset;
+      const found = RANGE_PRESETS.find((p) => p.id === preset);
+      if (!found) break;
+      mutate((draft) => {
+        draft.settings.visibleTimeRange = { start: found.start, end: found.end, preset: found.id };
+      }, preset === 'full' ? 'Tampilkan sepanjang hari.' : `Rentang ${found.label}.`);
+      break;
+    }
     case 'toggle-focus':
       toggleFocus();
       break;
@@ -480,6 +542,8 @@ function bindEvents() {
   initConfirmDialog();
   initEventEditor();
   initCalendarInteractions(els.calendarStage);
+  bindRangeDialog();
+  bindSpecialDayDialog();
 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape' || !focusMode) return;
