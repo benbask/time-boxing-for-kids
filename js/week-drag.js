@@ -58,7 +58,22 @@ function clearDropTarget() {
 }
 
 function holdPageStill(event) {
-  if (event.cancelable) event.preventDefault();
+  const current = gesture;
+  if (!current || !event.cancelable || !event.touches?.length) return;
+
+  const touch = event.touches[0];
+  const dx = touch.clientX - current.startX;
+  const dy = touch.clientY - current.startY;
+
+  // Once held, a clearly vertical move means "scroll", not "move to another day".
+  // Hand it back to the browser instead of trapping the finger.
+  if (!current.dragging
+    && Math.abs(dy) > SWIPE_TOLERANCE_PX
+    && Math.abs(dy) > Math.abs(dx) + DRAG_THRESHOLD_PX) {
+    cleanup();
+    return;
+  }
+  event.preventDefault();
 }
 
 function armDrag() {

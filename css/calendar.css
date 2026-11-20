@@ -934,7 +934,6 @@ body.is-focus .gesture-hint { display: none; }
 .week-event:hover { filter: brightness(0.96); }
 .week-event.is-week-dragging {
   z-index: 12;
-  pointer-events: none;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
   cursor: grabbing;
 }
