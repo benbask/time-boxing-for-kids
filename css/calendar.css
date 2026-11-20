@@ -156,6 +156,8 @@
   position: sticky;
   left: 0;
   z-index: 5;
+  grid-column: 1;
+  grid-row: 1;
   border-right: 1px solid var(--border);
   background: var(--surface-2);
 }
@@ -163,6 +165,8 @@
 /* scroll zone on the right for vertical scrolling when events are dense */
 .scroll-zone {
   position: relative;
+  grid-column: 3;
+  grid-row: 1;
   min-width: var(--scroll-zone);
   background: transparent;
 }
@@ -187,6 +191,8 @@
 .time-canvas {
   position: relative;
   min-width: 0;
+  grid-column: 2;
+  grid-row: 1;
 }
 
 .hour-row {
@@ -210,8 +216,10 @@
 }
 
 .event-layer {
-  position: absolute;
-  inset: 0;
+  /* Overlay the canvas and the right scroll zone so blocks reach the card edge. */
+  grid-column: 2 / 4;
+  grid-row: 1;
+  position: relative;
   pointer-events: none;
 }
 
@@ -220,7 +228,7 @@
 .event-block {
   position: absolute;
   left: calc(var(--ev-left, 0%) + 3px);
-  width: calc(var(--ev-width, 100%) - 6px);
+  width: calc(var(--ev-width, 100%) - 3px);
   display: flex;
   flex-direction: column;
   gap: 1px;

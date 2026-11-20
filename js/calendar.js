@@ -183,10 +183,10 @@ function dayViewMarkup(data, layout) {
           <div class="time-gutter" aria-hidden="true">${hourLabels()}</div>
           <div class="time-canvas">
             ${hourRows()}
-            <div class="event-layer">
-              ${layout.blocks.map(renderBlock).join('')}
-              ${nowLineMarkup(dateKey)}
-            </div>
+          </div>
+          <div class="event-layer">
+            ${layout.blocks.map(renderBlock).join('')}
+            ${nowLineMarkup(dateKey)}
           </div>
           <div class="scroll-zone" aria-hidden="true"></div>
         </div>

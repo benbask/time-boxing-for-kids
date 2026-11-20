@@ -299,6 +299,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 76 | Geser kiri: pindah ke hari sebelumnya; geser ke hari yang sama tidak mengubah data | Lulus |
 | 77 | Geser cepat sebelum tahan selesai: blok tidak berpindah dan tidak ada sisa status gestur | Lulus |
 | 78 | Ketuk blok minggu membuka editor; ketuk judul hari membuka tampilan hari | Lulus |
+| 79 | Blok harian mentok ke tepi kanan timeline (termasuk area scroll); ketuk blok/area kosong tetap berfungsi | Lulus |
 
 **Batasan yang belum diverifikasi:**
 
