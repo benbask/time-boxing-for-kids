@@ -205,7 +205,7 @@ function dayViewMarkup(data, layout) {
 
 function weekHourLabels() {
   return Array.from({ length: 24 }, (_, hour) => (
-    `<span class="week-hour" style="top:calc(var(--week-hour-height) * ${hour})">${pad2(hour)}:00</span>`
+    `<span class="week-hour" style="top:calc(var(--week-head-height) + var(--week-hour-height) * ${hour})">${pad2(hour)}:00</span>`
   )).join('');
 }
 
