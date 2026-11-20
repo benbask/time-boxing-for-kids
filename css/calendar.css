@@ -157,6 +157,9 @@
   z-index: 5;
   grid-column: 1;
   grid-row: 1;
+  /* Clip the half of the 00:00 / 24:00 labels that hangs past the hour grid,
+     so it does not extend the scrollable area. */
+  overflow: hidden;
   border-right: 1px solid var(--border);
   background: var(--surface-2);
 }
@@ -853,6 +856,8 @@ body.is-gesturing {
   left: 0;
   z-index: 4;
   height: calc(var(--week-head-height) + var(--week-hour-height) * 24);
+  /* Same as the day view: clip the overhanging half of the 24:00 label. */
+  overflow: hidden;
   border-right: 1px solid var(--border);
   background: var(--surface-2);
 }
