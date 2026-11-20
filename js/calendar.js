@@ -338,7 +338,11 @@ export function renderCalendar(stage, data) {
   const dateKey = data.settings.selectedDate;
 
   if (view === 'week') {
+    const previousWeekScroll = stage.querySelector('.week-scroll');
+    const weekScrollTop = previousWeekScroll ? previousWeekScroll.scrollTop : 0;
     stage.innerHTML = weekViewMarkup(data);
+    const nextWeekScroll = stage.querySelector('.week-scroll');
+    if (nextWeekScroll) setScrollTop(nextWeekScroll, weekScrollTop);
     previousDateKey = null;
     previousScrollTop = null;
     return;

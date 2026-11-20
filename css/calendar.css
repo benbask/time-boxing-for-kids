@@ -823,6 +823,15 @@ body.is-focus .gesture-hint { display: none; }
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   background: var(--surface);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+body.is-gesturing {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .week-grid {

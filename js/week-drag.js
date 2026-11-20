@@ -12,7 +12,7 @@ import { addDays, eventDateKey, parseDateKey } from './utils.js';
 import { showToast } from './ui.js';
 
 const LONG_PRESS_DELAY_MS = 380;
-const SWIPE_TOLERANCE_PX = 10;
+const SWIPE_TOLERANCE_PX = 20;
 const DRAG_THRESHOLD_PX = 8;
 const CLICK_SUPPRESS_MS = 500;
 
@@ -62,14 +62,16 @@ function holdPageStill(event) {
   if (!current || !event.cancelable || !event.touches?.length) return;
 
   const touch = event.touches[0];
-  const dx = touch.clientX - current.startX;
-  const dy = touch.clientY - current.startY;
+  // Measure from where the finger was when the hold completed, not from the
+  // initial touch: fingers drift a little while waiting for 380 ms.
+  const dx = touch.clientX - (current.armX ?? current.startX);
+  const dy = touch.clientY - (current.armY ?? current.startY);
 
-  // Once held, a clearly vertical move means "scroll", not "move to another day".
-  // Hand it back to the browser instead of trapping the finger.
+  // Only a clearly vertical move means "scroll"; anything else belongs to the
+  // day-drag gesture and must not turn into text selection.
   if (!current.dragging
-    && Math.abs(dy) > SWIPE_TOLERANCE_PX
-    && Math.abs(dy) > Math.abs(dx) + DRAG_THRESHOLD_PX) {
+    && Math.abs(dy) > 24
+    && Math.abs(dy) > Math.abs(dx) * 2) {
     cleanup();
     return;
   }
@@ -83,6 +85,8 @@ function armDrag() {
   current.armed = true;
   current.timer = null;
   current.rects = columns().map((column) => column.getBoundingClientRect());
+  current.armX = current.lastX ?? current.startX;
+  current.armY = current.lastY ?? current.startY;
   current.block.classList.add('is-week-dragging');
   document.body.classList.add('is-gesturing');
 
@@ -129,6 +133,9 @@ function cleanup() {
 function onMove(event) {
   const current = gesture;
   if (!current || event.pointerId !== current.pointerId) return;
+
+  current.lastX = event.clientX;
+  current.lastY = event.clientY;
 
   const dx = event.clientX - current.startX;
   const dy = event.clientY - current.startY;
@@ -220,6 +227,10 @@ function handlePointerDown(event) {
     pointerId: event.pointerId,
     startX: event.clientX,
     startY: event.clientY,
+    lastX: event.clientX,
+    lastY: event.clientY,
+    armX: event.clientX,
+    armY: event.clientY,
     sourceIndex,
     targetIndex: sourceIndex,
     dateKey: eventDateKey(record),
@@ -253,5 +264,9 @@ export function initWeekDrag(stageElement) {
   if (!stage) return;
 
   stage.addEventListener('pointerdown', handlePointerDown);
+  stage.addEventListener('contextmenu', (event) => {
+    // A long press on a block must not open the browser's selection menu.
+    if (event.target.closest('.week-event')) event.preventDefault();
+  });
   document.addEventListener('click', handleClickCapture, true);
 }
