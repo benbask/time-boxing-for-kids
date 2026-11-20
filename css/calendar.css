@@ -854,6 +854,7 @@ body.is-gesturing {
 .week-hour {
   position: absolute;
   right: 4px;
+  transform: translateY(-50%);
   font-size: 0.62rem;
   font-variant-numeric: tabular-nums;
   color: var(--text-muted);
