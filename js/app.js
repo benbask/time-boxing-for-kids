@@ -26,6 +26,7 @@ import { getStorageStats } from './storage.js';
 import { THEMES, applyTheme } from './themes.js';
 import { confirmAction, initConfirmDialog, showToast } from './ui.js';
 import { escapeHtml, formatBytes, formatLongDate, todayKey, uid } from './utils.js';
+import { initWeekDrag } from './week-drag.js';
 
 const els = {
   calendarView: document.getElementById('calendarView'),
@@ -491,6 +492,7 @@ function bindEvents() {
   initConfirmDialog();
   initEventEditor();
   initCalendarInteractions(els.calendarStage);
+  initWeekDrag(els.calendarStage);
 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape' || !focusMode) return;

@@ -89,6 +89,22 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
 - **Tetap terbaca di layar sempit**: blok 2 lane menyembunyikan avatar dan
   durasi inline di ponsel; 3 lane atau lebih memakai satu baris judul + durasi.
 
+## Fitur Fase 4 (tampilan minggu)
+
+- **Tujuh kolom hari** (Sen–Min) dengan satu gutter jam; blok kegiatan hanya
+  tampil pada jamnya, bukan daftar ringkasan terpisah.
+- **Label jam seragam**: setiap baris jam diberi label di awal barisnya
+  (00:00–23:00), sehingga jarak antar label sama dari atas sampai bawah.
+- **Garis jam dan blok satu titik nol**: garis grid digambar di area jam, bukan
+  di area judul hari, jadi posisi blok selalu cocok dengan labelnya.
+- **Pindah hari lewat gestur**: tahan blok ±0,4 detik lalu geser ke kiri/kanan
+  untuk memindahkannya ke hari sebelumnya/berikutnya. Jam dan durasi tetap;
+  kolom tujuan disorot dan muncul notifikasi "Dipindah ke …".
+- **Swipe tetap menggulir**: geser sebelum tahan selesai tidak memindahkan blok.
+- Ketuk blok → editor kegiatan; ketuk judul hari → tampilan hari.
+- Kegiatan milik profil yang disembunyikan tetap mengikuti aturan visibilitas
+  yang sama seperti tampilan hari.
+
 ## Panel atas yang ringkas
 
 Panel di atas kanvas dibuat seringkas mungkin agar timeline dapat ruang:
@@ -123,13 +139,13 @@ sehingga kanvas bertambah dari 387 px menjadi ±539 px (±+39%).
 | --- | --- | --- |
 | 2 | Buat/geser/resize/edit/hapus kegiatan, snapping 10 menit, touch gesture | **Selesai** |
 | 3 | Lane otomatis untuk kegiatan bertumpuk, peringatan konflik | **Selesai** |
-| 4 | Tampilan minggu & bulan, special day, zoom dan rentang waktu | Minggu selesai, sisanya menyusul |
+| 4 | Tampilan minggu & bulan, special day, zoom dan rentang waktu | Minggu selesai; bulan, special day, zoom menyusul |
 | 5 | Waktu salat lokal dengan parameter Kemenag/SIHAT | Belum |
 | 6 | Ekspor/impor JSON, reset aplikasi | Belum |
 | 7 | Uji perangkat Android, performance, deployment GitHub Pages | Belum |
 
-Tampilan Minggu dan Bulan sengaja menampilkan placeholder berlabel **Fase 4**
-agar tidak terlihat seperti fitur yang sudah berfungsi.
+Tampilan Bulan masih menampilkan placeholder berlabel **Fase 4** agar tidak
+terlihat seperti fitur yang sudah berfungsi.
 
 ## Data dan privasi
 
@@ -202,7 +218,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 15 | Data bertahan setelah refresh | Lulus |
 | 16 | Tidak ada error console saat pemakaian normal | Lulus |
 | 17 | Tidak ada overflow horizontal pada 390 px | Lulus (setelah perbaikan) |
-| 18 | Placeholder Minggu/Bulan dapat dibuka dan kembali ke Hari | Lulus |
+| 18 | Tampilan Minggu terbuka dengan 7 kolom; placeholder Bulan dapat dibuka dan kembali ke Hari | Lulus |
 | 19 | Dialog profil menolak nama kosong | Lulus |
 | 20 | Kondisi 0 profil tidak membuat aplikasi error | Lulus |
 | 21 | Deploy GitHub Pages dan aplikasi berjalan dari subpath repositori | Lulus (5 profil, 7 kegiatan, tanpa error console) |
@@ -278,6 +294,11 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 71 | Ikon kalender di toolbar menampilkan tanggal hari ini (1–31) dan tetap sama saat membuka tanggal lain | Lulus |
 | 72 | Ketuk ikon kalender kembali ke hari ini; `aria-label` menyebut tanggal lengkap | Lulus |
 | 73 | Angka di ikon diperbarui otomatis saat lewat tengah malam tanpa reload | Lulus (logika 30 detik) |
+| 74 | Minggu: 7 kolom, gutter 00:00–23:00 dengan jarak label sama, garis jam dan blok segaris | Lulus |
+| 75 | Tahan blok di minggu lalu geser kanan: pindah ke hari berikutnya, jam dan durasi tetap, muncul notifikasi | Lulus |
+| 76 | Geser kiri: pindah ke hari sebelumnya; geser ke hari yang sama tidak mengubah data | Lulus |
+| 77 | Geser cepat sebelum tahan selesai: blok tidak berpindah dan tidak ada sisa status gestur | Lulus |
+| 78 | Ketuk blok minggu membuka editor; ketuk judul hari membuka tampilan hari | Lulus |
 
 **Batasan yang belum diverifikasi:**
 

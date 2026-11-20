@@ -845,13 +845,11 @@ body.is-focus .gesture-hint { display: none; }
 .week-hour {
   position: absolute;
   right: 4px;
-  transform: translateY(-50%);
   font-size: 0.62rem;
   font-variant-numeric: tabular-nums;
   color: var(--text-muted);
   white-space: nowrap;
 }
-.week-hour:first-child { transform: translateY(2px); }
 
 .week-cols {
   display: grid;
@@ -928,8 +926,22 @@ body.is-focus .gesture-hint { display: none; }
   overflow: hidden;
   cursor: pointer;
   min-height: 11px;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .week-event:hover { filter: brightness(0.96); }
+.week-event.is-week-dragging {
+  z-index: 12;
+  pointer-events: none;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+  cursor: grabbing;
+}
+.week-col.is-drop-target {
+  background: var(--primary-soft);
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
 .week-event.is-conflict { border-style: dashed; border-color: var(--warning); }
 .week-event.is-neutral { --we-bg: var(--surface-3); }
 .week-event.is-thin { padding: 0 2px; border-left-width: 2px; }
