@@ -5,7 +5,7 @@
  */
 
 import { renderCalendar, refreshNowIndicator } from './calendar.js';
-import { initEventEditor } from './event-editor.js';
+import { initEventEditor, openEventEditor } from './event-editor.js';
 import { initCalendarInteractions } from './event-interactions.js';
 import {
   dateHeadline,
@@ -386,6 +386,9 @@ async function handleActionClick(event) {
     case 'open-day':
       setSelectedDate(actionTarget.dataset.date);
       setView('day');
+      break;
+    case 'edit-week-event':
+      openEventEditor(actionTarget.dataset.eventId);
       break;
     case 'toggle-focus':
       toggleFocus();

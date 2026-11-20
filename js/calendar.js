@@ -12,6 +12,8 @@ import { weekHeadline, weekSummary } from './periods.js';
 import {
   escapeHtml,
   formatDurationLabel,
+  formatLongDate,
+  hexToRgba,
   nowMinutes,
   pad2,
   relativeDayLabel,
@@ -201,46 +203,67 @@ function dayViewMarkup(data, layout) {
     </div>`;
 }
 
-function weekRow(day) {
+function weekHourLabels() {
+  return Array.from({ length: 24 }, (_, hour) => (
+    `<span class="week-hour" style="top:calc(var(--week-hour-height) * ${hour})">${pad2(hour)}:00</span>`
+  )).join('');
+}
+
+function weekEvent(block) {
   const classes = [
-    'week-row',
+    'week-event',
+    block.isConflict ? 'is-conflict' : '',
+    block.isNeutral ? 'is-neutral' : '',
+    block.heightPercent < 2.2 ? 'is-thin' : '',
+  ].filter(Boolean).join(' ');
+  const style = [
+    `top:calc(${block.topPercent.toFixed(4)}% + 1px)`,
+    `height:calc(${block.heightPercent.toFixed(4)}% - 2px)`,
+    `--we-stripe:${block.stripe}`,
+    block.color ? `--we-bg:${hexToRgba(block.color, 0.18)}` : '',
+  ].filter(Boolean).join(';');
+
+  return `
+    <button type="button" class="${classes}" style="${style}"
+      data-action="edit-week-event" data-event-id="${escapeHtml(block.id)}"
+      title="${escapeHtml(`${block.title} · ${block.timeLabel}`)}"
+      aria-label="Ubah kegiatan ${escapeHtml(block.title)}, ${escapeHtml(block.timeLabel)}">
+      <span class="week-event-title">${escapeHtml(block.title)}</span>
+    </button>`;
+}
+
+function weekColumn(day, dateKey) {
+  const classes = [
+    'week-col',
     day.isToday ? 'is-today' : '',
     day.isSelected ? 'is-selected' : '',
     day.isWeekend ? 'is-weekend' : '',
   ].filter(Boolean).join(' ');
 
-  const labels = [
-    `${day.weekdayLong}, ${day.dayNumber}`,
-    `${day.count} kegiatan`,
-    day.conflictCount ? `${day.conflictCount} bentrok` : '',
-    day.specialDays.map((entry) => entry.title).join(', '),
-    day.isToday ? 'hari ini' : '',
-  ].filter(Boolean).join('. ');
-
-  const dots = day.colors.map((color) => (
-    `<span class="week-dot" style="--dot-color:${escapeHtml(color)}"></span>`
-  )).join('');
+  const now = day.isToday
+    ? `<div class="week-now" style="top:${((nowMinutes() / 1440) * 100).toFixed(4)}%"><span></span></div>`
+    : '';
 
   return `
-    <button type="button" class="${classes}" data-action="open-day" data-date="${day.dateKey}" aria-label="${escapeHtml(labels)}">
-      <span class="week-day">
+    <div class="${classes}">
+      <button type="button" class="week-col-head" data-action="open-day" data-date="${day.dateKey}"
+        aria-label="Buka ${day.weekdayLong}, ${formatLongDate(day.dateKey)}">
         <span class="week-wd">${day.weekdayShort}</span>
         <span class="week-num">${day.dayNumber}</span>
-      </span>
-      <span class="week-info">
-        <span class="week-count">${day.count} kegiatan</span>
-        ${dots ? `<span class="week-dots" aria-hidden="true">${dots}</span>` : ''}
-        ${day.conflictCount ? `<span class="week-conflict" aria-hidden="true">⚠ ${day.conflictCount}</span>` : ''}
         ${day.specialDays.length ? `<span class="week-special" aria-hidden="true">${day.specialDays[0].type === 'birthday' ? '🎂' : day.specialDays[0].type === 'holiday' ? '🎉' : '⭐'}</span>` : ''}
-        ${day.isToday ? '<span class="week-today">Hari ini</span>' : ''}
-      </span>
-      <span class="week-chevron" aria-hidden="true">›</span>
-    </button>`;
+        ${day.conflictCount ? `<span class="week-conflict" aria-hidden="true">⚠</span>` : ''}
+      </button>
+      <div class="week-col-track" style="height:calc(var(--week-hour-height) * 24)">
+        ${day.blocks.map(weekEvent).join('')}
+        ${now}
+      </div>
+    </div>`;
 }
 
 function weekViewMarkup(data) {
-  const summary = weekSummary(data, data.settings.selectedDate);
-  const headline = weekHeadline(data.settings.selectedDate);
+  const dateKey = data.settings.selectedDate;
+  const summary = weekSummary(data, dateKey);
+  const headline = weekHeadline(dateKey);
 
   return `
     <div class="period-card week-card">
@@ -251,10 +274,15 @@ function weekViewMarkup(data) {
         </div>
         <button type="button" class="btn btn-ghost btn-sm" data-action="go-today">Minggu ini</button>
       </div>
-      <div class="week-list">
-        ${summary.days.map(weekRow).join('')}
+      <div class="week-scroll">
+        <div class="week-grid">
+          <div class="week-gutter" aria-hidden="true">${weekHourLabels()}</div>
+          <div class="week-cols">
+            ${summary.days.map((day) => weekColumn(day, dateKey)).join('')}
+          </div>
+        </div>
       </div>
-      <p class="period-hint">Ketuk hari untuk membuka tampilan hari.</p>
+      <p class="period-hint">Ketuk judul hari untuk membuka tampilan hari · ketuk blok untuk mengubah kegiatan.</p>
     </div>`;
 }
 

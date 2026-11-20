@@ -123,7 +123,7 @@ sehingga kanvas bertambah dari 387 px menjadi ±539 px (±+39%).
 | --- | --- | --- |
 | 2 | Buat/geser/resize/edit/hapus kegiatan, snapping 10 menit, touch gesture | **Selesai** |
 | 3 | Lane otomatis untuk kegiatan bertumpuk, peringatan konflik | **Selesai** |
-| 4 | Tampilan minggu & bulan, special day, zoom dan rentang waktu | Belum |
+| 4 | Tampilan minggu & bulan, special day, zoom dan rentang waktu | Minggu selesai, sisanya menyusul |
 | 5 | Waktu salat lokal dengan parameter Kemenag/SIHAT | Belum |
 | 6 | Ekspor/impor JSON, reset aplikasi | Belum |
 | 7 | Uji perangkat Android, performance, deployment GitHub Pages | Belum |

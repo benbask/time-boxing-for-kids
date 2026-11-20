@@ -44,6 +44,18 @@ function daySummary(data, dateKey) {
     conflictCount: layout.conflictCount,
     colors: colors.slice(0, 3),
     specialDays,
+    blocks: layout.blocks.map((block) => ({
+      id: block.id,
+      title: block.title,
+      timeLabel: block.timeLabel,
+      topPercent: block.topPercent,
+      heightPercent: block.heightPercent,
+      durationMinutes: block.durationMinutes,
+      isConflict: block.conflicts.length > 0,
+      isNeutral: block.isNeutral,
+      color: block.baseColor,
+      stripe: block.stripe,
+    })),
   };
 }
 
