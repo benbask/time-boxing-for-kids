@@ -26,7 +26,7 @@ let previousScrollTop = null;
 const HOUR_LABEL_COUNT = 24;
 
 function hourLabels() {
-  return Array.from({ length: HOUR_LABEL_COUNT }, (_, hour) => (
+  return Array.from({ length: HOUR_LABEL_COUNT + 1 }, (_, hour) => (
     `<span class="hour-label" style="top:calc(var(--hour-height) * ${hour})">${pad2(hour)}:00</span>`
   )).join('');
 }
@@ -204,7 +204,7 @@ function dayViewMarkup(data, layout) {
 }
 
 function weekHourLabels() {
-  return Array.from({ length: 24 }, (_, hour) => (
+  return Array.from({ length: 25 }, (_, hour) => (
     `<span class="week-hour" style="top:calc(var(--week-head-height) + var(--week-hour-height) * ${hour})">${pad2(hour)}:00</span>`
   )).join('');
 }

@@ -93,8 +93,8 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
 
 - **Tujuh kolom hari** (Sen–Min) dengan satu gutter jam; blok kegiatan hanya
   tampil pada jamnya, bukan daftar ringkasan terpisah.
-- **Label jam seragam**: setiap baris jam diberi label di awal barisnya
-  (00:00–23:00), sehingga jarak antar label sama dari atas sampai bawah.
+- **Label jam seragam**: 00:00–24:00 berada tepat di tengah garis jamnya,
+  baik di tampilan hari maupun minggu, dan tidak terpotong di ujung atas/bawah.
 - **Garis jam dan blok satu titik nol**: garis grid digambar di area jam, bukan
   di area judul hari, jadi posisi blok selalu cocok dengan labelnya.
 - **Pindah hari lewat gestur**: tahan blok ±0,4 detik lalu geser ke kiri/kanan
@@ -300,6 +300,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 77 | Geser cepat sebelum tahan selesai: blok tidak berpindah dan tidak ada sisa status gestur | Lulus |
 | 78 | Ketuk blok minggu membuka editor; ketuk judul hari membuka tampilan hari | Lulus |
 | 79 | Blok harian mentok ke tepi kanan timeline (termasuk area scroll); ketuk blok/area kosong tetap berfungsi | Lulus |
+| 80 | Hari & minggu: label 00:00 dan 24:00 tepat di garisnya, tidak terpotong saat digulir ke ujung | Lulus |
 
 **Batasan yang belum diverifikasi:**
 
