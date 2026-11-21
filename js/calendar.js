@@ -48,6 +48,7 @@ function renderParticipants(participants) {
 
 function renderBlock(block) {
   const compact = block.durationMinutes < 60;
+  const short = block.durationMinutes >= 60 && block.durationMinutes < 90;
   const tall = block.durationMinutes >= 120;
   const narrow = block.laneCount >= 3;
   const tiny = block.laneCount >= 4;
@@ -55,6 +56,7 @@ function renderBlock(block) {
   const classes = [
     'event-block',
     compact ? 'is-compact' : '',
+    short ? 'is-short' : '',
     tall ? 'is-tall' : '',
     narrow ? 'is-narrow' : '',
     tiny ? 'is-tiny' : '',

@@ -360,6 +360,11 @@
 
 
 .event-title {
+  /* The title is the primary content: it stays at the top and never shrinks
+     away when the block is short and time/avatars compete for space. */
+  order: -1;
+  flex: 0 0 auto;
+  min-height: 1.2em;
   font-size: 0.87rem;
   font-weight: 700;
   line-height: 1.2;
@@ -369,6 +374,10 @@
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
 }
+
+/* 60–89 minute blocks are the tightest non-compact ones on a phone: dropping
+   the avatars keeps the title and the exact time readable. */
+.event-block.is-short .event-people { display: none; }
 
 .event-people {
   display: flex;
