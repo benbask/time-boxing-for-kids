@@ -1046,7 +1046,8 @@ body.zoom-detail-1 .event-block.is-short .event-people,
 body.zoom-detail-1 .event-block.is-tall .event-people { display: flex; }
 body.zoom-detail-1 .event-block .event-title { -webkit-line-clamp: 2; }
 body.zoom-detail-1 .week-event-time { display: block; }
-body.zoom-detail-1 .week-event-title { -webkit-line-clamp: 2; }
+body.zoom-detail-1 .week-event-title,
+body.zoom-detail-1 .week-event.is-thin .week-event-title { -webkit-line-clamp: 2; }
 
 body.zoom-detail-2 .event-block .event-note-icon { display: block; }
 body.zoom-detail-2 .event-block.is-tall .event-title { -webkit-line-clamp: 3; }
@@ -1056,7 +1057,8 @@ body.zoom-detail-2 .event-block.is-narrow {
 }
 body.zoom-detail-2 .event-block.is-narrow .event-time { display: flex; }
 body.zoom-detail-2 .event-block.is-narrow .event-duration-chip { display: none; }
-body.zoom-detail-2 .week-event-title { -webkit-line-clamp: 3; }
+body.zoom-detail-2 .week-event-title,
+body.zoom-detail-2 .week-event.is-thin .week-event-title { -webkit-line-clamp: 3; }
 
 .week-now {
   position: absolute;
