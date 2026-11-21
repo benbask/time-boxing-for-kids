@@ -42,7 +42,9 @@ const els = {
   todayIconDay: document.getElementById('todayIconDay'),
   todayIconBtn: document.querySelector('.today-icon-btn'),
   dateSub: document.getElementById('dateSub'),
-  viewSelect: document.getElementById('viewSelect'),
+  viewSelectButton: document.getElementById('viewSelectButton'),
+  viewSelectLabel: document.getElementById('viewSelectLabel'),
+  viewMenu: document.getElementById('viewSelectMenu'),
   focusBar: document.getElementById('focusBar'),
   focusDate: document.getElementById('focusDate'),
   themeGrid: document.getElementById('themeGrid'),
@@ -132,6 +134,20 @@ function toggleFocus() {
   applyChrome(getData());
 }
 
+function openViewMenu() {
+  if (!els.viewMenu || !els.viewSelectButton) return;
+  els.viewMenu.hidden = false;
+  els.viewSelectButton.setAttribute('aria-expanded', 'true');
+  els.viewMenu.querySelector('[aria-selected="true"]')?.focus();
+}
+
+function closeViewMenu(restoreFocus = false) {
+  if (!els.viewMenu || els.viewMenu.hidden) return;
+  els.viewMenu.hidden = true;
+  els.viewSelectButton?.setAttribute('aria-expanded', 'false');
+  if (restoreFocus) els.viewSelectButton?.focus();
+}
+
 function renderNav(data) {
   const view = data.settings.currentView;
 
@@ -148,7 +164,13 @@ function renderNav(data) {
     button.setAttribute('aria-pressed', String(isActive));
   });
 
-  if (els.viewSelect) els.viewSelect.value = view;
+  const selectedViewItem = els.viewMenu?.querySelector(`[data-view="${view}"]`);
+  if (selectedViewItem) {
+    els.viewSelectLabel.textContent = selectedViewItem.textContent.trim();
+    els.viewMenu.querySelectorAll('.view-menu-item').forEach((item) => {
+      item.setAttribute('aria-selected', String(item === selectedViewItem));
+    });
+  }
 }
 
 function renderViews(data) {
@@ -377,6 +399,11 @@ async function handleActionClick(event) {
   switch (action) {
     case 'set-view':
       setView(actionTarget.dataset.view);
+      closeViewMenu();
+      break;
+    case 'toggle-view-menu':
+      if (els.viewMenu?.hidden) openViewMenu();
+      else closeViewMenu();
       break;
     case 'shift-date':
       moveSelectedPeriod(Number(actionTarget.dataset.days) || 0);
@@ -450,6 +477,9 @@ function bindEvents() {
     document.querySelectorAll('.overflow-menu[open]').forEach((menu) => {
       if (!menu.contains(event.target)) menu.open = false;
     });
+    if (els.viewMenu && !els.viewMenu.hidden && !event.target.closest('.view-select-wrap')) {
+      closeViewMenu();
+    }
 
     handleActionClick(event).catch((error) => {
       console.error('[app] Aksi gagal.', error);
@@ -457,8 +487,31 @@ function bindEvents() {
     });
   });
 
-  els.viewSelect?.addEventListener('change', (event) => {
-    setView(event.target.value);
+  els.viewSelectButton?.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowDown' && els.viewMenu?.hidden) {
+      event.preventDefault();
+      openViewMenu();
+    }
+  });
+
+  els.viewMenu?.addEventListener('keydown', (event) => {
+    const items = [...els.viewMenu.querySelectorAll('.view-menu-item')];
+    const index = items.indexOf(document.activeElement);
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeViewMenu(true);
+      return;
+    }
+    if (index === -1 || !['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+
+    event.preventDefault();
+    let next = index;
+    if (event.key === 'ArrowDown') next = (index + 1) % items.length;
+    if (event.key === 'ArrowUp') next = (index - 1 + items.length) % items.length;
+    if (event.key === 'Home') next = 0;
+    if (event.key === 'End') next = items.length - 1;
+    items[next].focus();
   });
 
   els.profileForm.addEventListener('submit', handleProfileSubmit);

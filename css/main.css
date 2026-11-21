@@ -362,7 +362,8 @@ button { cursor: pointer; }
   background: var(--surface-3);
 }
 
-/* Native select: compact replacement for the segmented switch on phones. */
+/* In-app view picker. A native <select> opens the Android system dialog, so
+   phones use this HTML button + listbox styled like the rest of the app. */
 .view-select-wrap {
   position: relative;
   display: none;
@@ -373,7 +374,7 @@ button { cursor: pointer; }
   content: "▾";
   position: absolute;
   right: 10px;
-  top: 50%;
+  top: 22px;
   transform: translateY(-50%);
   font-size: 0.7rem;
   color: var(--text-muted);
@@ -381,16 +382,64 @@ button { cursor: pointer; }
 }
 
 .view-select {
-  appearance: none;
-  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
   min-height: 44px;
   padding: 0 28px 0 12px;
   border: 1px solid var(--border-strong);
   border-radius: 12px;
   background: var(--surface);
   color: var(--text);
+  font: inherit;
   font-size: 0.82rem;
   font-weight: 700;
+  cursor: pointer;
+}
+.view-select[aria-expanded="true"] { border-color: var(--primary); }
+
+.view-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 160px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.view-menu[hidden] { display: none; }
+
+.view-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.view-menu-item:hover,
+.view-menu-item:focus-visible { background: var(--surface-2); }
+.view-menu-item[aria-selected="true"] {
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+.view-menu-item[aria-selected="true"]::after {
+  content: "✓";
+  font-weight: 800;
 }
 
 .toolbar-actions {

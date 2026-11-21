@@ -84,14 +84,18 @@
               <button type="button" class="seg-btn" data-action="set-view" data-view="week">Minggu</button>
               <button type="button" class="seg-btn" data-action="set-view" data-view="month">Bulan</button>
             </div>
-            <span class="view-select-wrap">
-              <label class="visually-hidden" for="viewSelect">Pilih tampilan kalender</label>
-              <select id="viewSelect" class="view-select">
-                <option value="day">Hari</option>
-                <option value="week">Minggu</option>
-                <option value="month">Bulan</option>
-              </select>
-            </span>
+            <div class="view-select-wrap">
+              <button type="button" id="viewSelectButton" class="view-select" data-action="toggle-view-menu"
+                aria-haspopup="listbox" aria-expanded="false" aria-controls="viewSelectMenu"
+                aria-label="Pilih tampilan kalender">
+                <span id="viewSelectLabel">Minggu</span>
+              </button>
+              <div id="viewSelectMenu" class="view-menu" role="listbox" aria-label="Pilih tampilan kalender" hidden>
+                <button type="button" class="view-menu-item" role="option" data-action="set-view" data-view="day" aria-selected="false">Hari</button>
+                <button type="button" class="view-menu-item" role="option" data-action="set-view" data-view="week" aria-selected="true">Minggu</button>
+                <button type="button" class="view-menu-item" role="option" data-action="set-view" data-view="month" aria-selected="false">Bulan</button>
+              </div>
+            </div>
           </div>
         </div>
 

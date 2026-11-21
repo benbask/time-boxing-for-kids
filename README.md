@@ -304,6 +304,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 79 | Blok harian mentok ke tepi kanan timeline (termasuk area scroll); ketuk blok/area kosong tetap berfungsi | Lulus |
 | 80 | Hari & minggu: label 00:00 dan 24:00 tepat di garisnya; 24 terpotong setengah tanpa menambah area gulir | Lulus |
 | 81 | Judul kegiatan selalu tampil dan berada di urutan teratas, juga pada blok 60 menit di layar 390 px | Lulus |
+| 82 | Pemilih Hari/Minggu/Bulan di HP memakai menu HTML aplikasi, bukan dialog sistem Android; pilihan, klik di luar, Esc, dan panah keyboard berfungsi | Lulus |
 
 **Batasan yang belum diverifikasi:**
 
