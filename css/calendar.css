@@ -939,8 +939,8 @@ body.is-gesturing {
 
 .week-event {
   position: absolute;
-  left: 2px;
-  right: 2px;
+  left: calc(var(--we-left, 0%) + 2px);
+  width: calc(var(--we-width, 100%) - 4px);
   display: block;
   padding: 1px 2px 1px 4px;
   border: 1px solid var(--we-stripe, var(--border-strong));
@@ -973,6 +973,14 @@ body.is-gesturing {
 .week-event.is-conflict { border-style: dashed; border-color: var(--warning); }
 .week-event.is-neutral { --we-bg: var(--surface-3); }
 .week-event.is-thin { padding: 0 2px; border-left-width: 2px; }
+/* Overlapping events share the narrow day column, so each gets its own lane
+   instead of covering the others. */
+.week-event.is-laned {
+  padding: 1px 1px 1px 2px;
+  border-left-width: 2px;
+  font-size: 0.56rem;
+}
+.week-event.is-laned .week-event-title { word-break: break-all; }
 .week-event-title {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -1012,7 +1020,7 @@ body.is-gesturing {
 @media (max-width: 620px) {
   .week-grid { --week-hour-height: 30px; --week-gutter: 38px; }
   .week-hour { font-size: 0.58rem; }
-  .week-event { font-size: 0.58rem; left: 1px; right: 1px; padding-left: 3px; }
+  .week-event { font-size: 0.58rem; padding-left: 3px; }
 }
 
 @media (max-width: 360px) {

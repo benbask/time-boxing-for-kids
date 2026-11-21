@@ -103,6 +103,10 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
   untuk memindahkannya ke hari sebelumnya/berikutnya. Jam dan durasi tetap;
   kolom tujuan disorot dan muncul notifikasi "Dipindah ke …".
 - **Swipe tetap menggulir**: geser sebelum tahan selesai tidak memindahkan blok.
+- **Lane untuk kegiatan bersamaan**: kegiatan yang bertumpuk dalam satu kolom
+  dibagi menjadi lajur-lajur seperti di tampilan hari, jadi tidak saling
+  menutupi. Blok yang sangat sempit tetap bisa diketuk untuk melihat judul
+  lengkap di editor.
 - Ketuk blok → editor kegiatan; ketuk judul hari → tampilan hari.
 - Kegiatan milik profil yang disembunyikan tetap mengikuti aturan visibilitas
   yang sama seperti tampilan hari.
@@ -305,6 +309,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 80 | Hari & minggu: label 00:00 dan 24:00 tepat di garisnya; 24 terpotong setengah tanpa menambah area gulir | Lulus |
 | 81 | Judul kegiatan selalu tampil dan berada di urutan teratas, juga pada blok 60 menit di layar 390 px | Lulus |
 | 82 | Pemilih Hari/Minggu/Bulan di HP memakai menu HTML aplikasi, bukan dialog sistem Android; pilihan, klik di luar, Esc, dan panah keyboard berfungsi | Lulus |
+| 83 | Minggu: kegiatan bersamaan dalam satu kolom dibagi ke lane terpisah, tidak saling menimpa; ketuk & geser tetap berfungsi | Lulus |
 
 **Batasan yang belum diverifikasi:**
 

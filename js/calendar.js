@@ -212,8 +212,10 @@ function weekHourLabels() {
 }
 
 function weekEvent(block) {
+  const laned = block.laneCount > 1;
   const classes = [
     'week-event',
+    laned ? 'is-laned' : '',
     block.isConflict ? 'is-conflict' : '',
     block.isNeutral ? 'is-neutral' : '',
     block.heightPercent < 2.2 ? 'is-thin' : '',
@@ -221,6 +223,8 @@ function weekEvent(block) {
   const style = [
     `top:calc(${block.topPercent.toFixed(4)}% + 1px)`,
     `height:calc(${block.heightPercent.toFixed(4)}% - 2px)`,
+    `--we-left:${block.leftPercent.toFixed(4)}%`,
+    `--we-width:${block.widthPercent.toFixed(4)}%`,
     `--we-stripe:${block.stripe}`,
     block.color ? `--we-bg:${hexToRgba(block.color, 0.18)}` : '',
   ].filter(Boolean).join(';');
