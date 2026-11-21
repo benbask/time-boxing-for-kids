@@ -137,7 +137,7 @@
   /* --zoom is set on the root by the pinch gesture; media queries only change
      the base height, so the scale survives every re-render. */
   --hour-height: calc(var(--hour-height-base) * var(--zoom, 1));
-  --callout-space: 220px;
+  --callout-space: 250px;
   position: relative;
   --gutter-width: 62px;
   --scroll-zone: 10%;
@@ -1120,7 +1120,12 @@ body.is-gesturing {
   z-index: 11;
   pointer-events: none;
 }
-.timeline.has-callouts .event-block.is-micro .event-title { display: none; }
+/* The block keeps a faint, clipped copy of its title; the callout is the
+   readable version. */
+.timeline.has-callouts .event-block.is-micro .event-title {
+  color: var(--text-muted);
+  opacity: 0.55;
+}
 
 .callout {
   position: absolute;
@@ -1130,12 +1135,14 @@ body.is-gesturing {
   max-width: 38%;
   min-width: 104px;
   padding: 3px 6px;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--text-muted);
   border-left: 3px solid var(--leader-color, var(--primary));
   border-radius: 6px;
   background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  backdrop-filter: blur(3px);
   color: var(--text);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.2);
   font: inherit;
   font-size: 0.78rem;
   font-weight: 500;
@@ -1153,21 +1160,20 @@ body.is-gesturing {
   text-overflow: ellipsis;
 }
 
-.callout-leader {
+.callout-lines {
   position: absolute;
-  height: 0;
-  border-top: 1px dashed var(--leader-color, var(--primary));
-  opacity: 0.75;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
 }
-.callout-leader::after {
-  content: "";
-  position: absolute;
-  right: -2px;
-  top: -3px;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--leader-color, var(--primary));
+.callout-line {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+}
+.callout-dot {
+  stroke: var(--surface);
+  stroke-width: 1;
 }
 
 .week-now {
@@ -1198,7 +1204,7 @@ body.is-gesturing {
 }
 
 @media (max-width: 620px) {
-  .timeline { --callout-space: 150px; }
+  .timeline { --callout-space: 175px; }
   .week-grid { --week-hour-height-base: 30px; --week-gutter: 38px; }
   .week-hour { font-size: 0.58rem; }
   .week-event { font-size: 0.58rem; padding-left: 3px; }

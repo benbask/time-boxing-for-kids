@@ -106,14 +106,19 @@ function renderCallouts() {
   timeline.classList.toggle('has-callouts', microBlocks.length > 0);
   if (microBlocks.length === 0) return;
 
-  const space = parseFloat(getComputedStyle(timeline).getPropertyValue('--callout-space')) || 150;
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#2F80ED';
+  const space = parseFloat(getComputedStyle(timeline).getPropertyValue('--callout-space')) || 175;
   const timelineRect = timeline.getBoundingClientRect();
+
   const items = microBlocks.map((block) => {
     if (!block.dataset.calloutWidth) {
       block.dataset.calloutWidth = block.style.getPropertyValue('--ev-width');
     }
     block.style.setProperty('--ev-width', `calc(100% - ${space}px)`);
 
+    const stripe = block.style.getPropertyValue('--ev-stripe').trim();
+    const color = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(stripe) ? stripe : primary;
     const title = block.querySelector('.event-title').textContent.trim();
     const button = document.createElement('button');
     button.type = 'button';
@@ -121,24 +126,28 @@ function renderCallouts() {
     button.dataset.action = 'edit-week-event';
     button.dataset.eventId = block.dataset.eventId;
     button.title = title;
-    button.style.setProperty('--leader-color', block.style.getPropertyValue('--ev-stripe') || 'var(--primary)');
-    button.innerHTML = `<span class="callout-title"></span>`;
-    button.firstChild.textContent = title;
+    button.style.setProperty('--leader-color', color);
 
-    const leader = document.createElement('span');
-    leader.className = 'callout-leader';
-    leader.style.setProperty('--leader-color', block.style.getPropertyValue('--ev-stripe') || 'var(--primary)');
-
-    layer.append(leader, button);
-    return { block, button, leader };
+    const titleSpan = document.createElement('span');
+    titleSpan.className = 'callout-title';
+    titleSpan.textContent = title;
+    button.appendChild(titleSpan);
+    return { block, button, color };
   });
+
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.classList.add('callout-lines');
+  svg.setAttribute('width', String(timeline.scrollWidth));
+  svg.setAttribute('height', String(timeline.scrollHeight));
+  layer.appendChild(svg);
+  items.forEach(({ button }) => layer.appendChild(button));
 
   // Measure after insertion, then push overlapping labels down in time order.
   items.sort((a, b) => (
     a.block.getBoundingClientRect().top - b.block.getBoundingClientRect().top
   ));
   let previousBottom = -Infinity;
-  items.forEach(({ block, button, leader }) => {
+  items.forEach(({ block, button }) => {
     const blockRect = block.getBoundingClientRect();
     const labelHeight = button.getBoundingClientRect().height;
     const desired = blockRect.top + blockRect.height / 2 - timelineRect.top - labelHeight / 2;
@@ -147,15 +156,35 @@ function renderCallouts() {
     previousBottom = top + labelHeight;
   });
 
-  items.forEach(({ block, button, leader }) => {
+  // Elbow connector: a dot inside the real block, a bend, then a dot inside
+  // the floating label. The bend keeps ownership clear even when labels stack.
+  items.forEach(({ block, button, color }) => {
     const blockRect = block.getBoundingClientRect();
     const labelRect = button.getBoundingClientRect();
-    const startX = blockRect.right - timelineRect.left;
-    const endX = labelRect.left - timelineRect.left;
-    const y = blockRect.top + blockRect.height / 2 - timelineRect.top;
-    leader.style.left = `${startX}px`;
-    leader.style.top = `${y}px`;
-    leader.style.width = `${Math.max(0, endX - startX - 3)}px`;
+    const startX = blockRect.right - timelineRect.left - 12;
+    const startY = blockRect.top + blockRect.height / 2 - timelineRect.top;
+    const endX = labelRect.left - timelineRect.left + 12;
+    const endY = labelRect.top + labelRect.height / 2 - timelineRect.top;
+    const elbowX = startX + Math.max(12, (endX - startX) * 0.45);
+    const points = [[startX, startY], [elbowX, startY], [elbowX, endY], [endX, endY]]
+      .map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`)
+      .join(' ');
+
+    const line = document.createElementNS(svgNS, 'polyline');
+    line.setAttribute('class', 'callout-line');
+    line.setAttribute('points', points);
+    line.setAttribute('stroke', color);
+    svg.appendChild(line);
+
+    [[startX, startY], [endX, endY]].forEach(([x, y]) => {
+      const dot = document.createElementNS(svgNS, 'circle');
+      dot.setAttribute('class', 'callout-dot');
+      dot.setAttribute('cx', x.toFixed(1));
+      dot.setAttribute('cy', y.toFixed(1));
+      dot.setAttribute('r', '3');
+      dot.setAttribute('fill', color);
+      svg.appendChild(dot);
+    });
   });
 }
 
