@@ -1063,10 +1063,12 @@ body.is-gesturing {
 .event-block.room-4 .event-title { -webkit-line-clamp: 3; }
 
 .week-event.room-1 .week-event-time { display: block; }
+.week-event.room-1 .week-event-title,
+.week-event.room-1.is-thin .week-event-title { -webkit-line-clamp: 2; }
 .week-event.room-2 .week-event-title,
-.week-event.room-2.is-thin .week-event-title { -webkit-line-clamp: 2; }
+.week-event.room-2.is-thin .week-event-title { -webkit-line-clamp: 3; }
 .week-event.room-3 .week-event-title,
-.week-event.room-3.is-thin .week-event-title { -webkit-line-clamp: 3; }
+.week-event.room-3.is-thin .week-event-title { -webkit-line-clamp: 4; }
 
 .week-now {
   position: absolute;

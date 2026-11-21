@@ -116,6 +116,9 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
   secara berurutan — judul → jam → dua baris judul → peserta & catatan → tiga
   baris judul. Kalau belum cukup, hanya yang paling penting yang tampil.
   Blok minggu juga menampilkan rentang jam saat ada ruang.
+- **Judul menyesuaikan kotak**: blok yang terlalu sempit membuat judul
+  mengecil otomatis dan tidak tebal, sehingga teks tetap terbaca daripada
+  dipotong dalam ukuran besar.
 - **Trackpad**: pinch (ctrl + wheel) melakukan hal yang sama di desktop.
 - **Tombol "Zoom …%"** muncul saat skala bukan 100% untuk kembali ke normal.
 - Ketuk blok → editor kegiatan; ketuk judul hari → tampilan hari.
@@ -325,6 +328,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 85 | Pinch membatalkan geser/resize yang sedang berjalan, tidak membuka editor, dan tombol Zoom 100% mengembalikan skala | Lulus |
 | 86 | Detail blok berdasar tinggi nyata: jam → 2 baris judul → peserta/catatan → 3 baris judul; blok minggu menampilkan jam saat cukup tinggi | Lulus |
 | 87 | Zoom maksimum 400%; geser/resize snapping 5 menit pada data lama maupun baru; durasi minimum tetap 10 menit | Lulus |
+| 88 | Judul blok sempit mengecil otomatis & tidak tebal, tetap terbaca di Hari/minggu tanpa overflow | Lulus |
 
 **Batasan yang belum diverifikasi:**
 

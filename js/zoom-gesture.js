@@ -29,6 +29,8 @@ const ROOM_CLASSES = ['room-1', 'room-2', 'room-3', 'room-4'];
 let stage = null;
 let pinch = null;
 let suppressClickUntil = 0;
+const measureCanvas = document.createElement('canvas');
+const measureContext = measureCanvas.getContext('2d');
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
@@ -46,13 +48,48 @@ function applyRooms(element, height, levels) {
   });
 }
 
+/**
+ * Shrink a title that cannot fit its box instead of clipping the big bold text.
+ * The font keeps its CSS base size; we only apply a per-block scale so a tiny
+ * 30-minute block still shows its whole title in a quiet, lighter weight.
+ */
+function fitTitle(title, lines) {
+  if (!title) return;
+  const text = title.textContent.trim();
+  if (!text) return;
+
+  // Start from the stylesheet value on every pass, never from a previous scale.
+  title.style.fontSize = '';
+  title.style.fontWeight = '';
+  const style = getComputedStyle(title);
+  const base = parseFloat(style.fontSize);
+  if (!Number.isFinite(base) || base <= 0) return;
+
+  measureContext.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+  const textWidth = measureContext.measureText(text).width;
+  if (textWidth <= 0) return;
+
+  const padding = (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0);
+  const available = Math.max(1, title.clientWidth - padding) * lines;
+  const scale = clamp(available / textWidth, 0.6, 1);
+
+  if (scale < 0.99) {
+    title.style.fontSize = `${Math.max(7, base * scale).toFixed(2)}px`;
+    title.style.fontWeight = '500';
+  }
+}
+
 /** Re-measure every block after a zoom, a re-render or an orientation change. */
 export function refreshBlockDetail() {
   document.querySelectorAll('.event-block').forEach((block) => {
     applyRooms(block, block.getBoundingClientRect().height, DAY_LEVELS);
+    const lines = block.classList.contains('room-4') ? 3 : block.classList.contains('room-2') ? 2 : 1;
+    fitTitle(block.querySelector('.event-title'), lines);
   });
   document.querySelectorAll('.week-event').forEach((block) => {
     applyRooms(block, block.getBoundingClientRect().height, WEEK_LEVELS);
+    const lines = block.classList.contains('room-3') ? 4 : block.classList.contains('room-2') ? 3 : block.classList.contains('room-1') ? 2 : 1;
+    fitTitle(block.querySelector('.week-event-title'), lines);
   });
 }
 
