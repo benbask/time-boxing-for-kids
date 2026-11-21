@@ -119,6 +119,10 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
 - **Judul menyesuaikan kotak**: blok yang terlalu sempit membuat judul
   mengecil otomatis dan tidak tebal, sehingga teks tetap terbaca daripada
   dipotong dalam ukuran besar.
+- **Label callout untuk blok mikro**: kalau blok lebih pendek dari ~24 px,
+  judulnya dipindah ke label berukuran normal di sisi kanan kanvas, dengan
+  garis putus-putus yang menunjuk ke bloknya. Beberapa label yang berdekatan
+  ditumpuk agar tidak bertabrakan. Ketuk label = buka editor.
 - **Trackpad**: pinch (ctrl + wheel) melakukan hal yang sama di desktop.
 - **Tombol "Zoom …%"** muncul saat skala bukan 100% untuk kembali ke normal.
 - Ketuk blok → editor kegiatan; ketuk judul hari → tampilan hari.
@@ -329,7 +333,8 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 86 | Detail blok berdasar tinggi nyata: jam → 2 baris judul → peserta/catatan → 3 baris judul; blok minggu menampilkan jam saat cukup tinggi | Lulus |
 | 87 | Zoom maksimum 400%; geser/resize snapping 5 menit pada data lama maupun baru; durasi minimum tetap 10 menit | Lulus |
 | 88 | Judul blok sempit mengecil otomatis & tidak tebal, tetap terbaca di Hari/minggu tanpa overflow | Lulus |
-| 89 | Zoom 80%: blok 10 menit memakai seluruh slot tanpa padding, judul 7 px tetap terbaca, blok berurutan tidak saling menimpa | Lulus |
+| 89 | Zoom 80%: blok 10 menit memakai seluruh slot tanpa padding, blok berurutan tidak saling menimpa | Lulus |
+| 90 | Blok mikro memakai label callout berukuran normal di kanan kanvas + garis penunjuk; label bertumpuk rapi dan ketuk label membuka editor | Lulus |
 
 **Batasan yang belum diverifikasi:**
 

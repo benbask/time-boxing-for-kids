@@ -255,7 +255,7 @@ function handlePointerDown(event) {
 function handleClickCapture(event) {
   if (Date.now() >= suppressClickUntil) return;
   // Pinch suppression must not swallow the app's own zoom-reset button.
-  if (event.target.closest?.('.zoom-reset')) return;
+  if (event.target.closest?.('.zoom-reset, .callout')) return;
   suppressClickUntil = 0;
   event.preventDefault();
   event.stopPropagation();

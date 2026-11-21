@@ -80,6 +80,85 @@ function fitTitle(title, lines, maxFontPx = Infinity) {
   }
 }
 
+/* ------------------------------------------------------------- callouts --- */
+
+function calloutLayer() {
+  const timeline = document.querySelector('#calendarStage .timeline');
+  if (!timeline) return null;
+
+  let layer = timeline.querySelector(':scope > .callout-layer');
+  if (!layer) {
+    layer = document.createElement('div');
+    layer.className = 'callout-layer';
+    timeline.appendChild(layer);
+  }
+  return { timeline, layer };
+}
+
+function renderCallouts() {
+  const found = calloutLayer();
+  if (!found) return;
+  const { timeline, layer } = found;
+
+  const microBlocks = [...document.querySelectorAll('.event-block.is-micro')]
+    .filter((block) => block.querySelector('.event-title')?.textContent.trim());
+  layer.replaceChildren();
+  timeline.classList.toggle('has-callouts', microBlocks.length > 0);
+  if (microBlocks.length === 0) return;
+
+  const space = parseFloat(getComputedStyle(timeline).getPropertyValue('--callout-space')) || 150;
+  const timelineRect = timeline.getBoundingClientRect();
+  const items = microBlocks.map((block) => {
+    if (!block.dataset.calloutWidth) {
+      block.dataset.calloutWidth = block.style.getPropertyValue('--ev-width');
+    }
+    block.style.setProperty('--ev-width', `calc(100% - ${space}px)`);
+
+    const title = block.querySelector('.event-title').textContent.trim();
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'callout';
+    button.dataset.action = 'edit-week-event';
+    button.dataset.eventId = block.dataset.eventId;
+    button.title = title;
+    button.style.setProperty('--leader-color', block.style.getPropertyValue('--ev-stripe') || 'var(--primary)');
+    button.innerHTML = `<span class="callout-title"></span>`;
+    button.firstChild.textContent = title;
+
+    const leader = document.createElement('span');
+    leader.className = 'callout-leader';
+    leader.style.setProperty('--leader-color', block.style.getPropertyValue('--ev-stripe') || 'var(--primary)');
+
+    layer.append(leader, button);
+    return { block, button, leader };
+  });
+
+  // Measure after insertion, then push overlapping labels down in time order.
+  items.sort((a, b) => (
+    a.block.getBoundingClientRect().top - b.block.getBoundingClientRect().top
+  ));
+  let previousBottom = -Infinity;
+  items.forEach(({ block, button, leader }) => {
+    const blockRect = block.getBoundingClientRect();
+    const labelHeight = button.getBoundingClientRect().height;
+    const desired = blockRect.top + blockRect.height / 2 - timelineRect.top - labelHeight / 2;
+    const top = Math.max(desired, previousBottom + 4);
+    button.style.top = `${top}px`;
+    previousBottom = top + labelHeight;
+  });
+
+  items.forEach(({ block, button, leader }) => {
+    const blockRect = block.getBoundingClientRect();
+    const labelRect = button.getBoundingClientRect();
+    const startX = blockRect.right - timelineRect.left;
+    const endX = labelRect.left - timelineRect.left;
+    const y = blockRect.top + blockRect.height / 2 - timelineRect.top;
+    leader.style.left = `${startX}px`;
+    leader.style.top = `${y}px`;
+    leader.style.width = `${Math.max(0, endX - startX - 3)}px`;
+  });
+}
+
 /** Re-measure every block after a zoom, a re-render or an orientation change. */
 export function refreshBlockDetail() {
   document.querySelectorAll('.event-block').forEach((block) => {
@@ -87,6 +166,10 @@ export function refreshBlockDetail() {
     applyRooms(block, height, DAY_LEVELS);
     const micro = height < 24;
     block.classList.toggle('is-micro', micro);
+    if (!micro && block.dataset.calloutWidth) {
+      block.style.setProperty('--ev-width', block.dataset.calloutWidth);
+      delete block.dataset.calloutWidth;
+    }
     // The normal block style shaves 2px off the slot for breathing room. A
     // micro block needs every pixel, so let it use the whole slot.
     if (block.style.height) {
@@ -110,6 +193,7 @@ export function refreshBlockDetail() {
     const lines = block.classList.contains('room-3') ? 4 : block.classList.contains('room-2') ? 3 : block.classList.contains('room-1') ? 2 : 1;
     fitTitle(block.querySelector('.week-event-title'), lines, micro ? 7 : Infinity);
   });
+  renderCallouts();
 }
 
 function setZoom(next) {
@@ -246,7 +330,7 @@ function onWheel(event) {
 function handleClickCapture(event) {
   if (Date.now() >= suppressClickUntil) return;
   // The reset button is app UI, not a timeline tap left over from the pinch.
-  if (event.target.closest?.('.zoom-reset')) return;
+  if (event.target.closest?.('.zoom-reset, .callout')) return;
   suppressClickUntil = 0;
   event.preventDefault();
   event.stopPropagation();
