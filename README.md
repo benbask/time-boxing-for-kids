@@ -366,8 +366,14 @@ atau memindahkan repositori.
 
 Semua path aset dan modul memakai path relatif (`css/…`, `js/…`, `./…`),
 sehingga aplikasi tetap berjalan di subpath repositori, bukan hanya di root
-domain. Setelah deploy, lakukan hard refresh (Ctrl/Cmd+Shift+R) jika browser
-masih menampilkan versi lama.
+domain.
+
+GitHub Pages meng-cache aset selama 10 menit. Untuk memaksa versi baru tanpa
+mengganti nama file, buka URL dengan parameter `?v=` unik, misalnya
+`https://benbask.github.io/time-boxing-for-kids/?v=04daab4`. Nilai `v` tersebut
+disalin ke semua URL CSS, entry `app.js`, dan seluruh modul lewat import map,
+jadi halaman dan asetnya benar-benar dimuat ulang. Tanpa `?v=`, aplikasi memakai
+path aset biasa seperti sebelumnya.
 
 ## Catatan pengembangan
 

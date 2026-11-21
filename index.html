@@ -7,10 +7,34 @@
   <meta name="description" content="Jadwal keluarga sederhana dalam satu garis waktu visual. Tanpa login, tanpa server.">
   <meta name="theme-color" content="#1f9d8f">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/themes.css">
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/calendar.css">
-  <link rel="stylesheet" href="css/responsive.css">
+  <!-- Asset URLs follow ?v= from the page URL, so a versioned link bypasses the
+       10-minute cache on GitHub Pages without renaming any file. -->
+  <script>
+    (function () {
+      var v = new URLSearchParams(location.search).get('v');
+      var q = v ? '?v=' + encodeURIComponent(v) : '';
+      ['css/themes.css', 'css/main.css', 'css/calendar.css', 'css/responsive.css']
+        .forEach(function (file) {
+          document.write('<link rel="stylesheet" href="' + file + q + '">');
+        });
+
+      // ES module imports are relative, so an import map carries the same
+      // version to every module, not just to the app.js entry point.
+      if (v) {
+        var modules = [
+          'app.js', 'calendar.js', 'conflicts.js', 'event-editor.js',
+          'event-interactions.js', 'layout-engine.js', 'navigation.js',
+          'periods.js', 'profiles.js', 'state.js', 'storage.js', 'themes.js',
+          'ui.js', 'utils.js', 'week-drag.js', 'zoom-gesture.js',
+        ];
+        var imports = {};
+        modules.forEach(function (file) {
+          imports['./js/' + file] = './js/' + file + q;
+        });
+        document.write('<script type="importmap">' + JSON.stringify({ imports: imports }) + '<\/script>');
+      }
+    })();
+  </script>
   <!-- Apply the stored theme before first paint (no flash of the default theme). -->
   <script>
     try {
@@ -275,6 +299,12 @@
     <p class="noscript">Aplikasi ini membutuhkan JavaScript. Aktifkan JavaScript di browser untuk melanjutkan.</p>
   </noscript>
 
-  <script type="module" src="js/app.js"></script>
+  <script>
+    (function () {
+      var v = new URLSearchParams(location.search).get('v');
+      var q = v ? '?v=' + encodeURIComponent(v) : '';
+      document.write('<script type="module" src="js/app.js' + q + '"><\/script>');
+    })();
+  </script>
 </body>
 </html>
