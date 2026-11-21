@@ -27,7 +27,7 @@ import { THEMES, applyTheme } from './themes.js';
 import { confirmAction, initConfirmDialog, showToast } from './ui.js';
 import { escapeHtml, formatBytes, formatLongDate, todayKey, uid } from './utils.js';
 import { initWeekDrag } from './week-drag.js';
-import { initPinchZoom, resetZoom, syncZoomControls } from './zoom-gesture.js';
+import { initPinchZoom, refreshBlockDetail, resetZoom, syncZoomControls } from './zoom-gesture.js';
 
 const els = {
   calendarView: document.getElementById('calendarView'),
@@ -228,6 +228,7 @@ function renderAll() {
   const view = data.settings.currentView;
   if (view === 'day' || view === 'week' || view === 'month') {
     renderCalendar(els.calendarStage, data);
+    refreshBlockDetail();
     syncZoomControls();
   }
 

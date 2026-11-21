@@ -1030,35 +1030,43 @@ body.is-gesturing {
 }
 
 /* --------------------------------------------------------------- zoom detail --- */
-/* Zooming makes each block taller, so details that were clipped at 100% can
-   now be shown: the exact time, more of the title, participants and notes. */
+/* Priority by available room, measured per block: title first, then the exact
+   time, then participants/notes. A class is added only when the box is tall
+   enough, so the same zoom level can give different detail to each block. */
 
-body.zoom-detail-1 .event-block.is-compact {
+/* room-1: enough for the exact time. */
+.event-block.room-1 .event-time { display: flex; }
+.event-block.room-1.is-compact .event-duration-chip { display: none; }
+.event-block.room-1.is-narrow .event-time { display: flex; }
+.event-block.room-1.is-narrow .event-duration-chip { display: none; }
+
+/* room-2: enough to stack the time and two lines of title. */
+.event-block.room-2 .event-title { -webkit-line-clamp: 2; }
+.event-block.room-2.is-compact {
   flex-direction: column;
   align-items: stretch;
   gap: 1px;
   padding: 5px 10px 5px 16px;
   padding-right: 30px;
 }
-body.zoom-detail-1 .event-block.is-compact .event-time { display: flex; }
-body.zoom-detail-1 .event-block.is-compact .event-duration-chip { display: none; }
-body.zoom-detail-1 .event-block.is-short .event-people,
-body.zoom-detail-1 .event-block.is-tall .event-people { display: flex; }
-body.zoom-detail-1 .event-block .event-title { -webkit-line-clamp: 2; }
-body.zoom-detail-1 .week-event-time { display: block; }
-body.zoom-detail-1 .week-event-title,
-body.zoom-detail-1 .week-event.is-thin .week-event-title { -webkit-line-clamp: 2; }
-
-body.zoom-detail-2 .event-block .event-note-icon { display: block; }
-body.zoom-detail-2 .event-block.is-tall .event-title { -webkit-line-clamp: 3; }
-body.zoom-detail-2 .event-block.is-narrow {
+.event-block.room-2.is-narrow {
   flex-direction: column;
   align-items: stretch;
 }
-body.zoom-detail-2 .event-block.is-narrow .event-time { display: flex; }
-body.zoom-detail-2 .event-block.is-narrow .event-duration-chip { display: none; }
-body.zoom-detail-2 .week-event-title,
-body.zoom-detail-2 .week-event.is-thin .week-event-title { -webkit-line-clamp: 3; }
+
+/* room-3: enough for avatars and the note marker. */
+.event-block.room-3 .event-people,
+.event-block.room-3[data-lanes="2"] .event-people { display: flex; }
+.event-block.room-3 .event-note-icon { display: block; }
+
+/* room-4: enough for a third title line. */
+.event-block.room-4 .event-title { -webkit-line-clamp: 3; }
+
+.week-event.room-1 .week-event-time { display: block; }
+.week-event.room-2 .week-event-title,
+.week-event.room-2.is-thin .week-event-title { -webkit-line-clamp: 2; }
+.week-event.room-3 .week-event-title,
+.week-event.room-3.is-thin .week-event-title { -webkit-line-clamp: 3; }
 
 .week-now {
   position: absolute;

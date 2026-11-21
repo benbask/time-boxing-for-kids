@@ -6,8 +6,11 @@
  * user does not lose orientation. Day and week share one zoom value because
  * both draw the same 24-hour grid.
  *
- * A trackpad pinch (ctrl + wheel) is supported too, which also makes the
- * gesture testable on a desktop.
+ * Block detail is chosen from the block's ACTUAL pixel height, not from the
+ * zoom number: a short block that suddenly gets taller shows its time first,
+ * then its participants and notes, in priority order.
+ *
+ * A trackpad pinch (ctrl + wheel) is supported too.
  */
 
 import { showToast } from './ui.js';
@@ -16,8 +19,14 @@ const MIN_ZOOM = 0.8;
 const MAX_ZOOM = 3;
 const PINCH_START_EVENT = 'tbk:pinch-start';
 
+// Minimum pixel height for each extra piece of information, in priority order.
+// day: time -> two title lines -> participants/note -> three title lines.
+// week: time -> two title lines -> three title lines.
+const DAY_LEVELS = [36, 58, 84, 110];
+const WEEK_LEVELS = [32, 48, 72];
+const ROOM_CLASSES = ['room-1', 'room-2', 'room-3', 'room-4'];
+
 let stage = null;
-const pointers = new Map();
 let pinch = null;
 let suppressClickUntil = 0;
 
@@ -30,19 +39,29 @@ function currentZoom() {
   return Number.isFinite(raw) && raw > 0 ? raw : 1;
 }
 
+function applyRooms(element, height, levels) {
+  element.classList.remove(...ROOM_CLASSES);
+  levels.forEach((minimum, index) => {
+    if (height >= minimum) element.classList.add(ROOM_CLASSES[index]);
+  });
+}
+
+/** Re-measure every block after a zoom, a re-render or an orientation change. */
+export function refreshBlockDetail() {
+  document.querySelectorAll('.event-block').forEach((block) => {
+    applyRooms(block, block.getBoundingClientRect().height, DAY_LEVELS);
+  });
+  document.querySelectorAll('.week-event').forEach((block) => {
+    applyRooms(block, block.getBoundingClientRect().height, WEEK_LEVELS);
+  });
+}
+
 function setZoom(next) {
   const zoom = clamp(next, MIN_ZOOM, MAX_ZOOM);
   document.documentElement.style.setProperty('--zoom', String(zoom));
-  applyDetailLevel(zoom);
+  refreshBlockDetail();
   syncZoomControls();
   return zoom;
-}
-
-/* A bigger block has room for more than a clipped title. These classes let the
-   block styles reveal the time, participants and notes as the user zooms in. */
-function applyDetailLevel(zoom) {
-  document.body.classList.toggle('zoom-detail-1', zoom >= 1.3);
-  document.body.classList.toggle('zoom-detail-2', zoom >= 1.8);
 }
 
 export function syncZoomControls() {
@@ -72,7 +91,6 @@ function trackOrigin(scroller) {
 function applyScroll(scroller, top) {
   const next = Math.max(0, top);
   scroller.scrollTop = next;
-  // A fresh zoom can clamp the assignment before layout settles; try once more.
   if (next > 0 && scroller.scrollTop < next - 1) {
     requestAnimationFrame(() => { scroller.scrollTop = next; });
   }
@@ -90,14 +108,14 @@ function zoomAround(scroller, clientY, nextZoom) {
   applyScroll(scroller, origin + anchor * (zoom / before) - viewportY);
 }
 
-function beginPinch(scroller) {
-  if (pinch || pointers.size < 2) return;
-  const [a, b] = [...pointers.values()].slice(0, 2);
-  const distance = Math.hypot(a.x - b.x, a.y - b.y);
+function beginPinch(touches, scroller) {
+  if (pinch) return;
+  const [a, b] = touches;
+  const distance = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
   if (distance < 20) return;
 
   const rect = scroller.getBoundingClientRect();
-  const middleY = (a.y + b.y) / 2 - rect.top;
+  const middleY = (a.clientY + b.clientY) / 2 - rect.top;
   const origin = trackOrigin(scroller);
 
   pinch = {
@@ -109,35 +127,35 @@ function beginPinch(scroller) {
     middleY,
   };
 
-  // A second finger means this is a zoom, never a move/resize/tap.
+  // A second finger means zoom, never a move/resize/tap.
   window.dispatchEvent(new Event(PINCH_START_EVENT));
   suppressClickUntil = Date.now() + 600;
   document.body.classList.add('is-pinching');
 }
 
-function onPointerDown(event) {
-  if (event.pointerType === 'mouse') return;
+function onTouchStart(event) {
+  if (event.touches.length !== 2) return;
   const scroller = scrollerFor(event.target);
   if (!scroller) return;
 
-  pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-  if (pointers.size === 2) beginPinch(scroller);
+  // Stop the browser from claiming the gesture as a page zoom or a scroll.
+  if (event.cancelable) event.preventDefault();
+  beginPinch([event.touches[0], event.touches[1]], scroller);
 }
 
-function onPointerMove(event) {
-  if (!pointers.has(event.pointerId)) return;
-  pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
-  if (!pinch) return;
-
+function onTouchMove(event) {
+  if (!pinch || event.touches.length < 2) return;
   if (event.cancelable) event.preventDefault();
-  const [a, b] = [...pointers.values()].slice(0, 2);
-  const distance = Math.hypot(a.x - b.x, a.y - b.y);
+
+  const [a, b] = event.touches;
+  const distance = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
   if (distance < 10) return;
 
   const nextZoom = clamp(pinch.zoom * (distance / pinch.distance), MIN_ZOOM, MAX_ZOOM);
   if (Math.abs(nextZoom - currentZoom()) < 0.001) return;
 
   document.documentElement.style.setProperty('--zoom', String(nextZoom));
+  refreshBlockDetail();
   syncZoomControls();
   applyScroll(
     pinch.scroller,
@@ -153,17 +171,10 @@ function endPinch() {
   if (changed) showToast(`Zoom ${Math.round(currentZoom() * 100)}%.`);
 }
 
-function onPointerEnd(event) {
-  if (!pointers.has(event.pointerId)) return;
-  pointers.delete(event.pointerId);
-  if (pinch && pointers.size < 2) {
-    if (event.cancelable) event.preventDefault();
-    endPinch();
-  }
-}
-
-function onTouchMove(event) {
-  if (pinch && event.cancelable) event.preventDefault();
+function onTouchEnd(event) {
+  if (!pinch || event.touches.length >= 2) return;
+  if (event.cancelable) event.preventDefault();
+  endPinch();
 }
 
 function onWheel(event) {
@@ -173,8 +184,7 @@ function onWheel(event) {
   if (!scroller) return;
 
   event.preventDefault();
-  const next = currentZoom() * Math.exp(-event.deltaY * 0.002);
-  zoomAround(scroller, event.clientY, next);
+  zoomAround(scroller, event.clientY, currentZoom() * Math.exp(-event.deltaY * 0.002));
 }
 
 function handleClickCapture(event) {
@@ -190,13 +200,13 @@ export function initPinchZoom(stageElement) {
   stage = stageElement;
   if (!stage) return;
 
-  stage.addEventListener('pointerdown', onPointerDown);
-  stage.addEventListener('wheel', onWheel, { passive: false });
+  stage.addEventListener('touchstart', onTouchStart, { passive: false });
   stage.addEventListener('touchmove', onTouchMove, { passive: false });
-  window.addEventListener('pointermove', onPointerMove);
-  window.addEventListener('pointerup', onPointerEnd);
-  window.addEventListener('pointercancel', onPointerEnd);
+  stage.addEventListener('touchend', onTouchEnd, { passive: false });
+  stage.addEventListener('touchcancel', onTouchEnd, { passive: false });
+  stage.addEventListener('wheel', onWheel, { passive: false });
+  window.addEventListener('resize', refreshBlockDetail);
   document.addEventListener('click', handleClickCapture, true);
-  applyDetailLevel(currentZoom());
+  refreshBlockDetail();
   syncZoomControls();
 }

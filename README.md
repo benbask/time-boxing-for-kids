@@ -111,9 +111,11 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
   300%) dengan titik di bawah jari tetap diam, sehingga arah panduan tidak
   hilang. Skala dipakai bersama oleh kedua tampilan; geser satu jari tetap
   menggulir dan tidak berubah menjadi geser blok.
-- **Detail ikut terbuka saat zoom-in**: blok yang tadinya hanya menampilkan
-  judul terpotong kini menampilkan jam, lebih banyak baris judul, peserta, dan
-  ikon catatan; blok minggu juga menampilkan rentang jam.
+- **Detail menyesuaikan ruang blok**: bukan sekadar angka zoom. Setiap blok
+  diukur tinggi aslinya; kalau cukup, ia menampilkan informasi berikutnya
+  secara berurutan — judul → jam → dua baris judul → peserta & catatan → tiga
+  baris judul. Kalau belum cukup, hanya yang paling penting yang tampil.
+  Blok minggu juga menampilkan rentang jam saat ada ruang.
 - **Trackpad**: pinch (ctrl + wheel) melakukan hal yang sama di desktop.
 - **Tombol "Zoom …%"** muncul saat skala bukan 100% untuk kembali ke normal.
 - Ketuk blok → editor kegiatan; ketuk judul hari → tampilan hari.
@@ -321,7 +323,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 83 | Minggu: kegiatan bersamaan dalam satu kolom dibagi ke lane terpisah, tidak saling menimpa; ketuk & geser tetap berfungsi | Lulus |
 | 84 | Cubit di Hari/Minggu mengubah skala jam 80–300%; titik di bawah jari tetap di tempat yang sama, label jam tetap segaris | Lulus |
 | 85 | Pinch membatalkan geser/resize yang sedang berjalan, tidak membuka editor, dan tombol Zoom 100% mengembalikan skala | Lulus |
-| 86 | Zoom-in membuka detail blok: jam muncul pada blok pendek, judul lebih banyak baris, peserta/ikon catatan tampil, blok minggu menampilkan jam | Lulus |
+| 86 | Detail blok berdasar tinggi nyata: jam → 2 baris judul → peserta/catatan → 3 baris judul; blok minggu menampilkan jam saat cukup tinggi | Lulus |
 
 **Batasan yang belum diverifikasi:**
 
