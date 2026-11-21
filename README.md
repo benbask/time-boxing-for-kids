@@ -59,7 +59,7 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
 ## Fitur Fase 2
 
 - **Buat kegiatan**: ketuk area kosong di timeline → blok 30 menit langsung
-  muncul (dengan snapping 10 menit).
+  muncul (dengan snapping 5 menit).
 - **Geser kegiatan**: tahan blok ±0,4 detik, lalu geser untuk memindah waktu
   (durasi tetap). Geser tanpa menahan akan menggulir timeline, bukan memindah.
 - **Resize kegiatan**: tahan pegangan atas/bawah lalu geser untuk mengubah jam
@@ -67,7 +67,7 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
 - **Edit kegiatan**: ketuk blok atau tombol pensil → dialog ringan (nama, peserta,
   catatan). Waktu diubah di timeline, bukan di dialog.
 - **Hapus kegiatan**: dari dialog edit, dengan konfirmasi.
-- **Snapping 10 menit** dan **durasi minimum 10 menit** (dari pengaturan).
+- **Snapping 5 menit** untuk geser/resize dan **durasi minimum 10 menit**.
 - **Durasi terlihat di dalam blok**: `30 mnt`, `1 j`, `1 j 30 mnt`.
 - **Touchscreen**: Pointer Events API — mouse, sentuh, stylus, tablet. Swipe
   vertikal di mana saja (kanvas maupun blok) menggulir jadwal.
@@ -108,7 +108,7 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
   menutupi. Blok yang sangat sempit tetap bisa diketuk untuk melihat judul
   lengkap di editor.
 - **Cubit untuk zoom** di Hari dan Minggu: dua jari mengubah skala jam (80%–
-  300%) dengan titik di bawah jari tetap diam, sehingga arah panduan tidak
+  400%) dengan titik di bawah jari tetap diam, sehingga arah panduan tidak
   hilang. Skala dipakai bersama oleh kedua tampilan; geser satu jari tetap
   menggulir dan tidak berubah menjadi geser blok.
 - **Detail menyesuaikan ruang blok**: bukan sekadar angka zoom. Setiap blok
@@ -154,7 +154,7 @@ sehingga kanvas bertambah dari 387 px menjadi ±539 px (±+39%).
 
 | Fase | Fitur | Status |
 | --- | --- | --- |
-| 2 | Buat/geser/resize/edit/hapus kegiatan, snapping 10 menit, touch gesture | **Selesai** |
+| 2 | Buat/geser/resize/edit/hapus kegiatan, snapping 5 menit, durasi minimum 10 menit, touch gesture | **Selesai** |
 | 3 | Lane otomatis untuk kegiatan bertumpuk, peringatan konflik | **Selesai** |
 | 4 | Tampilan minggu & bulan, special day, zoom dan rentang waktu | Minggu + pinch zoom selesai; bulan, special day, preset rentang waktu menyusul |
 | 5 | Waktu salat lokal dengan parameter Kemenag/SIHAT | Belum |
@@ -248,8 +248,8 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 
 | # | Pengujian | Hasil |
 | --- | --- | --- |
-| 26 | Ketuk area kosong di timeline membuat blok 30 menit dengan snapping 10 menit | Lulus |
-| 27 | Seret tengah blok memindah kegiatan (durasi tetap, snapping 10 menit) | Lulus |
+| 26 | Ketuk area kosong di timeline membuat blok 30 menit dengan snapping 5 menit | Lulus |
+| 27 | Seret tengah blok memindah kegiatan (durasi tetap, snapping 5 menit, minimum 10 menit) | Lulus |
 | 28 | Seret pegangan atas mengubah jam mulai (durasi minimum 10 menit) | Lulus |
 | 29 | Seret pegangan bawah mengubah jam selesai (durasi minimum 10 menit) | Lulus |
 | 30 | Ketuk blok / tombol pensil membuka dialog edit (nama, peserta, catatan) | Lulus |
@@ -284,7 +284,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | # | Pengujian | Hasil |
 | --- | --- | --- |
 | 51 | Swipe vertikal di atas blok kegiatan menggulir timeline (tidak memindah blok) | Perlu uji HP |
-| 52 | Tahan ±0,4 detik tanpa bergeser lalu geser: blok ikut jari, snapping 10 menit tetap | Lulus (emulasi) |
+| 52 | Tahan ±0,4 detik tanpa bergeser lalu geser: blok ikut jari, snapping 5 menit tetap | Lulus (emulasi) |
 | 53 | Geser sedikit sebelum tahan berakhir (≤10 px) tetap dianggap swipe, bukan drag | Lulus (emulasi) |
 | 54 | Saat drag aktif halaman tidak ikut tergulir (touchmove non-pasif ditahan) | Perlu uji HP |
 | 55 | Durasi tampil di dalam blok compact (`30 mnt`) dan blok tinggi (`1 j 30 mnt`) | Lulus |
@@ -321,9 +321,10 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 81 | Judul kegiatan selalu tampil dan berada di urutan teratas, juga pada blok 60 menit di layar 390 px | Lulus |
 | 82 | Pemilih Hari/Minggu/Bulan di HP memakai menu HTML aplikasi, bukan dialog sistem Android; pilihan, klik di luar, Esc, dan panah keyboard berfungsi | Lulus |
 | 83 | Minggu: kegiatan bersamaan dalam satu kolom dibagi ke lane terpisah, tidak saling menimpa; ketuk & geser tetap berfungsi | Lulus |
-| 84 | Cubit di Hari/Minggu mengubah skala jam 80–300%; titik di bawah jari tetap di tempat yang sama, label jam tetap segaris | Lulus |
+| 84 | Cubit di Hari/Minggu mengubah skala jam 80–400%; titik di bawah jari tetap di tempat yang sama, label jam tetap segaris | Lulus |
 | 85 | Pinch membatalkan geser/resize yang sedang berjalan, tidak membuka editor, dan tombol Zoom 100% mengembalikan skala | Lulus |
 | 86 | Detail blok berdasar tinggi nyata: jam → 2 baris judul → peserta/catatan → 3 baris judul; blok minggu menampilkan jam saat cukup tinggi | Lulus |
+| 87 | Zoom maksimum 400%; geser/resize snapping 5 menit pada data lama maupun baru; durasi minimum tetap 10 menit | Lulus |
 
 **Batasan yang belum diverifikasi:**
 

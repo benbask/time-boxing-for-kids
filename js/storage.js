@@ -47,7 +47,7 @@ export function defaultSettings(selectedDate = todayKey()) {
     selectedDate,
     // Full-day range by default; presets arrive in Phase 4.
     visibleTimeRange: { start: '00:00', end: '24:00', preset: 'full' },
-    snapInterval: 10,
+    snapInterval: 5,
     location: {
       name: '',
       latitude: null,
@@ -239,7 +239,9 @@ function sanitizeSettings(raw) {
   const prayer = raw.prayerSettings && typeof raw.prayerSettings === 'object' ? raw.prayerSettings : {};
 
   const snapCandidates = [5, 10, 15, 30];
-  const snap = Number(raw.snapInterval);
+  // The old default was 10 and there is no setting UI yet: migrate saved data
+  // to the new 5-minute interval while respecting an explicit other choice.
+  const snap = Number(raw.snapInterval) === 10 ? 5 : Number(raw.snapInterval);
 
   return {
     activeTheme: isThemeId(raw.activeTheme) ? raw.activeTheme : defaults.activeTheme,

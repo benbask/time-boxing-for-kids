@@ -16,7 +16,7 @@
 import { showToast } from './ui.js';
 
 const MIN_ZOOM = 0.8;
-const MAX_ZOOM = 3;
+const MAX_ZOOM = 4;
 const PINCH_START_EVENT = 'tbk:pinch-start';
 
 // Minimum pixel height for each extra piece of information, in priority order.
