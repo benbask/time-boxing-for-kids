@@ -1070,6 +1070,45 @@ body.is-gesturing {
 .week-event.room-3 .week-event-title,
 .week-event.room-3.is-thin .week-event-title { -webkit-line-clamp: 4; }
 
+/* --------------------------------------------------------------- micro blocks --- */
+/* At 80% zoom a 10-minute block is only ~7px tall. Remove all padding, borders
+   and affordances so the title still fits instead of making blocks overlap. */
+.event-block.is-micro {
+  padding: 0 18px 0 12px;
+  border-top-width: 0;
+  border-bottom-width: 0;
+  border-radius: 4px;
+}
+.event-block.is-micro::before { width: 4px; }
+.event-block.is-micro .event-title {
+  min-height: 0;
+  line-height: 1;
+  -webkit-line-clamp: 1;
+  padding-right: 0;
+}
+.event-block.is-micro .event-time,
+.event-block.is-micro .event-people,
+.event-block.is-micro .event-duration,
+.event-block.is-micro .event-duration-chip,
+.event-block.is-micro .event-note-icon,
+.event-block.is-micro .event-edit,
+.event-block.is-micro .event-resize,
+.event-block.is-micro .event-conflict-mark { display: none; }
+
+.week-event.is-micro {
+  min-height: 0;
+  padding: 0 1px;
+  border-top-width: 0;
+  border-bottom-width: 0;
+  border-radius: 3px;
+}
+.week-event.is-micro .week-event-time { display: none; }
+.week-event.is-micro .week-event-title {
+  min-height: 0;
+  line-height: 1;
+  -webkit-line-clamp: 1;
+}
+
 .week-now {
   position: absolute;
   left: 0;

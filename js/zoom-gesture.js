@@ -53,7 +53,7 @@ function applyRooms(element, height, levels) {
  * The font keeps its CSS base size; we only apply a per-block scale so a tiny
  * 30-minute block still shows its whole title in a quiet, lighter weight.
  */
-function fitTitle(title, lines) {
+function fitTitle(title, lines, maxFontPx = Infinity) {
   if (!title) return;
   const text = title.textContent.trim();
   if (!text) return;
@@ -72,9 +72,10 @@ function fitTitle(title, lines) {
   const padding = (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0);
   const available = Math.max(1, title.clientWidth - padding) * lines;
   const scale = clamp(available / textWidth, 0.6, 1);
+  const target = Math.min(base * scale, maxFontPx);
 
-  if (scale < 0.99) {
-    title.style.fontSize = `${Math.max(7, base * scale).toFixed(2)}px`;
+  if (target < base * 0.99) {
+    title.style.fontSize = `${Math.max(6, target).toFixed(2)}px`;
     title.style.fontWeight = '500';
   }
 }
@@ -82,14 +83,32 @@ function fitTitle(title, lines) {
 /** Re-measure every block after a zoom, a re-render or an orientation change. */
 export function refreshBlockDetail() {
   document.querySelectorAll('.event-block').forEach((block) => {
-    applyRooms(block, block.getBoundingClientRect().height, DAY_LEVELS);
+    const height = block.getBoundingClientRect().height;
+    applyRooms(block, height, DAY_LEVELS);
+    const micro = height < 24;
+    block.classList.toggle('is-micro', micro);
+    // The normal block style shaves 2px off the slot for breathing room. A
+    // micro block needs every pixel, so let it use the whole slot.
+    if (block.style.height) {
+      block.style.height = micro
+        ? block.style.height.replace('- 2px)', '- 0px)')
+        : block.style.height.replace('- 0px)', '- 2px)');
+    }
     const lines = block.classList.contains('room-4') ? 3 : block.classList.contains('room-2') ? 2 : 1;
-    fitTitle(block.querySelector('.event-title'), lines);
+    fitTitle(block.querySelector('.event-title'), lines, micro ? 7 : Infinity);
   });
   document.querySelectorAll('.week-event').forEach((block) => {
-    applyRooms(block, block.getBoundingClientRect().height, WEEK_LEVELS);
+    const height = block.getBoundingClientRect().height;
+    applyRooms(block, height, WEEK_LEVELS);
+    const micro = height < 20;
+    block.classList.toggle('is-micro', micro);
+    if (block.style.height) {
+      block.style.height = micro
+        ? block.style.height.replace('- 2px)', '- 0px)')
+        : block.style.height.replace('- 0px)', '- 2px)');
+    }
     const lines = block.classList.contains('room-3') ? 4 : block.classList.contains('room-2') ? 3 : block.classList.contains('room-1') ? 2 : 1;
-    fitTitle(block.querySelector('.week-event-title'), lines);
+    fitTitle(block.querySelector('.week-event-title'), lines, micro ? 7 : Infinity);
   });
 }
 

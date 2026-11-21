@@ -329,6 +329,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 86 | Detail blok berdasar tinggi nyata: jam → 2 baris judul → peserta/catatan → 3 baris judul; blok minggu menampilkan jam saat cukup tinggi | Lulus |
 | 87 | Zoom maksimum 400%; geser/resize snapping 5 menit pada data lama maupun baru; durasi minimum tetap 10 menit | Lulus |
 | 88 | Judul blok sempit mengecil otomatis & tidak tebal, tetap terbaca di Hari/minggu tanpa overflow | Lulus |
+| 89 | Zoom 80%: blok 10 menit memakai seluruh slot tanpa padding, judul 7 px tetap terbaca, blok berurutan tidak saling menimpa | Lulus |
 
 **Batasan yang belum diverifikasi:**
 
