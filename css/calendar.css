@@ -1018,6 +1018,45 @@ body.is-gesturing {
   word-break: break-word;
 }
 .week-event.is-thin .week-event-title { -webkit-line-clamp: 1; }
+.week-event-time {
+  display: none;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.54rem;
+  line-height: 1.1;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --------------------------------------------------------------- zoom detail --- */
+/* Zooming makes each block taller, so details that were clipped at 100% can
+   now be shown: the exact time, more of the title, participants and notes. */
+
+body.zoom-detail-1 .event-block.is-compact {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1px;
+  padding: 5px 10px 5px 16px;
+  padding-right: 30px;
+}
+body.zoom-detail-1 .event-block.is-compact .event-time { display: flex; }
+body.zoom-detail-1 .event-block.is-compact .event-duration-chip { display: none; }
+body.zoom-detail-1 .event-block.is-short .event-people,
+body.zoom-detail-1 .event-block.is-tall .event-people { display: flex; }
+body.zoom-detail-1 .event-block .event-title { -webkit-line-clamp: 2; }
+body.zoom-detail-1 .week-event-time { display: block; }
+body.zoom-detail-1 .week-event-title { -webkit-line-clamp: 2; }
+
+body.zoom-detail-2 .event-block .event-note-icon { display: block; }
+body.zoom-detail-2 .event-block.is-tall .event-title { -webkit-line-clamp: 3; }
+body.zoom-detail-2 .event-block.is-narrow {
+  flex-direction: column;
+  align-items: stretch;
+}
+body.zoom-detail-2 .event-block.is-narrow .event-time { display: flex; }
+body.zoom-detail-2 .event-block.is-narrow .event-duration-chip { display: none; }
+body.zoom-detail-2 .week-event-title { -webkit-line-clamp: 3; }
 
 .week-now {
   position: absolute;

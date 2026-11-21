@@ -235,6 +235,7 @@ function weekEvent(block) {
       data-action="edit-week-event" data-event-id="${escapeHtml(block.id)}"
       title="${escapeHtml(`${block.title} · ${block.timeLabel}`)}"
       aria-label="Ubah kegiatan ${escapeHtml(block.title)}, ${escapeHtml(block.timeLabel)}">
+      <span class="week-event-time">${escapeHtml(block.timeLabel)}</span>
       <span class="week-event-title">${escapeHtml(block.title)}</span>
     </button>`;
 }

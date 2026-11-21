@@ -33,8 +33,16 @@ function currentZoom() {
 function setZoom(next) {
   const zoom = clamp(next, MIN_ZOOM, MAX_ZOOM);
   document.documentElement.style.setProperty('--zoom', String(zoom));
+  applyDetailLevel(zoom);
   syncZoomControls();
   return zoom;
+}
+
+/* A bigger block has room for more than a clipped title. These classes let the
+   block styles reveal the time, participants and notes as the user zooms in. */
+function applyDetailLevel(zoom) {
+  document.body.classList.toggle('zoom-detail-1', zoom >= 1.3);
+  document.body.classList.toggle('zoom-detail-2', zoom >= 1.8);
 }
 
 export function syncZoomControls() {
@@ -189,5 +197,6 @@ export function initPinchZoom(stageElement) {
   window.addEventListener('pointerup', onPointerEnd);
   window.addEventListener('pointercancel', onPointerEnd);
   document.addEventListener('click', handleClickCapture, true);
+  applyDetailLevel(currentZoom());
   syncZoomControls();
 }
