@@ -107,6 +107,12 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
   dibagi menjadi lajur-lajur seperti di tampilan hari, jadi tidak saling
   menutupi. Blok yang sangat sempit tetap bisa diketuk untuk melihat judul
   lengkap di editor.
+- **Cubit untuk zoom** di Hari dan Minggu: dua jari mengubah skala jam (80%–
+  300%) dengan titik di bawah jari tetap diam, sehingga arah panduan tidak
+  hilang. Skala dipakai bersama oleh kedua tampilan; geser satu jari tetap
+  menggulir dan tidak berubah menjadi geser blok.
+- **Trackpad**: pinch (ctrl + wheel) melakukan hal yang sama di desktop.
+- **Tombol "Zoom …%"** muncul saat skala bukan 100% untuk kembali ke normal.
 - Ketuk blok → editor kegiatan; ketuk judul hari → tampilan hari.
 - Kegiatan milik profil yang disembunyikan tetap mengikuti aturan visibilitas
   yang sama seperti tampilan hari.
@@ -145,7 +151,7 @@ sehingga kanvas bertambah dari 387 px menjadi ±539 px (±+39%).
 | --- | --- | --- |
 | 2 | Buat/geser/resize/edit/hapus kegiatan, snapping 10 menit, touch gesture | **Selesai** |
 | 3 | Lane otomatis untuk kegiatan bertumpuk, peringatan konflik | **Selesai** |
-| 4 | Tampilan minggu & bulan, special day, zoom dan rentang waktu | Minggu selesai; bulan, special day, zoom menyusul |
+| 4 | Tampilan minggu & bulan, special day, zoom dan rentang waktu | Minggu + pinch zoom selesai; bulan, special day, preset rentang waktu menyusul |
 | 5 | Waktu salat lokal dengan parameter Kemenag/SIHAT | Belum |
 | 6 | Ekspor/impor JSON, reset aplikasi | Belum |
 | 7 | Uji perangkat Android, performance, deployment GitHub Pages | Belum |
@@ -310,6 +316,8 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 81 | Judul kegiatan selalu tampil dan berada di urutan teratas, juga pada blok 60 menit di layar 390 px | Lulus |
 | 82 | Pemilih Hari/Minggu/Bulan di HP memakai menu HTML aplikasi, bukan dialog sistem Android; pilihan, klik di luar, Esc, dan panah keyboard berfungsi | Lulus |
 | 83 | Minggu: kegiatan bersamaan dalam satu kolom dibagi ke lane terpisah, tidak saling menimpa; ketuk & geser tetap berfungsi | Lulus |
+| 84 | Cubit di Hari/Minggu mengubah skala jam 80–300%; titik di bawah jari tetap di tempat yang sama, label jam tetap segaris | Lulus |
+| 85 | Pinch membatalkan geser/resize yang sedang berjalan, tidak membuka editor, dan tombol Zoom 100% mengembalikan skala | Lulus |
 
 **Batasan yang belum diverifikasi:**
 

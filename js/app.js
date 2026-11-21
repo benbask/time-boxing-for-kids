@@ -27,6 +27,7 @@ import { THEMES, applyTheme } from './themes.js';
 import { confirmAction, initConfirmDialog, showToast } from './ui.js';
 import { escapeHtml, formatBytes, formatLongDate, todayKey, uid } from './utils.js';
 import { initWeekDrag } from './week-drag.js';
+import { initPinchZoom, resetZoom, syncZoomControls } from './zoom-gesture.js';
 
 const els = {
   calendarView: document.getElementById('calendarView'),
@@ -227,6 +228,7 @@ function renderAll() {
   const view = data.settings.currentView;
   if (view === 'day' || view === 'week' || view === 'month') {
     renderCalendar(els.calendarStage, data);
+    syncZoomControls();
   }
 
   applyChrome(data);
@@ -405,6 +407,9 @@ async function handleActionClick(event) {
       if (els.viewMenu?.hidden) openViewMenu();
       else closeViewMenu();
       break;
+    case 'reset-zoom':
+      resetZoom();
+      break;
     case 'shift-date':
       moveSelectedPeriod(Number(actionTarget.dataset.days) || 0);
       break;
@@ -546,6 +551,7 @@ function bindEvents() {
   initEventEditor();
   initCalendarInteractions(els.calendarStage);
   initWeekDrag(els.calendarStage);
+  initPinchZoom(els.calendarStage);
 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape' || !focusMode) return;

@@ -160,7 +160,7 @@
   }
 
   .timeline {
-    --hour-height: 56px;
+    --hour-height-base: 56px;
     --gutter-width: 54px;
   }
 
@@ -251,7 +251,7 @@
 
 @media (min-width: 900px) {
   .timeline {
-    --hour-height: 68px;
+    --hour-height-base: 68px;
     --gutter-width: 70px;
   }
 
@@ -318,7 +318,7 @@
 
 @media (max-height: 560px) {
   .timeline {
-    --hour-height: 48px;
+    --hour-height-base: 48px;
   }
 
   .timeline-scroll { min-height: 0; }

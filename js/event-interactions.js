@@ -39,6 +39,7 @@ const MAX_END = 1439; // storage sanitizer requires end > start on the same day
 let stage = null;
 let suppressClickUntil = 0;
 let canvasPointerDown = null;
+let activeGesture = null;
 
 function snapInterval() {
   const value = Number(getData().settings.snapInterval);
@@ -97,6 +98,7 @@ function startGesture(pointerEvent, block, mode) {
   const originalTimeText = timeEl ? timeEl.textContent : '';
 
   const pointerId = pointerEvent.pointerId;
+  const token = {};
   // Touch and pen must hold still before anything moves; a mouse drags at once.
   const touchLike = pointerEvent.pointerType !== 'mouse';
   let previewStart = originalStart;
@@ -158,6 +160,7 @@ function startGesture(pointerEvent, block, mode) {
     window.removeEventListener('touchmove', holdPageStill);
     block.classList.remove('is-gesturing', 'is-resize-start', 'is-resize-end', 'is-moving');
     document.body.classList.remove('is-gesturing');
+    if (activeGesture?.token === token) activeGesture = null;
     if (block.hasPointerCapture?.(pointerId)) block.releasePointerCapture(pointerId);
   };
 
@@ -263,6 +266,8 @@ function startGesture(pointerEvent, block, mode) {
     resetPreview();
   };
 
+  activeGesture = { token, abandon };
+
   if (touchLike) {
     longPressTimer = setTimeout(armDrag, LONG_PRESS_DELAY_MS);
   } else {
@@ -364,4 +369,9 @@ export function initCalendarInteractions(stageElement) {
 
   stage.addEventListener('pointerdown', handlePointerDown);
   stage.addEventListener('click', handleClick);
+  window.addEventListener('tbk:pinch-start', () => {
+    activeGesture?.abandon();
+    canvasPointerDown = null;
+    suppressClickUntil = Date.now() + SWIPE_CLICK_SUPPRESS_MS;
+  });
 }

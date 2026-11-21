@@ -254,6 +254,8 @@ function handlePointerDown(event) {
 
 function handleClickCapture(event) {
   if (Date.now() >= suppressClickUntil) return;
+  // Pinch suppression must not swallow the app's own zoom-reset button.
+  if (event.target.closest?.('.zoom-reset')) return;
   suppressClickUntil = 0;
   event.preventDefault();
   event.stopPropagation();
@@ -267,6 +269,10 @@ export function initWeekDrag(stageElement) {
   stage.addEventListener('contextmenu', (event) => {
     // A long press on a block must not open the browser's selection menu.
     if (event.target.closest('.week-event')) event.preventDefault();
+  });
+  window.addEventListener('tbk:pinch-start', () => {
+    cleanup();
+    suppressClickUntil = Date.now() + CLICK_SUPPRESS_MS;
   });
   document.addEventListener('click', handleClickCapture, true);
 }

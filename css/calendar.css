@@ -127,11 +127,16 @@
   overflow-x: hidden;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  /* Pinch is handled by zoom-gesture.js; let the browser keep vertical pan. */
+  touch-action: pan-y;
   scrollbar-width: thin;
 }
 
 .timeline {
-  --hour-height: 60px;
+  --hour-height-base: 60px;
+  /* --zoom is set on the root by the pinch gesture; media queries only change
+     the base height, so the scale survives every re-render. */
+  --hour-height: calc(var(--hour-height-base) * var(--zoom, 1));
   --gutter-width: 62px;
   --scroll-zone: 10%;
   display: grid;
@@ -240,8 +245,8 @@
   overflow: hidden;
   pointer-events: auto;
   cursor: grab;
-  /* Vertical swipes scroll the timeline; only a held press starts a drag. */
-  touch-action: pan-y pinch-zoom;
+  /* Vertical swipes scroll the timeline; pinch is owned by zoom-gesture.js. */
+  touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset;
@@ -260,7 +265,7 @@
   height: 12px;
   z-index: 3;
   cursor: ns-resize;
-  touch-action: pan-y pinch-zoom;
+  touch-action: pan-y;
 }
 
 .event-resize-start { top: 0; }
@@ -832,6 +837,28 @@ body.is-focus .gesture-hint { display: none; }
 .period-sub { font-size: 0.78rem; color: var(--text-muted); }
 .btn-sm { padding: 4px 10px; font-size: 0.78rem; border-radius: 8px; min-height: 34px; }
 
+/* Pinch feedback and the one-tap way back to the default scale. */
+body.is-pinching {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.zoom-reset {
+  flex: none;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary-strong);
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.zoom-reset[hidden] { display: none; }
+
 .week-scroll {
   position: relative;
   flex: 1 1 auto;
@@ -839,6 +866,7 @@ body.is-focus .gesture-hint { display: none; }
   overflow: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   background: var(--surface);
   user-select: none;
   -webkit-user-select: none;
@@ -852,7 +880,8 @@ body.is-gesturing {
 }
 
 .week-grid {
-  --week-hour-height: 34px;
+  --week-hour-height-base: 34px;
+  --week-hour-height: calc(var(--week-hour-height-base) * var(--zoom, 1));
   --week-gutter: 42px;
   --week-head-height: 44px;
   display: grid;
@@ -1018,7 +1047,7 @@ body.is-gesturing {
 }
 
 @media (max-width: 620px) {
-  .week-grid { --week-hour-height: 30px; --week-gutter: 38px; }
+  .week-grid { --week-hour-height-base: 30px; --week-gutter: 38px; }
   .week-hour { font-size: 0.58rem; }
   .week-event { font-size: 0.58rem; padding-left: 3px; }
 }
@@ -1030,6 +1059,6 @@ body.is-gesturing {
 }
 
 @media (min-width: 900px) {
-  .week-grid { --week-hour-height: 44px; --week-gutter: 56px; }
+  .week-grid { --week-hour-height-base: 44px; --week-gutter: 56px; }
   .week-event { font-size: 0.68rem; }
 }
