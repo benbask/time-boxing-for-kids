@@ -297,7 +297,7 @@ function weekViewMarkup(data) {
           </div>
         </div>
       </div>
-      <p class="period-hint">Geser area kosong untuk pindah minggu · tahan blok lalu geser untuk pindah hari · cubit untuk zoom · ketuk blok untuk mengubah. <button type="button" class="zoom-reset" data-action="reset-zoom" hidden>Zoom 100%</button></p>
+      <p class="period-hint">Geser ke kiri/kanan untuk pindah minggu · tahan blok lalu geser untuk pindah hari · cubit untuk zoom · ketuk blok untuk mengubah. <button type="button" class="zoom-reset" data-action="reset-zoom" hidden>Zoom 100%</button></p>
     </div>`;
 }
 

@@ -270,9 +270,11 @@ export function initWeekDrag(stageElement) {
     // A long press on a block must not open the browser's selection menu.
     if (event.target.closest('.week-event')) event.preventDefault();
   });
-  window.addEventListener('tbk:pinch-start', () => {
+  const cancelGesture = () => {
     cleanup();
     suppressClickUntil = Date.now() + CLICK_SUPPRESS_MS;
-  });
+  };
+  window.addEventListener('tbk:pinch-start', cancelGesture);
+  window.addEventListener('tbk:cancel-block-gesture', cancelGesture);
   document.addEventListener('click', handleClickCapture, true);
 }

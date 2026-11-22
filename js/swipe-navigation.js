@@ -12,6 +12,9 @@ import { getData } from './state.js';
 const MIN_DISTANCE_PX = 50;
 const AXIS_RATIO = 1.5;
 const START_TOLERANCE_PX = 10;
+const BLOCK_TOLERANCE_PX = 18;
+// After this long on a block, the gesture belongs to long-press drag instead.
+const LONG_PRESS_MS = 380;
 const SLIDE_OUT_MS = 160;
 const SNAP_BACK_MS = 200;
 const CLICK_SUPPRESS_MS = 400;
@@ -21,7 +24,7 @@ let finishTimer = null;
 let suppressClickUntil = 0;
 
 function isSwipeTarget(target) {
-  if (target.closest?.('.event-block, .week-event, .event-resize, .callout')) return false;
+  if (target.closest?.('[data-resize], .callout')) return false;
   return Boolean(target.closest?.('#timelineScroll, .week-scroll'));
 }
 
@@ -60,6 +63,8 @@ function onPointerDown(event) {
     grid,
     scroller,
     swiping: false,
+    onBlock: Boolean(event.target.closest?.('.event-block, .week-event')),
+    downAt: Date.now(),
   };
 }
 
@@ -70,15 +75,23 @@ function onPointerMove(event) {
   const dy = event.clientY - gesture.y;
 
   if (!gesture.swiping) {
-    // Vertical intent belongs to the scroll container, not to this swipe.
-    if (Math.abs(dy) > START_TOLERANCE_PX && Math.abs(dy) >= Math.abs(dx)) {
+    // A held block belongs to the long-press move/resize gesture.
+    if (gesture.onBlock && Date.now() - gesture.downAt > LONG_PRESS_MS) {
       stopGesture();
       return;
     }
-    if (Math.abs(dx) < START_TOLERANCE_PX) return;
+    const tolerance = gesture.onBlock ? BLOCK_TOLERANCE_PX : START_TOLERANCE_PX;
+    // Vertical intent belongs to the scroll container, not to this swipe.
+    if (Math.abs(dy) > tolerance && Math.abs(dy) >= Math.abs(dx)) {
+      stopGesture();
+      return;
+    }
+    if (Math.abs(dx) < tolerance) return;
     gesture.swiping = true;
     gesture.scroller.classList.add('is-swiping');
     gesture.grid.style.transition = 'none';
+    // Cancel the block's own pointer gesture before this swipe takes over.
+    if (gesture.onBlock) window.dispatchEvent(new Event('tbk:cancel-block-gesture'));
   }
 
   if (event.cancelable) event.preventDefault();

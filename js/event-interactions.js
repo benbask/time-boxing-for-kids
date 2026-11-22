@@ -369,9 +369,11 @@ export function initCalendarInteractions(stageElement) {
 
   stage.addEventListener('pointerdown', handlePointerDown);
   stage.addEventListener('click', handleClick);
-  window.addEventListener('tbk:pinch-start', () => {
+  const cancelGesture = () => {
     activeGesture?.abandon();
     canvasPointerDown = null;
     suppressClickUntil = Date.now() + SWIPE_CLICK_SUPPRESS_MS;
-  });
+  };
+  window.addEventListener('tbk:pinch-start', cancelGesture);
+  window.addEventListener('tbk:cancel-block-gesture', cancelGesture);
 }
