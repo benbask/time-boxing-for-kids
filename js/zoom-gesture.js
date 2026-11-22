@@ -151,28 +151,39 @@ function renderCallouts() {
     const blockRect = block.getBoundingClientRect();
     const labelHeight = button.getBoundingClientRect().height;
     const desired = blockRect.top + blockRect.height / 2 - timelineRect.top - labelHeight / 2;
-    const top = Math.max(desired, previousBottom + 4);
+    // A generous gap keeps the stacked labels — and therefore their lines —
+    // from sitting on top of each other.
+    const top = Math.max(desired, previousBottom + 10);
     button.style.top = `${top}px`;
     previousBottom = top + labelHeight;
   });
 
-  // Elbow connector: a dot inside the real block, a bend, then a dot inside
-  // the floating label. The bend keeps ownership clear even when labels stack.
+  // Smooth S-curves instead of right angles. Lines keep the same top-to-bottom
+  // order as their blocks, so they never cross; dots sit inside both boxes.
+  let lastStartY = -Infinity;
+  let stagger = 0;
   items.forEach(({ block, button, color }) => {
     const blockRect = block.getBoundingClientRect();
     const labelRect = button.getBoundingClientRect();
-    const startX = blockRect.right - timelineRect.left - 12;
     const startY = blockRect.top + blockRect.height / 2 - timelineRect.top;
+    if (startY - lastStartY < 10) stagger += 6;
+    else stagger = 0;
+    lastStartY = startY;
+
+    const startX = blockRect.right - timelineRect.left - 12 - stagger;
     const endX = labelRect.left - timelineRect.left + 12;
     const endY = labelRect.top + labelRect.height / 2 - timelineRect.top;
-    const elbowX = startX + Math.max(12, (endX - startX) * 0.45);
-    const points = [[startX, startY], [elbowX, startY], [elbowX, endY], [endX, endY]]
-      .map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`)
-      .join(' ');
+    const bend = Math.max(24, (endX - startX) * 0.55);
+    const path = [
+      `M ${startX.toFixed(1)} ${startY.toFixed(1)}`,
+      `C ${(startX + bend).toFixed(1)} ${startY.toFixed(1)},`,
+      `${(endX - bend).toFixed(1)} ${endY.toFixed(1)},`,
+      `${endX.toFixed(1)} ${endY.toFixed(1)}`,
+    ].join(' ');
 
-    const line = document.createElementNS(svgNS, 'polyline');
+    const line = document.createElementNS(svgNS, 'path');
     line.setAttribute('class', 'callout-line');
-    line.setAttribute('points', points);
+    line.setAttribute('d', path);
     line.setAttribute('stroke', color);
     svg.appendChild(line);
 
