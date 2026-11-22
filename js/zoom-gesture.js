@@ -158,42 +158,87 @@ function renderCallouts() {
     previousBottom = top + labelHeight;
   });
 
-  // Smooth S-curves instead of right angles. Lines keep the same top-to-bottom
-  // order as their blocks, so they never cross; dots sit inside both boxes.
+  // Smooth S-curves instead of right angles. The boxes may stay close, but the
+  // curves are checked against each other and pushed apart until they keep a
+  // safe gap — they must never touch or lie on top of one another.
+  const MIN_LINE_GAP = 12;
   let lastStartY = -Infinity;
   let stagger = 0;
-  items.forEach(({ block, button, color }) => {
-    const blockRect = block.getBoundingClientRect();
-    const labelRect = button.getBoundingClientRect();
-    const startY = blockRect.top + blockRect.height / 2 - timelineRect.top;
-    if (startY - lastStartY < 10) stagger += 6;
+  items.forEach((item) => {
+    const blockRect = item.block.getBoundingClientRect();
+    item.labelHeight = item.button.getBoundingClientRect().height;
+    item.startY = blockRect.top + blockRect.height / 2 - timelineRect.top;
+    if (item.startY - lastStartY < 10) stagger += 14;
     else stagger = 0;
-    lastStartY = startY;
+    lastStartY = item.startY;
 
-    const startX = blockRect.right - timelineRect.left - 12 - stagger;
-    const endX = labelRect.left - timelineRect.left + 12;
-    const endY = labelRect.top + labelRect.height / 2 - timelineRect.top;
-    const bend = Math.max(24, (endX - startX) * 0.55);
+    item.startX = blockRect.right - timelineRect.left - 12 - stagger;
+    const labelRect = item.button.getBoundingClientRect();
+    item.endX = labelRect.left - timelineRect.left + 12;
+    item.bend = Math.max(24, (item.endX - item.startX) * 0.55);
+  });
+
+  const endY = (item) => parseFloat(item.button.style.top) + item.labelHeight / 2;
+  const pointAt = (item, t) => {
+    const u = 1 - t;
+    const y1 = item.startY;
+    const y2 = endY(item);
+    const c1x = item.startX + item.bend;
+    const c2x = item.endX - item.bend;
+    return [
+      u * u * u * item.startX + 3 * u * u * t * c1x + 3 * u * t * t * c2x + t * t * t * item.endX,
+      u * u * u * y1 + 3 * u * u * t * y1 + 3 * u * t * t * y2 + t * t * t * y2,
+    ];
+  };
+  const closestDistance = (a, b) => {
+    let closest = Infinity;
+    for (let i = 0; i <= 10; i += 1) {
+      for (let j = 0; j <= 10; j += 1) {
+        const p = pointAt(a, i / 10);
+        const q = pointAt(b, j / 10);
+        closest = Math.min(closest, Math.hypot(p[0] - q[0], p[1] - q[1]));
+      }
+    }
+    return closest;
+  };
+
+  for (let pass = 0; pass < 10; pass += 1) {
+    let moved = false;
+    for (let index = 0; index < items.length - 1; index += 1) {
+      const distance = closestDistance(items[index], items[index + 1]);
+      if (distance >= MIN_LINE_GAP) continue;
+      const push = MIN_LINE_GAP - distance + 2;
+      for (let next = index + 1; next < items.length; next += 1) {
+        const top = parseFloat(items[next].button.style.top) + push;
+        items[next].button.style.top = `${top}px`;
+      }
+      moved = true;
+    }
+    if (!moved) break;
+  }
+
+  items.forEach((item) => {
+    const y2 = endY(item);
     const path = [
-      `M ${startX.toFixed(1)} ${startY.toFixed(1)}`,
-      `C ${(startX + bend).toFixed(1)} ${startY.toFixed(1)},`,
-      `${(endX - bend).toFixed(1)} ${endY.toFixed(1)},`,
-      `${endX.toFixed(1)} ${endY.toFixed(1)}`,
+      `M ${item.startX.toFixed(1)} ${item.startY.toFixed(1)}`,
+      `C ${(item.startX + item.bend).toFixed(1)} ${item.startY.toFixed(1)},`,
+      `${(item.endX - item.bend).toFixed(1)} ${y2.toFixed(1)},`,
+      `${item.endX.toFixed(1)} ${y2.toFixed(1)}`,
     ].join(' ');
 
     const line = document.createElementNS(svgNS, 'path');
     line.setAttribute('class', 'callout-line');
     line.setAttribute('d', path);
-    line.setAttribute('stroke', color);
+    line.setAttribute('stroke', item.color);
     svg.appendChild(line);
 
-    [[startX, startY], [endX, endY]].forEach(([x, y]) => {
+    [[item.startX, item.startY], [item.endX, y2]].forEach(([x, y]) => {
       const dot = document.createElementNS(svgNS, 'circle');
       dot.setAttribute('class', 'callout-dot');
       dot.setAttribute('cx', x.toFixed(1));
       dot.setAttribute('cy', y.toFixed(1));
       dot.setAttribute('r', '3');
-      dot.setAttribute('fill', color);
+      dot.setAttribute('fill', item.color);
       svg.appendChild(dot);
     });
   });
