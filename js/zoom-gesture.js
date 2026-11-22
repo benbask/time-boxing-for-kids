@@ -127,6 +127,11 @@ function renderCallouts() {
     button.dataset.eventId = block.dataset.eventId;
     button.title = title;
     button.style.setProperty('--leader-color', color);
+    // Reuse the block's own tint and edge so the floating label matches it.
+    const tint = block.style.getPropertyValue('--ev-bg').trim();
+    const edge = block.style.getPropertyValue('--ev-border').trim();
+    button.style.setProperty('--callout-bg', tint || 'color-mix(in srgb, var(--surface) 86%, transparent)');
+    button.style.setProperty('--callout-border', edge || 'var(--text-muted)');
 
     const titleSpan = document.createElement('span');
     titleSpan.className = 'callout-title';

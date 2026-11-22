@@ -1135,11 +1135,10 @@ body.is-gesturing {
   max-width: 38%;
   min-width: 104px;
   padding: 3px 6px;
-  border: 1px solid var(--text-muted);
+  border: 1px solid var(--callout-border, var(--text-muted));
   border-left: 3px solid var(--leader-color, var(--primary));
   border-radius: 6px;
-  background: var(--surface);
-  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  background: var(--callout-bg, color-mix(in srgb, var(--surface) 86%, transparent));
   backdrop-filter: blur(3px);
   color: var(--text);
   box-shadow: 0 3px 9px rgba(0, 0, 0, 0.2);

@@ -337,6 +337,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 90 | Blok mikro memakai label callout berukuran normal di kanan kanvas + garis penunjuk; label bertumpuk rapi dan ketuk label membuka editor | Lulus |
 | 91 | Blok aslinya dipersempit, judul redup tetap ada; callout transparan dengan dot di dalam kedua kotak | Lulus |
 | 92 | Jarak kotak callout mengikuti jarak asli timebox: 0 saat blok nempel, ≈5,7 px untuk jeda 5 menit; kurva tidak saling menyentuh | Lulus |
+| 93 | Warna background & border callout sama dengan blok aslinya, tetap transparan | Lulus |
 
 **Batasan yang belum diverifikasi:**
 
