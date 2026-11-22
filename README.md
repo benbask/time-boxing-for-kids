@@ -355,7 +355,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 94 | Bulan: grid 6×7, 42 tanggal, jumlah kegiatan & titik warna profil, penanda hari ini/terpilih | Lulus |
 | 95 | Bulan: ‹/› pindah per bulan, "Hari ini" kembali ke bulan berjalan, ketuk tanggal membuka Hari | Lulus |
 | 96 | Bulan di 390/360 px: sel ≥44 px, footer terlihat, tanpa overflow horizontal | Lulus |
-| 97 | Swipe kiri/kanan di area kosong: Hari pindah ±1 hari, Minggu pindah ±1 minggu | Lulus |
+| 97 | Swipe kiri/kanan di area kosong: timeline mengikuti jari, lalu pindah ±1 hari/minggu atau kembali jika kurang jauh | Lulus |
 | 98 | Swipe vertikal & swipe di atas blok tidak menggeser tanggal; ketuk area kosong tetap membuat kegiatan | Lulus |
 
 **Batasan yang belum diverifikasi:**

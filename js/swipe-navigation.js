@@ -1,9 +1,9 @@
 /**
  * Horizontal swipe navigation for the day and week timelines.
  *
- * A swipe on empty timeline space moves to the previous/next day (day view) or
- * week (week view). Blocks are excluded: their horizontal gestures belong to
- * event dragging, and a vertical swipe there still scrolls the timeline.
+ * The timeline follows the finger while swiping, then either snaps back or
+ * slides out and advances the date. Swipes start only on empty timeline space;
+ * blocks keep their own drag/resize gestures.
  */
 
 import { moveSelectedDate, moveSelectedPeriod } from './navigation.js';
@@ -11,9 +11,13 @@ import { getData } from './state.js';
 
 const MIN_DISTANCE_PX = 50;
 const AXIS_RATIO = 1.5;
+const START_TOLERANCE_PX = 10;
+const SLIDE_OUT_MS = 160;
+const SNAP_BACK_MS = 200;
 const CLICK_SUPPRESS_MS = 400;
 
-let start = null;
+let gesture = null;
+let finishTimer = null;
 let suppressClickUntil = 0;
 
 function isSwipeTarget(target) {
@@ -21,35 +25,102 @@ function isSwipeTarget(target) {
   return Boolean(target.closest?.('#timelineScroll, .week-scroll'));
 }
 
+function navigate(view, direction) {
+  if (view === 'week') moveSelectedPeriod(direction);
+  else if (view === 'day') moveSelectedDate(direction);
+}
+
+function stopGesture() {
+  if (finishTimer) {
+    window.clearTimeout(finishTimer);
+    finishTimer = null;
+  }
+  if (gesture?.grid) {
+    gesture.grid.style.transition = '';
+    gesture.grid.style.transform = '';
+  }
+  gesture?.scroller?.classList.remove('is-swiping');
+  gesture = null;
+}
+
 function onPointerDown(event) {
   if (event.pointerType === 'mouse' || !event.isPrimary) return;
   if (!isSwipeTarget(event.target)) return;
+  if (gesture) stopGesture();
 
-  start = {
+  const scroller = event.target.closest('#timelineScroll, .week-scroll');
+  const grid = scroller?.querySelector('.timeline, .week-grid');
+  if (!grid) return;
+
+  gesture = {
     id: event.pointerId,
     x: event.clientX,
     y: event.clientY,
     view: getData().settings.currentView,
+    grid,
+    scroller,
+    swiping: false,
   };
 }
 
+function onPointerMove(event) {
+  if (!gesture || event.pointerId !== gesture.id) return;
+
+  const dx = event.clientX - gesture.x;
+  const dy = event.clientY - gesture.y;
+
+  if (!gesture.swiping) {
+    // Vertical intent belongs to the scroll container, not to this swipe.
+    if (Math.abs(dy) > START_TOLERANCE_PX && Math.abs(dy) >= Math.abs(dx)) {
+      stopGesture();
+      return;
+    }
+    if (Math.abs(dx) < START_TOLERANCE_PX) return;
+    gesture.swiping = true;
+    gesture.scroller.classList.add('is-swiping');
+    gesture.grid.style.transition = 'none';
+  }
+
+  if (event.cancelable) event.preventDefault();
+  // A little resistance at longer distances keeps the motion calm.
+  const resistance = Math.abs(dx) > 120 ? 0.65 : 1;
+  gesture.grid.style.transform = `translateX(${(dx * resistance).toFixed(1)}px)`;
+}
+
 function onPointerEnd(event, cancelled = false) {
-  if (!start || event.pointerId !== start.id) return;
+  if (!gesture || event.pointerId !== gesture.id) return;
 
-  const dx = event.clientX - start.x;
-  const dy = event.clientY - start.y;
-  const { view } = start;
-  start = null;
-  if (cancelled) return;
-
+  const g = gesture;
+  const dx = event.clientX - g.x;
+  const dy = event.clientY - g.y;
   const horizontal = Math.abs(dx) >= MIN_DISTANCE_PX && Math.abs(dx) > Math.abs(dy) * AXIS_RATIO;
-  if (!horizontal || (view !== 'day' && view !== 'week')) return;
-
-  // Swiping left reveals the next period, like flipping a calendar page.
   const direction = dx < 0 ? 1 : -1;
-  if (view === 'week') moveSelectedPeriod(direction);
-  else moveSelectedDate(direction);
-  suppressClickUntil = Date.now() + CLICK_SUPPRESS_MS;
+
+  if (g.swiping && !cancelled && horizontal) {
+    g.grid.style.transition = `transform ${SLIDE_OUT_MS}ms ease-out`;
+    g.grid.style.transform = `translateX(${direction > 0 ? -window.innerWidth : window.innerWidth}px)`;
+    finishTimer = window.setTimeout(() => {
+      gesture = null;
+      finishTimer = null;
+      navigate(g.view, direction);
+      suppressClickUntil = Date.now() + CLICK_SUPPRESS_MS;
+    }, SLIDE_OUT_MS);
+    return;
+  }
+
+  if (g.swiping) {
+    g.grid.style.transition = `transform ${SNAP_BACK_MS}ms ease`;
+    g.grid.style.transform = 'translateX(0px)';
+    finishTimer = window.setTimeout(() => stopGesture(), SNAP_BACK_MS);
+    suppressClickUntil = Date.now() + CLICK_SUPPRESS_MS;
+    return;
+  }
+
+  stopGesture();
+  if (!cancelled && horizontal) {
+    navigate(g.view, direction);
+    suppressClickUntil = Date.now() + CLICK_SUPPRESS_MS;
+  }
 }
 
 function handleClickCapture(event) {
@@ -63,7 +134,9 @@ function handleClickCapture(event) {
 export function initSwipeNavigation(stageElement) {
   if (!stageElement) return;
   stageElement.addEventListener('pointerdown', onPointerDown);
+  window.addEventListener('pointermove', onPointerMove);
   window.addEventListener('pointerup', (event) => onPointerEnd(event));
   window.addEventListener('pointercancel', (event) => onPointerEnd(event, true));
+  window.addEventListener('tbk:pinch-start', () => stopGesture());
   document.addEventListener('click', handleClickCapture, true);
 }

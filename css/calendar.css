@@ -881,6 +881,10 @@ body.is-gesturing {
   -webkit-touch-callout: none;
 }
 
+/* While a swipe follows the finger, never let the translated grid create a
+   horizontal scrollbar. */
+.is-swiping { overflow-x: hidden !important; }
+
 .week-grid {
   --week-hour-height-base: 34px;
   --week-hour-height: calc(var(--week-hour-height-base) * var(--zoom, 1));
