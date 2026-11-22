@@ -142,7 +142,8 @@ function renderCallouts() {
   layer.appendChild(svg);
   items.forEach(({ button }) => layer.appendChild(button));
 
-  // Measure after insertion, then push overlapping labels down in time order.
+  // Labels stay at their normal time-box spacing: stacked tightly, only a
+  // few pixels apart. We never move them away from their block's time.
   items.sort((a, b) => (
     a.block.getBoundingClientRect().top - b.block.getBoundingClientRect().top
   ));
@@ -151,31 +152,39 @@ function renderCallouts() {
     const blockRect = block.getBoundingClientRect();
     const labelHeight = button.getBoundingClientRect().height;
     const desired = blockRect.top + blockRect.height / 2 - timelineRect.top - labelHeight / 2;
-    // A generous gap keeps the stacked labels — and therefore their lines —
-    // from sitting on top of each other.
-    const top = Math.max(desired, previousBottom + 10);
+    const top = Math.max(desired, previousBottom + 4);
     button.style.top = `${top}px`;
     previousBottom = top + labelHeight;
   });
 
-  // Smooth S-curves instead of right angles. The boxes may stay close, but the
-  // curves are checked against each other and pushed apart until they keep a
-  // safe gap — they must never touch or lie on top of one another.
-  const MIN_LINE_GAP = 12;
+  // Smooth S-curves. To keep curves off each other without moving the boxes,
+  // their end dots fan out horizontally inside the floating label.
+  const MIN_LINE_GAP = 8;
+
+  const updateGeometry = (item) => {
+    item.startX = Math.max(item.blockLeftX + 8, item.startBaseX - item.startOffset);
+    item.endX = Math.min(item.labelRightX - 10, item.endBaseX + item.endOffset);
+    item.bend = Math.max(24, (item.endX - item.startX) * 0.55);
+  };
+
   let lastStartY = -Infinity;
   let stagger = 0;
   items.forEach((item) => {
     const blockRect = item.block.getBoundingClientRect();
-    item.labelHeight = item.button.getBoundingClientRect().height;
+    const labelRect = item.button.getBoundingClientRect();
+    item.labelHeight = labelRect.height;
     item.startY = blockRect.top + blockRect.height / 2 - timelineRect.top;
     if (item.startY - lastStartY < 10) stagger += 14;
     else stagger = 0;
     lastStartY = item.startY;
 
-    item.startX = blockRect.right - timelineRect.left - 12 - stagger;
-    const labelRect = item.button.getBoundingClientRect();
-    item.endX = labelRect.left - timelineRect.left + 12;
-    item.bend = Math.max(24, (item.endX - item.startX) * 0.55);
+    item.blockLeftX = blockRect.left - timelineRect.left;
+    item.labelRightX = labelRect.right - timelineRect.left;
+    item.startBaseX = blockRect.right - timelineRect.left - 12 - stagger;
+    item.endBaseX = labelRect.left - timelineRect.left + 10;
+    item.startOffset = 0;
+    item.endOffset = 0;
+    updateGeometry(item);
   });
 
   const endY = (item) => parseFloat(item.button.style.top) + item.labelHeight / 2;
@@ -202,16 +211,17 @@ function renderCallouts() {
     return closest;
   };
 
-  for (let pass = 0; pass < 10; pass += 1) {
+  // Fan only the line endpoints; the callout boxes never move.
+  for (let pass = 0; pass < 12; pass += 1) {
     let moved = false;
     for (let index = 0; index < items.length - 1; index += 1) {
-      const distance = closestDistance(items[index], items[index + 1]);
+      const later = items[index + 1];
+      const distance = closestDistance(items[index], later);
       if (distance >= MIN_LINE_GAP) continue;
-      const push = MIN_LINE_GAP - distance + 2;
-      for (let next = index + 1; next < items.length; next += 1) {
-        const top = parseFloat(items[next].button.style.top) + push;
-        items[next].button.style.top = `${top}px`;
-      }
+      const fan = MIN_LINE_GAP - distance + 1;
+      later.endOffset += fan;
+      later.startOffset += fan * 0.5;
+      updateGeometry(later);
       moved = true;
     }
     if (!moved) break;

@@ -336,7 +336,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 89 | Zoom 80%: blok 10 menit memakai seluruh slot tanpa padding, blok berurutan tidak saling menimpa | Lulus |
 | 90 | Blok mikro memakai label callout berukuran normal di kanan kanvas + garis penunjuk; label bertumpuk rapi dan ketuk label membuka editor | Lulus |
 | 91 | Blok aslinya dipersempit, judul redup tetap ada; callout transparan dengan dot di dalam kedua kotak | Lulus |
-| 92 | Garis penunjuk berupa kurva halus (bukan siku 90°); jarak antar garis dijaga ≥12 px, kotak boleh berdekatan | Lulus |
+| 92 | Kotak callout tetap berdekatan sesuai waktu (jarak 4 px); kurva halus dijaga ≥8 px dengan ujung dot tetap di dalam kotak | Lulus |
 
 **Batasan yang belum diverifikasi:**
 
