@@ -142,19 +142,26 @@ function renderCallouts() {
   layer.appendChild(svg);
   items.forEach(({ button }) => layer.appendChild(button));
 
-  // Labels stay at their normal time-box spacing: stacked tightly, only a
-  // few pixels apart. We never move them away from their block's time.
+  // Label spacing mirrors the real time-boxes: touching blocks produce
+  // touching labels; a 5- or 10-minute gap produces that same pixel gap.
   items.sort((a, b) => (
     a.block.getBoundingClientRect().top - b.block.getBoundingClientRect().top
   ));
   let previousBottom = -Infinity;
-  items.forEach(({ block, button }) => {
+  let previousBlockBottom = null;
+  items.forEach(({ block, button }, index) => {
     const blockRect = block.getBoundingClientRect();
     const labelHeight = button.getBoundingClientRect().height;
-    const desired = blockRect.top + blockRect.height / 2 - timelineRect.top - labelHeight / 2;
-    const top = Math.max(desired, previousBottom + 4);
+    let top;
+    if (index === 0) {
+      top = blockRect.top + blockRect.height / 2 - timelineRect.top - labelHeight / 2;
+    } else {
+      const realGap = Math.max(0, blockRect.top - previousBlockBottom);
+      top = previousBottom + realGap;
+    }
     button.style.top = `${top}px`;
     previousBottom = top + labelHeight;
+    previousBlockBottom = blockRect.bottom;
   });
 
   // Smooth S-curves. To keep curves off each other without moving the boxes,
