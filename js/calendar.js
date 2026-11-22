@@ -8,7 +8,14 @@
  */
 
 import { buildDayLayout } from './layout-engine.js';
-import { weekHeadline, weekSummary } from './periods.js';
+import {
+  monthHeadline,
+  monthSummary,
+  SPECIAL_TYPES,
+  weekHeadline,
+  weekSummary,
+  WEEKDAY_SHORT,
+} from './periods.js';
 import {
   escapeHtml,
   formatDurationLabel,
@@ -294,14 +301,61 @@ function weekViewMarkup(data) {
     </div>`;
 }
 
-function placeholderMarkup() {
+function monthDay(day) {
+  const classes = [
+    'month-day',
+    day.isCurrentMonth ? '' : 'is-outside',
+    day.isToday ? 'is-today' : '',
+    day.isSelected ? 'is-selected' : '',
+    day.isWeekend ? 'is-weekend' : '',
+  ].filter(Boolean).join(' ');
+
+  const dots = day.colors.map((color) => (
+    `<span class="month-dot" style="--dot-color:${escapeHtml(color)}" aria-hidden="true"></span>`
+  )).join('');
+  const special = day.specialDays.length
+    ? `<span class="month-special" aria-hidden="true">${SPECIAL_TYPES[day.specialDays[0].type]?.icon || '⭐'}</span>`
+    : '';
+  const conflict = day.conflictCount
+    ? '<span class="month-conflict" aria-hidden="true">⚠</span>'
+    : '';
+  const label = `${formatLongDate(day.dateKey)}. ${day.count} kegiatan${day.conflictCount ? `, ${day.conflictCount} bentrok` : ''}`;
+
   return `
-    <div class="placeholder-card">
-      <span class="placeholder-icon" aria-hidden="true">🗓️</span>
-      <span class="phase-tag">Fase 4</span>
-      <h3>Tampilan bulan</h3>
-      <p>Kalender bulanan, jumlah kegiatan, dan hari khusus akan hadir pada Fase 4. Sementara ini, gunakan tombol ‹ dan › untuk berpindah hari.</p>
-      <button type="button" class="btn btn-primary" data-action="set-view" data-view="day">Kembali ke tampilan hari</button>
+    <button type="button" class="${classes}" data-action="open-day" data-date="${day.dateKey}"
+      aria-label="${escapeHtml(label)}">
+      <span class="month-num">${day.dayNumber}</span>
+      ${special}${conflict}
+      <span class="month-dots" aria-hidden="true">${dots}</span>
+      ${day.count ? `<span class="month-count">${day.count}</span>` : ''}
+    </button>`;
+}
+
+function monthViewMarkup(data) {
+  const dateKey = data.settings.selectedDate;
+  const summary = monthSummary(data, dateKey);
+  const headline = monthHeadline(dateKey);
+
+  return `
+    <div class="period-card month-card">
+      <div class="period-head">
+        <div>
+          <h3 class="period-title">${escapeHtml(headline.label)}</h3>
+          <p class="period-sub">${summary.totalCount} kegiatan${summary.conflictCount ? ` · ${summary.conflictCount} bentrok` : ''}</p>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" data-action="go-today">Hari ini</button>
+      </div>
+      <div class="month-grid" role="grid" aria-label="Kalender ${escapeHtml(headline.label)}">
+        <div class="month-weekdays" role="row">
+          ${WEEKDAY_SHORT.map((day) => `<span role="columnheader">${day}</span>`).join('')}
+        </div>
+        <div class="month-weeks" style="--month-weeks:${summary.weeks.length}">
+          ${summary.weeks.map((week) => `
+            <div class="month-week" role="row">${week.map(monthDay).join('')}</div>
+          `).join('')}
+        </div>
+      </div>
+      <p class="period-hint">Ketuk tanggal untuk membuka tampilan hari.</p>
     </div>`;
 }
 
@@ -357,7 +411,7 @@ export function renderCalendar(stage, data) {
   }
 
   if (view === 'month') {
-    stage.innerHTML = placeholderMarkup();
+    stage.innerHTML = monthViewMarkup(data);
     previousDateKey = null;
     previousScrollTop = null;
     return;

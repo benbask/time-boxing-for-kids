@@ -4,7 +4,7 @@
  */
 
 import { getData, updateSettings } from './state.js';
-import { shiftWeekKey, weekHeadline } from './periods.js';
+import { monthHeadline, shiftMonthKey, shiftWeekKey, weekHeadline } from './periods.js';
 import { VIEW_IDS } from './storage.js';
 import {
   addDays,
@@ -37,6 +37,10 @@ export function moveSelectedPeriod(direction) {
     setSelectedDate(shiftWeekKey(data.settings.selectedDate, step));
     return;
   }
+  if (data.settings.currentView === 'month') {
+    setSelectedDate(shiftMonthKey(data.settings.selectedDate, step));
+    return;
+  }
   setSelectedDate(addDays(data.settings.selectedDate, step));
 }
 
@@ -52,6 +56,10 @@ export function setView(viewId) {
 export function dateHeadline(dateKey, view = 'day') {
   if (view === 'week') {
     const h = weekHeadline(dateKey);
+    return { label: h.label, sub: h.sub, short: h.short, tiny: h.tiny };
+  }
+  if (view === 'month') {
+    const h = monthHeadline(dateKey);
     return { label: h.label, sub: h.sub, short: h.short, tiny: h.tiny };
   }
 

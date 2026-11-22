@@ -28,6 +28,16 @@ export function shiftWeekKey(dateKey, amount) {
   return addDays(dateKey, amount * 7);
 }
 
+/** Move a whole month, keeping the day-of-month when it exists in the target. */
+export function shiftMonthKey(dateKey, amount) {
+  const source = parseDateKey(dateKey);
+  const day = source.getDate();
+  const target = new Date(source.getFullYear(), source.getMonth() + amount, 1);
+  const lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+  target.setDate(Math.min(day, lastDay));
+  return dateKeyFromDate(target);
+}
+
 function daySummary(data, dateKey) {
   const layout = buildDayLayout(data, dateKey);
   const colors = [];
@@ -114,4 +124,47 @@ export function weekHeadline(dateKey) {
     short,
     tiny,
   };
+}
+
+/** Six Monday–Sunday weeks so every month keeps the same grid height. */
+export function monthSummary(data, dateKey) {
+  const selected = parseDateKey(dateKey);
+  const firstKey = dateKeyFromDate(new Date(selected.getFullYear(), selected.getMonth(), 1));
+  const start = addDays(firstKey, -weekdayIndex(firstKey));
+  const today = todayKey();
+
+  const days = Array.from({ length: 42 }, (_, index) => {
+    const key = addDays(start, index);
+    const date = parseDateKey(key);
+    const column = index % 7;
+    return {
+      ...daySummary(data, key),
+      dayNumber: date.getDate(),
+      isCurrentMonth: date.getMonth() === selected.getMonth()
+        && date.getFullYear() === selected.getFullYear(),
+      isToday: key === today,
+      isSelected: key === dateKey,
+      isWeekend: column >= 5,
+    };
+  });
+  const weeks = Array.from({ length: 6 }, (_, index) => days.slice(index * 7, index * 7 + 7));
+
+  return {
+    start,
+    end: addDays(start, 41),
+    weeks,
+    totalCount: days.reduce((sum, day) => sum + day.count, 0),
+    conflictCount: days.reduce((sum, day) => sum + day.conflictCount, 0),
+  };
+}
+
+export function monthHeadline(dateKey) {
+  const date = parseDateKey(dateKey);
+  const label = date.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+  const short = date.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
+  const tiny = date.toLocaleDateString('id-ID', { month: 'short' });
+  const sub = todayKey().slice(0, 7) === String(dateKey).slice(0, 7)
+    ? 'Bulan ini'
+    : 'Tampilan bulan';
+  return { label, short, tiny, sub };
 }

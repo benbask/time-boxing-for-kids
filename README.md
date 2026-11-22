@@ -129,6 +129,16 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
 - Kegiatan milik profil yang disembunyikan tetap mengikuti aturan visibilitas
   yang sama seperti tampilan hari.
 
+## Fitur Fase 4 (tampilan bulan)
+
+- **Grid 6 minggu × 7 hari** dengan judul bulan dan total kegiatan.
+- **Jumlah kegiatan + titik warna profil** per tanggal (maksimal tiga warna),
+  mengikuti aturan profil tersembunyi yang sama dengan tampilan hari.
+- **Penanda visual**: hari ini, tanggal terpilih, akhir pekan, ikon hari khusus,
+  dan ⚠ bila ada jadwal bentrok.
+- **Navigasi per bulan** lewat ‹/› dan tombol "Hari ini"; ketuk tanggal untuk
+  membuka tampilan hari.
+
 ## Panel atas yang ringkas
 
 Panel di atas kanvas dibuat seringkas mungkin agar timeline dapat ruang:
@@ -163,13 +173,14 @@ sehingga kanvas bertambah dari 387 px menjadi ±539 px (±+39%).
 | --- | --- | --- |
 | 2 | Buat/geser/resize/edit/hapus kegiatan, snapping 5 menit, durasi minimum 10 menit, touch gesture | **Selesai** |
 | 3 | Lane otomatis untuk kegiatan bertumpuk, peringatan konflik | **Selesai** |
-| 4 | Tampilan minggu & bulan, special day, zoom dan rentang waktu | Minggu + pinch zoom selesai; bulan, special day, preset rentang waktu menyusul |
+| 4 | Tampilan minggu & bulan, special day, zoom dan rentang waktu | Minggu, bulan & pinch zoom selesai; special day dan preset rentang waktu menyusul |
 | 5 | Waktu salat lokal dengan parameter Kemenag/SIHAT | Belum |
 | 6 | Ekspor/impor JSON, reset aplikasi | Belum |
 | 7 | Uji perangkat Android, performance, deployment GitHub Pages | Belum |
 
-Tampilan Bulan masih menampilkan placeholder berlabel **Fase 4** agar tidak
-terlihat seperti fitur yang sudah berfungsi.
+Tampilan Bulan menampilkan grid 6 minggu (Sen–Min) dengan jumlah kegiatan,
+titik warna profil, penanda hari ini/terpilih, dan ikon hari khusus. Ketuk
+sebuah tanggal untuk membuka tampilan hari; tombol ‹/› melompat per bulan.
 
 ## Data dan privasi
 
@@ -242,7 +253,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 15 | Data bertahan setelah refresh | Lulus |
 | 16 | Tidak ada error console saat pemakaian normal | Lulus |
 | 17 | Tidak ada overflow horizontal pada 390 px | Lulus (setelah perbaikan) |
-| 18 | Tampilan Minggu terbuka dengan 7 kolom; placeholder Bulan dapat dibuka dan kembali ke Hari | Lulus |
+| 18 | Tampilan Minggu terbuka dengan 7 kolom; tampilan Bulan terbuka dengan grid tanggal dan kembali ke Hari | Lulus |
 | 19 | Dialog profil menolak nama kosong | Lulus |
 | 20 | Kondisi 0 profil tidak membuat aplikasi error | Lulus |
 | 21 | Deploy GitHub Pages dan aplikasi berjalan dari subpath repositori | Lulus (5 profil, 7 kegiatan, tanpa error console) |
@@ -338,6 +349,9 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 91 | Blok aslinya dipersempit, judul redup tetap ada; callout transparan dengan dot di dalam kedua kotak | Lulus |
 | 92 | Jarak kotak callout mengikuti jarak asli timebox: 0 saat blok nempel, ≈5,7 px untuk jeda 5 menit; kurva tidak saling menyentuh | Lulus |
 | 93 | Warna background & border callout sama dengan blok aslinya, tetap transparan | Lulus |
+| 94 | Bulan: grid 6×7, 42 tanggal, jumlah kegiatan & titik warna profil, penanda hari ini/terpilih | Lulus |
+| 95 | Bulan: ‹/› pindah per bulan, "Hari ini" kembali ke bulan berjalan, ketuk tanggal membuka Hari | Lulus |
+| 96 | Bulan di 390/360 px: sel ≥44 px, footer terlihat, tanpa overflow horizontal | Lulus |
 
 **Batasan yang belum diverifikasi:**
 
