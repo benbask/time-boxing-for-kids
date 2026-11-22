@@ -62,6 +62,9 @@ Anak 1–3) dan 7 kegiatan hari ini, termasuk satu kegiatan bersama.
   muncul (dengan snapping 5 menit).
 - **Geser kegiatan**: tahan blok ±0,4 detik, lalu geser untuk memindah waktu
   (durasi tetap). Geser tanpa menahan akan menggulir timeline, bukan memindah.
+- **Swipe kiri/kanan** di area kosong timeline: pindah hari (Hari) atau minggu
+  (Minggu). Swipe di atas blok tidak menggeser tanggal agar tidak bentrok
+  dengan geser kegiatan.
 - **Resize kegiatan**: tahan pegangan atas/bawah lalu geser untuk mengubah jam
   mulai/selesai.
 - **Edit kegiatan**: ketuk blok atau tombol pensil → dialog ringan (nama, peserta,
@@ -352,6 +355,8 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 94 | Bulan: grid 6×7, 42 tanggal, jumlah kegiatan & titik warna profil, penanda hari ini/terpilih | Lulus |
 | 95 | Bulan: ‹/› pindah per bulan, "Hari ini" kembali ke bulan berjalan, ketuk tanggal membuka Hari | Lulus |
 | 96 | Bulan di 390/360 px: sel ≥44 px, footer terlihat, tanpa overflow horizontal | Lulus |
+| 97 | Swipe kiri/kanan di area kosong: Hari pindah ±1 hari, Minggu pindah ±1 minggu | Lulus |
+| 98 | Swipe vertikal & swipe di atas blok tidak menggeser tanggal; ketuk area kosong tetap membuat kegiatan | Lulus |
 
 **Batasan yang belum diverifikasi:**
 

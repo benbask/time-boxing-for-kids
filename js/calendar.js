@@ -205,7 +205,7 @@ function dayViewMarkup(data, layout) {
           <span class="legend-item"><span class="dot" style="--dot-color:var(--now)"></span> Waktu sekarang</span>
           <span class="legend-item"><span class="shared-marks" aria-hidden="true">👥</span> <span class="legend-long">Kegiatan bersama tampil satu kali</span><span class="legend-short">Kegiatan bersama</span></span>
           ${layout.conflictCount > 0 ? '<span class="legend-item legend-conflict"><span aria-hidden="true">⚠</span> <span class="legend-long">Peserta bentrok</span><span class="legend-short">Bentrok</span></span>' : ''}
-          <span class="legend-item legend-hint">Ketuk area kosong untuk menambah · tahan blok untuk memindah · cubit untuk zoom</span>
+          <span class="legend-item legend-hint">Ketuk area kosong untuk menambah · geser untuk pindah hari · tahan blok untuk memindah · cubit untuk zoom</span>
         </div>
         <button type="button" class="zoom-reset" data-action="reset-zoom" hidden>Zoom 100%</button>
         <span>${layout.visibleCount} kegiatan</span>
@@ -297,7 +297,7 @@ function weekViewMarkup(data) {
           </div>
         </div>
       </div>
-      <p class="period-hint">Tahan blok lalu geser ke kiri/kanan untuk pindah hari · cubit untuk zoom · ketuk blok untuk mengubah. <button type="button" class="zoom-reset" data-action="reset-zoom" hidden>Zoom 100%</button></p>
+      <p class="period-hint">Geser area kosong untuk pindah minggu · tahan blok lalu geser untuk pindah hari · cubit untuk zoom · ketuk blok untuk mengubah. <button type="button" class="zoom-reset" data-action="reset-zoom" hidden>Zoom 100%</button></p>
     </div>`;
 }
 

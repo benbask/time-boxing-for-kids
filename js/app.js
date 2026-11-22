@@ -27,6 +27,7 @@ import { THEMES, applyTheme } from './themes.js';
 import { confirmAction, initConfirmDialog, showToast } from './ui.js';
 import { escapeHtml, formatBytes, formatLongDate, todayKey, uid } from './utils.js';
 import { initWeekDrag } from './week-drag.js';
+import { initSwipeNavigation } from './swipe-navigation.js';
 import { initPinchZoom, refreshBlockDetail, resetZoom, syncZoomControls } from './zoom-gesture.js';
 
 const els = {
@@ -553,6 +554,7 @@ function bindEvents() {
   initCalendarInteractions(els.calendarStage);
   initWeekDrag(els.calendarStage);
   initPinchZoom(els.calendarStage);
+  initSwipeNavigation(els.calendarStage);
 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape' || !focusMode) return;
