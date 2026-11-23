@@ -7,8 +7,8 @@ berwarna sesuai profil, dan kegiatan bersama hanya tampil satu kali.
 Tanpa login, tanpa server, tanpa database online. Data tersimpan di LocalStorage
 perangkat.
 
-**Status saat ini: Fase 1–3 selesai dan sudah live.**
-Fase 4–7 belum diimplementasikan sesuai instruksi pengembangan bertahap.
+**Status saat ini: Fase 1–4 selesai dan sudah live; Fase 5 (penanda waktu shalat) sebagian sudah live.**
+Fase 6–7 belum diimplementasikan sesuai instruksi pengembangan bertahap.
 
 **Coba sekarang:** <https://benbask.github.io/time-boxing-for-kids/>
 
@@ -225,8 +225,12 @@ time-boxing-for-kids/
     utils.js              # tanggal/waktu/warna (tanpa konversi zona waktu)
     event-editor.js       # dialog ringan edit kegiatan (Fase 2)
     event-interactions.js # gesture create/move/resize (Fase 2)
+    prayer-times.js       # hitung jadwal shalat offline (kriteria Kemenag)
+    city-data.js          # muat/cari daftar kabupaten+kota secara lazily
+  data/
+    cities.json           # 514 kab/kota + koordinat (≈35 KB, dimuat saat picker dibuka)
   lib/
-    prayer-calculation/   # disiapkan untuk Fase 5 (belum ada kode)
+    prayer-calculation/   # disiapkan untuk ekspansi Fase 5
   assets/
     favicon.svg
 ```
@@ -370,6 +374,10 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 109 | Tombol "Garis shalat tampil/disembunyikan" menyembunyikan atau menampilkan kembali garis & legenda; perubahan mengikuti tanggal | Lulus |
 | 110 | Balon shalat bergeser dinamis menjauh dari teks kegiatan (diukur dari teks aslinya, bukan lebar blok), memilih ruang kosong terdekat di kanan/kiri; jika terpaksa, tumpang tindih seminimal mungkin | Lulus |
 | 111 | Tampilan 500 px: garis & label shalat terbaca, blok tidak tertutup judulnya, tanpa overflow horizontal | Lulus |
+| 112 | Daftar 514 kabupaten/kota dimuat dari `data/cities.json` hanya saat picker dibuka (≈35 KB, tidak masuk bundle awal) | Lulus |
+| 113 | Kolom cari filter nama kab/kota + provinsi, hasil dibatasi 30; tanpa query tampil 15 kota populer + 24 pertama | Lulus |
+| 114 | Pilih kota dari hasil cari menyimpan id, nama, koordinat, dan zona waktu; jadwal diperbarui sesuai kota | Lulus |
+| 115 | Tombol "Gunakan lokasi saya" memakai GPS, mencari kota terdekat untuk zona waktu, dan fallback ke toast bila izin ditolak | Lulus |
 
 **Batasan yang belum diverifikasi:**
 
@@ -380,11 +388,14 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 - Lane otomatis/konflik (Fase 3) sudah ada; kegiatan yang bertumpuk tidak lagi
   saling menimpa, tetapi lane tidak bisa digeser horizontal.
 - Waktu salat dihitung offline dengan kriteria Kemenag (Subuh −20°, Isya −18°,
-  bayangan Ashar 1, ihtiyati 2 menit) untuk kota yang dipilih di Pengaturan.
+  bayangan Ashar 1, ihtiyati 2 menit) untuk lokasi yang dipilih di Pengaturan.
+  Pilihannya mencakup **514 kabupaten/kota** (pencarian nama + provinsi) atau GPS.
   Garis penanda saat ini hanya tampil di tampilan Hari. Akurasi sudah dibandingkan
   dengan jadwal acuan Bandar Lampung untuk 1, 23, dan 30 November 2026 (selisih
-  maksimal 1 menit); perbandingan langsung dengan SIHAT untuk kota lain belum
-  dilakukan.
+  maksimal 1 menit). Koordinat adalah pusat kabupaten/kota, jadi untuk kabupaten
+  luas jadwal bisa selisih beberapa menit dari jadwal Kemenag setempat.
+- Sumber koordinat: [emsifa/api-wilayah-indonesia](https://github.com/emsifa/api-wilayah-indonesia)
+  (MIT, turunan data Kepmendagri/BIG), disimpan statis di `data/cities.json`.
 - Pengujian pada Android Chrome fisik, tablet, dan stylus belum dilakukan.
 
 ## Deployment GitHub Pages

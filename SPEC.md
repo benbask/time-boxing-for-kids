@@ -837,8 +837,19 @@ The panels above the timeline are intentionally compressed so the canvas keeps m
   Legacy stored `ihtiyatiMinutes: 0` is migrated to 2.
 - Validation: Bandar Lampung (−5.3833, 105.2667, WIB) vs. the published Kemenag-style
   schedule for 2026-11-01 / 23 / 30 — Subuh, Dzuhur, Ashar, Maghrib and Isya are all
-  within 1 minute. Coordinates come from a small preset list (`CITY_PRESETS`);
-  Bandar Lampung is available alongside 14 other Indonesian cities.
+  within 1 minute.
+- Location picker: the 15 hand-checked presets remain as "Populer" shortcuts, plus
+  a lazily fetched `data/cities.json` containing all **514 regencies/cities** with
+  coordinates and IANA timezone (≈35 KB raw, ≈10 KB gzipped). `js/city-data.js`
+  fetches it only when Settings opens, applies the page's `?v=` asset version,
+  and provides word-based search (name + province) capped at 30 results. The
+  source is `emsifa/api-wilayah-indonesia` (MIT, derived from Kepmendagri/BIG);
+  elevations are normalised to 0 because applying them shifted the Bandar Lampung
+  Maghrib reference by 2–3 minutes.
+- The picker also offers **Gunakan lokasi saya** (`navigator.geolocation`): the GPS
+  coordinate is stored with id `gps`, and the nearest dataset city supplies its
+  timezone. Denied permission falls back to a toast and manual selection. Only the
+  chosen city (id, name, coordinates, timezone) is written to localStorage.
 - Settings → **Jadwal shalat** has an in-app city picker (`<details>` + option buttons,
   never the Android system `<select>`), a five-row preview for the selected date, and
   a `Garis shalat tampil` toggle backed by `settings.prayerSettings.showMarkers`.

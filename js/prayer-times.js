@@ -74,6 +74,14 @@ export function timezoneOffsetHours(timezone) {
   return TIMEZONE_OFFSETS[timezone] ?? TIMEZONE_OFFSETS['Asia/Jakarta'];
 }
 
+/** '7' / '8' / '9' → the matching IANA timezone used by the saved location. */
+export function timezoneForOffset(offset) {
+  const tz = Number(offset);
+  if (tz === 8) return 'Asia/Makassar';
+  if (tz === 9) return 'Asia/Jayapura';
+  return 'Asia/Jakarta';
+}
+
 function dayOfYear(dateKey) {
   const [year, month, day] = dateKey.split('-').map(Number);
   const start = Date.UTC(year, 0, 1);

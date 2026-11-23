@@ -30,7 +30,14 @@ import {
   PRAYER_LABELS,
   PRAYER_ORDER,
   prayerTimeLabel,
+  timezoneForOffset,
 } from './prayer-times.js';
+import {
+  loadCities,
+  nearestCity,
+  resolveSavedCity,
+  searchCities,
+} from './city-data.js';
 import { confirmAction, initConfirmDialog, showToast } from './ui.js';
 import { escapeHtml, formatBytes, formatLongDate, todayKey, uid } from './utils.js';
 import { initWeekDrag } from './week-drag.js';
@@ -72,6 +79,10 @@ const els = {
 // Focus mode is temporary UI state: deliberately not written to settings or
 // exported, and it resets on reload.
 let focusMode = false;
+
+// The full city list is loaded on demand; only the chosen city goes to storage.
+let cityList = [];
+let cityQuery = '';
 
 const GESTURE_HINT_KEY = 'timeboxing-kids:gesture-hint-dismissed';
 
@@ -207,6 +218,58 @@ function themeCardMarkup(theme, activeTheme) {
     </button>`;
 }
 
+function cityButton(city, activeId) {
+  const active = city.id === activeId;
+  const sub = city.province
+    ? `<span class="city-option-sub">${escapeHtml(city.province)}</span>`
+    : '';
+  return `<button type="button" class="city-option${active ? ' is-active' : ''}"
+    role="option" aria-selected="${active}"
+    data-action="set-prayer-city" data-city-id="${escapeHtml(city.id)}">
+    <span>${escapeHtml(city.name)}</span>${sub}
+  </button>`;
+}
+
+function renderCityResults() {
+  const host = els.prayerSettings?.querySelector('[data-city-results]');
+  const count = els.prayerSettings?.querySelector('.city-count');
+  if (count) count.textContent = cityList.length ? `${cityList.length} kab/kota` : 'Muat daftar…';
+  if (!host) return;
+  if (!cityList.length) {
+    host.innerHTML = '<p class="city-status">Memuat daftar kota…</p>';
+    return;
+  }
+
+  const location = getData().settings.location || {};
+  const activeId = location.id || resolveSavedCity(cityList, location)?.id || '';
+  const query = cityQuery.trim();
+  const results = query
+    ? searchCities(cityList, query, 30)
+    : [
+      ...CITY_PRESETS.map((city) => ({ ...city, province: 'Populer' })),
+      ...cityList.slice(0, 24),
+    ];
+
+  host.innerHTML = results.length
+    ? results.map((city) => cityButton(city, activeId)).join('')
+    : '<p class="city-status">Kota tidak ditemukan. Coba kata kunci lain.</p>';
+}
+
+function ensureCityList() {
+  if (cityList.length) {
+    renderCityResults();
+    return;
+  }
+  loadCities()
+    .then((list) => { cityList = list; renderCityResults(); })
+    .catch(() => {
+      const host = els.prayerSettings?.querySelector('[data-city-results]');
+      if (host) {
+        host.innerHTML = '<p class="city-status">Daftar kota gagal dimuat. Periksa koneksi, lalu buka lagi.</p>';
+      }
+    });
+}
+
 function prayerSettingsMarkup(data) {
   const location = data.settings.location || {};
   const prayer = data.settings.prayerSettings || {};
@@ -228,13 +291,16 @@ function prayerSettingsMarkup(data) {
           <span>${escapeHtml(cityName)}</span>
           <span class="city-caret" aria-hidden="true">▾</span>
         </summary>
-        <div class="city-list" role="listbox" aria-label="Pilih kota">
-          ${CITY_PRESETS.map((city) => {
-    const active = city.name === location.name;
-    return `<button type="button" class="city-option${active ? ' is-active' : ''}"
-            role="option" aria-selected="${active}"
-            data-action="set-prayer-city" data-city-id="${city.id}">${escapeHtml(city.name)}</button>`;
-  }).join('')}
+        <div class="city-panel">
+          <input type="search" class="city-search" data-city-search
+            placeholder="Cari kota atau kabupaten…" aria-label="Cari kota"
+            value="${escapeHtml(cityQuery)}" autocomplete="off">
+          <div class="city-actions">
+            <button type="button" class="btn btn-ghost btn-sm city-gps" data-action="use-my-location">📍 Gunakan lokasi saya</button>
+            <span class="city-count">${cityList.length ? `${cityList.length} kab/kota` : 'Muat daftar…'}</span>
+          </div>
+          <div class="city-results" data-city-results role="listbox" aria-label="Pilih kota"></div>
+          <p class="city-source">Koordinat pusat kabupaten/kota · sumber data wilayah Indonesia (MIT)</p>
         </div>
       </details>
     </div>
@@ -251,7 +317,10 @@ function renderSettings(data) {
   els.themeGrid.innerHTML = THEMES
     .map((theme) => themeCardMarkup(theme, data.settings.activeTheme))
     .join('');
-  if (els.prayerSettings) els.prayerSettings.innerHTML = prayerSettingsMarkup(data);
+  if (els.prayerSettings) {
+    els.prayerSettings.innerHTML = prayerSettingsMarkup(data);
+    if (data.settings.currentView === 'settings') ensureCityList();
+  }
 
   const stats = getStorageStats(data);
   els.storageStats.innerHTML = `
@@ -505,17 +574,48 @@ async function handleActionClick(event) {
       els.themeGrid.querySelector('.theme-card[aria-checked="true"]')?.focus();
       break;
     case 'set-prayer-city': {
-      const city = CITY_PRESETS.find((entry) => entry.id === actionTarget.dataset.cityId);
+      const id = actionTarget.dataset.cityId;
+      const city = cityList.find((entry) => entry.id === id)
+        || CITY_PRESETS.find((entry) => entry.id === id);
       if (!city) break;
+      cityQuery = '';
       mutate((draft) => {
         draft.settings.location = {
+          id: city.id || '',
           name: city.name,
           latitude: city.latitude,
           longitude: city.longitude,
-          timezone: city.timezone,
-          elevation: city.elevation,
+          // The dataset carries elevation 0 to match Kemenag's reference times.
+          timezone: city.timezone || timezoneForOffset(city.tz),
+          elevation: 0,
         };
       }, `Jadwal shalat: ${city.name}`);
+      break;
+    }
+    case 'use-my-location': {
+      if (!navigator.geolocation) {
+        showToast('Browser tidak mendukung lokasi otomatis. Pilih kota manual ya.');
+        break;
+      }
+      navigator.geolocation.getCurrentPosition((position) => {
+        const latitude = Number(position.coords.latitude.toFixed(4));
+        const longitude = Number(position.coords.longitude.toFixed(4));
+        const nearest = nearestCity(cityList, latitude, longitude);
+        const name = `Lokasi saya${nearest ? ` (${nearest.name})` : ''}`.slice(0, 60);
+        cityQuery = '';
+        mutate((draft) => {
+          draft.settings.location = {
+            id: 'gps',
+            name,
+            latitude,
+            longitude,
+            timezone: nearest?.timezone || 'Asia/Jakarta',
+            elevation: 0,
+          };
+        }, 'Lokasi dari GPS digunakan');
+      }, () => {
+        showToast('Izin lokasi ditolak atau tidak tersedia. Pilih kota manual ya.');
+      }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
       break;
     }
     case 'toggle-prayer-markers':
@@ -574,6 +674,12 @@ function bindEvents() {
       console.error('[app] Aksi gagal.', error);
       showToast('Terjadi kesalahan. Coba lagi.');
     });
+  });
+
+  document.addEventListener('input', (event) => {
+    if (!event.target.matches('[data-city-search]')) return;
+    cityQuery = event.target.value;
+    renderCityResults();
   });
 
   els.viewSelectButton?.addEventListener('keydown', (event) => {

@@ -49,6 +49,7 @@ export function defaultSettings(selectedDate = todayKey()) {
     visibleTimeRange: { start: '00:00', end: '24:00', preset: 'full' },
     snapInterval: 5,
     location: {
+      id: '',
       name: '',
       latitude: null,
       longitude: null,
@@ -256,6 +257,7 @@ function sanitizeSettings(raw) {
     },
     snapInterval: snapCandidates.includes(snap) ? snap : defaults.snapInterval,
     location: {
+      id: asString(location.id).slice(0, 20),
       name: asString(location.name).slice(0, 60),
       latitude: Number.isFinite(Number(location.latitude)) && location.latitude !== null
         ? Number(location.latitude)
