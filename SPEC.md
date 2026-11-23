@@ -848,7 +848,12 @@ The panels above the timeline are intentionally compressed so the canvas keeps m
   2 px dashed rule at ≈28% opacity, and the pill label is centred on that line —
   horizontally at the canvas midpoint and vertically straddling it — with a
   translucent (`≈68%`) blurred background so any text it must cross stays faintly
-  readable. The markers are `aria-hidden`, never draggable/resizable, and a matching
+  readable. `positionPrayerLabels()` in `js/zoom-gesture.js` re-measures the real
+  text extents (via a DOM `Range`, not the full-width block) that share each
+  balloon's vertical band and slides the balloon to the nearest clear spot —
+  usually just past the title's right edge — keeping a 6 px gap. It only accepts
+  an overlap when no free gap exists, and re-runs on zoom, resize and re-render.
+  The markers are `aria-hidden`, never draggable/resizable, and a matching
   legend item appears only when markers are on.
 - Scope note: markers currently render in Day view only; Week and Month do not show
   them yet.

@@ -368,7 +368,8 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 107 | Jadwal Bandar Lampung 23 Nov 2026: Subuh 04:13 · Dzuhur 11:48 · Ashar 15:12 · Maghrib 17:59 · Isya 19:14 (selisih ≤1 menit dari jadwal acuan) | Lulus |
 | 108 | Garis putus-putus 2 px agak transparan melayang di atas blok; balon nama+jam shalat berada tepat di tengah garis dan transparan, sehingga tulisan blok tertutup hanya sedikit | Lulus |
 | 109 | Tombol "Garis shalat tampil/disembunyikan" menyembunyikan atau menampilkan kembali garis & legenda; perubahan mengikuti tanggal | Lulus |
-| 110 | Tampilan 500 px: garis & label shalat terbaca, blok tidak tertutup, tanpa overflow horizontal | Lulus |
+| 110 | Balon shalat bergeser dinamis menjauh dari teks kegiatan (diukur dari teks aslinya, bukan lebar blok), memilih ruang kosong terdekat di kanan/kiri; jika terpaksa, tumpang tindih seminimal mungkin | Lulus |
+| 111 | Tampilan 500 px: garis & label shalat terbaca, blok tidak tertutup judulnya, tanpa overflow horizontal | Lulus |
 
 **Batasan yang belum diverifikasi:**
 

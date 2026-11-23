@@ -290,6 +290,96 @@ function renderCallouts() {
   });
 }
 
+const PRAYER_LABEL_SELECTOR = [
+  '.event-title',
+  '.event-time',
+  '.event-people',
+  '.event-duration-chip',
+  '.event-note-icon',
+  '.event-edit',
+].join(',');
+
+/**
+ * Keep each prayer balloon clear of event text.
+ *
+ * Balloons start at the line's midpoint. After measuring the rendered text that
+ * shares the balloon's vertical band, we try the text edges first (preferring
+ * the nearest clear spot, which is usually to the right) and only accept an
+ * overlap when the canvas has no free gap. Re-runs on zoom, resize and re-render.
+ */
+function visibleTextRect(element) {
+  const box = element.getBoundingClientRect();
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  const text = range.getBoundingClientRect();
+  if (text.width <= 0 || text.height <= 0) return box;
+  return {
+    left: Math.max(box.left, text.left),
+    right: Math.min(box.right, text.right),
+    top: Math.max(box.top, text.top),
+    bottom: Math.min(box.bottom, text.bottom),
+    width: Math.min(box.right, text.right) - Math.max(box.left, text.left),
+    height: Math.min(box.bottom, text.bottom) - Math.max(box.top, text.top),
+  };
+}
+
+function positionPrayerLabels() {
+  const layer = document.querySelector('#calendarStage .prayer-layer');
+  if (!layer) return;
+
+  const bounds = layer.getBoundingClientRect();
+  const obstacles = Array.from(
+    document.querySelectorAll(`#calendarStage .event-block ${PRAYER_LABEL_SELECTOR}`),
+  ).map(visibleTextRect)
+    .filter((rect) => rect.width > 0 && rect.height > 0);
+
+  layer.querySelectorAll('.prayer-line').forEach((line) => {
+    const label = line.querySelector('.prayer-label');
+    if (!label) return;
+
+    const lineRect = line.getBoundingClientRect();
+    const centerY = lineRect.top + lineRect.height / 2;
+    const labelRect = label.getBoundingClientRect();
+    const halfWidth = labelRect.width / 2;
+    const halfHeight = labelRect.height / 2;
+    const gap = 6;
+    const min = bounds.left + halfWidth + gap;
+    const max = bounds.right - halfWidth - gap;
+    if (max <= min) return;
+
+    const bandTop = centerY - halfHeight + 2;
+    const bandBottom = centerY + halfHeight - 2;
+    const nearby = obstacles.filter((rect) => (
+      rect.bottom > bandTop && rect.top < bandBottom
+    ));
+    const midpoint = (min + max) / 2;
+
+    const candidates = [midpoint];
+    nearby.forEach((rect) => {
+      candidates.push(rect.left - halfWidth - gap);
+      candidates.push(rect.right + halfWidth + gap);
+    });
+    // A fine sweep finds a gap between obstacles that their edges alone miss.
+    for (let step = 0; step <= 24; step += 1) {
+      candidates.push(min + ((max - min) * step) / 24);
+    }
+
+    let best = null;
+    candidates.forEach((candidate) => {
+      const center = clamp(candidate, min, max);
+      const left = center - halfWidth;
+      const right = center + halfWidth;
+      const overlap = nearby.reduce((sum, rect) => (
+        sum + Math.max(0, Math.min(right, rect.right) - Math.max(left, rect.left))
+      ), 0);
+      const score = overlap * 1000 + Math.abs(center - midpoint);
+      if (!best || score < best.score) best = { center, score };
+    });
+
+    label.style.left = `${(best.center - bounds.left).toFixed(1)}px`;
+  });
+}
+
 /** Re-measure every block after a zoom, a re-render or an orientation change. */
 export function refreshBlockDetail() {
   document.querySelectorAll('.event-block').forEach((block) => {
@@ -325,6 +415,7 @@ export function refreshBlockDetail() {
     fitTitle(block.querySelector('.week-event-title'), lines, micro ? 7 : Infinity);
   });
   renderCallouts();
+  positionPrayerLabels();
 }
 
 function setZoom(next) {
