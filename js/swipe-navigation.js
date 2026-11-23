@@ -22,9 +22,9 @@ let finishTimer = null;
 let suppressClickUntil = 0;
 
 function isSwipeTarget(target) {
-  // Resize handles are allowed: their gesture is vertical, so a horizontal
-  // swipe starting there must still navigate. Only the callout UI is exempt.
-  if (target.closest?.('.callout')) return false;
+  // Every part of the timeline is swipeable — including resize handles and
+  // floating callout labels. A tap still opens the editor; only a real
+  // horizontal swipe navigates.
   return Boolean(target.closest?.('#timelineScroll, .week-scroll'));
 }
 

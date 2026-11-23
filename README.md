@@ -358,6 +358,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 97 | Swipe kiri/kanan di area kosong: timeline mengikuti jari, lalu pindah ±1 hari/minggu atau kembali jika kurang jauh | Lulus |
 | 98 | Swipe horizontal juga bekerja di atas blok; tahan lama tetap menggeser kegiatan, ketuk blok tetap membuka editor | Lulus |
 | 99 | Swipe horizontal aktif di seluruh area blok termasuk pegangan resize; blok 30 menit bisa diswipe, tahan-lama tetap resize/move | Lulus |
+| 100 | Swipe kiri/kanan juga bekerja di atas floating callout; ketuk callout tetap membuka editor | Lulus |
 
 **Batasan yang belum diverifikasi:**
 
