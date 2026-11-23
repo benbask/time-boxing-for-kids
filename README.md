@@ -361,6 +361,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 100 | Swipe kiri/kanan juga bekerja di atas floating callout; ketuk callout tetap membuka editor | Lulus |
 | 101 | Floating callout punya fallback gesture sentuh langsung; jika pointer & touch keduanya terpicu, tanggal hanya bergeser sekali | Lulus |
 | 102 | Saat swipe, sebagian isi hari/minggu berikutnya ikut masuk sebagai panel preview dengan gutter jam sejajar, lalu diganti setelah pindah | Lulus |
+| 103 | Posisi vertikal saat swipe dibaca dan dipakai sebagai posisi awal halaman berikutnya (Hari & Minggu) | Lulus |
 
 **Batasan yang belum diverifikasi:**
 

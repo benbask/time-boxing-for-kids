@@ -6,7 +6,7 @@
  * blocks keep their own drag/resize gestures.
  */
 
-import { adjacentGridMarkup } from './calendar.js';
+import { adjacentGridMarkup, preserveScrollForNextRender } from './calendar.js';
 import { moveSelectedDate, moveSelectedPeriod } from './navigation.js';
 import { getData } from './state.js';
 
@@ -41,6 +41,8 @@ function handleNavigation(view, direction) {
   const now = Date.now();
   if (now - lastNavigateAt < 350) return;
   lastNavigateAt = now;
+  const scroller = document.querySelector('#timelineScroll, .week-scroll');
+  if (scroller) preserveScrollForNextRender(scroller.scrollTop);
   navigate(view, direction);
   suppressClickUntil = now + CLICK_SUPPRESS_MS;
 }

@@ -31,6 +31,13 @@ import {
 
 let previousDateKey = null;
 let previousScrollTop = null;
+let nextScrollTop = null;
+
+/** The next calendar render opens at this scroll position (used by swipe). */
+export function preserveScrollForNextRender(top) {
+  const value = Number(top);
+  nextScrollTop = Number.isFinite(value) && value >= 0 ? value : null;
+}
 
 const HOUR_LABEL_COUNT = 24;
 
@@ -370,13 +377,15 @@ function setScrollTop(container, top) {
   }
 }
 
-function restoreScroll(stage, dateKey) {
+function restoreScroll(stage, dateKey, forcedTop = null) {
   const container = stage.querySelector('#timelineScroll');
   if (!container) return;
   const row = container.querySelector('.hour-row');
   const hourHeight = row ? row.getBoundingClientRect().height : 60;
 
-  if (previousDateKey === dateKey && previousScrollTop !== null) {
+  if (forcedTop !== null) {
+    setScrollTop(container, forcedTop);
+  } else if (previousDateKey === dateKey && previousScrollTop !== null) {
     setScrollTop(container, previousScrollTop);
   } else if (dateKey === todayKey()) {
     // Keep the current time ~1.75 hours below the top so the ongoing block is
@@ -415,13 +424,17 @@ export function adjacentGridMarkup(data, direction) {
 export function renderCalendar(stage, data) {
   const previousContainer = stage.querySelector('#timelineScroll');
   if (previousContainer) previousScrollTop = previousContainer.scrollTop;
+  const forcedScrollTop = nextScrollTop;
+  nextScrollTop = null;
 
   const view = data.settings.currentView;
   const dateKey = data.settings.selectedDate;
 
   if (view === 'week') {
     const previousWeekScroll = stage.querySelector('.week-scroll');
-    const weekScrollTop = previousWeekScroll ? previousWeekScroll.scrollTop : 0;
+    const weekScrollTop = forcedScrollTop !== null
+      ? forcedScrollTop
+      : (previousWeekScroll ? previousWeekScroll.scrollTop : 0);
     stage.innerHTML = weekViewMarkup(data);
     const nextWeekScroll = stage.querySelector('.week-scroll');
     if (nextWeekScroll) setScrollTop(nextWeekScroll, weekScrollTop);
@@ -439,7 +452,7 @@ export function renderCalendar(stage, data) {
 
   const layout = buildDayLayout(data, dateKey);
   stage.innerHTML = dayViewMarkup(data, layout);
-  restoreScroll(stage, dateKey);
+  restoreScroll(stage, dateKey, forcedScrollTop);
   previousDateKey = dateKey;
 }
 
