@@ -1153,6 +1153,9 @@ body.is-gesturing {
   text-align: left;
   cursor: pointer;
   pointer-events: auto;
+  /* Keep horizontal swipes on the label available to our own gesture layer. */
+  touch-action: pan-y;
+  -webkit-touch-callout: none;
 }
 .callout:hover,
 .callout:focus-visible { background: var(--surface-2); }
