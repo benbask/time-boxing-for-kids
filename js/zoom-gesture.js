@@ -137,6 +137,30 @@ function renderCallouts() {
     titleSpan.className = 'callout-title';
     titleSpan.textContent = title;
     button.appendChild(titleSpan);
+
+    // Direct touch fallback for the floating label: on some mobile browsers a
+    // pointer swipe on a <button> is swallowed. This path reports the same
+    // navigation event; swipe-navigation deduplicates the two sources.
+    let touchOrigin = null;
+    button.addEventListener('touchstart', (event) => {
+      if (event.touches.length !== 1) return;
+      touchOrigin = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+    }, { passive: true });
+    button.addEventListener('touchend', (event) => {
+      if (!touchOrigin) return;
+      const origin = touchOrigin;
+      touchOrigin = null;
+      const point = event.changedTouches[0];
+      if (!point) return;
+      const dx = point.clientX - origin.x;
+      const dy = point.clientY - origin.y;
+      if (Math.abs(dx) < 50 || Math.abs(dx) <= Math.abs(dy) * 1.5) return;
+      window.dispatchEvent(new CustomEvent('tbk:callout-swipe', {
+        detail: { direction: dx < 0 ? 1 : -1 },
+      }));
+    }, { passive: true });
+    button.addEventListener('touchcancel', () => { touchOrigin = null; }, { passive: true });
+
     return { block, button, color };
   });
 

@@ -359,6 +359,7 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 98 | Swipe horizontal juga bekerja di atas blok; tahan lama tetap menggeser kegiatan, ketuk blok tetap membuka editor | Lulus |
 | 99 | Swipe horizontal aktif di seluruh area blok termasuk pegangan resize; blok 30 menit bisa diswipe, tahan-lama tetap resize/move | Lulus |
 | 100 | Swipe kiri/kanan juga bekerja di atas floating callout; ketuk callout tetap membuka editor | Lulus |
+| 101 | Floating callout punya fallback gesture sentuh langsung; jika pointer & touch keduanya terpicu, tanggal hanya bergeser sekali | Lulus |
 
 **Batasan yang belum diverifikasi:**
 

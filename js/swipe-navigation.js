@@ -20,6 +20,7 @@ const CLICK_SUPPRESS_MS = 400;
 let gesture = null;
 let finishTimer = null;
 let suppressClickUntil = 0;
+let lastNavigateAt = 0;
 
 function isSwipeTarget(target) {
   // Every part of the timeline is swipeable — including resize handles and
@@ -31,6 +32,16 @@ function isSwipeTarget(target) {
 function navigate(view, direction) {
   if (view === 'week') moveSelectedPeriod(direction);
   else if (view === 'day') moveSelectedDate(direction);
+}
+
+/* Pointer Events and the direct touch fallback can both report one physical
+   swipe. Accept only the first one within a short window. */
+function handleNavigation(view, direction) {
+  const now = Date.now();
+  if (now - lastNavigateAt < 350) return;
+  lastNavigateAt = now;
+  navigate(view, direction);
+  suppressClickUntil = now + CLICK_SUPPRESS_MS;
 }
 
 function stopGesture() {
@@ -115,8 +126,7 @@ function onPointerEnd(event, cancelled = false) {
     finishTimer = window.setTimeout(() => {
       gesture = null;
       finishTimer = null;
-      navigate(g.view, direction);
-      suppressClickUntil = Date.now() + CLICK_SUPPRESS_MS;
+      handleNavigation(g.view, direction);
     }, SLIDE_OUT_MS);
     return;
   }
@@ -130,10 +140,7 @@ function onPointerEnd(event, cancelled = false) {
   }
 
   stopGesture();
-  if (!cancelled && horizontal) {
-    navigate(g.view, direction);
-    suppressClickUntil = Date.now() + CLICK_SUPPRESS_MS;
-  }
+  if (!cancelled && horizontal) handleNavigation(g.view, direction);
 }
 
 function handleClickCapture(event) {
@@ -151,5 +158,8 @@ export function initSwipeNavigation(stageElement) {
   window.addEventListener('pointerup', (event) => onPointerEnd(event));
   window.addEventListener('pointercancel', (event) => onPointerEnd(event, true));
   window.addEventListener('tbk:pinch-start', () => stopGesture());
+  window.addEventListener('tbk:callout-swipe', (event) => {
+    handleNavigation(getData().settings.currentView, event.detail.direction);
+  });
   document.addEventListener('click', handleClickCapture, true);
 }
