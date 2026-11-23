@@ -108,15 +108,9 @@ function renderCallouts() {
 
   const svgNS = 'http://www.w3.org/2000/svg';
   const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#2F80ED';
-  const space = parseFloat(getComputedStyle(timeline).getPropertyValue('--callout-space')) || 175;
   const timelineRect = timeline.getBoundingClientRect();
 
   const items = microBlocks.map((block) => {
-    if (!block.dataset.calloutWidth) {
-      block.dataset.calloutWidth = block.style.getPropertyValue('--ev-width');
-    }
-    block.style.setProperty('--ev-width', `calc(100% - ${space}px)`);
-
     const stripe = block.style.getPropertyValue('--ev-stripe').trim();
     const color = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(stripe) ? stripe : primary;
     const title = block.querySelector('.event-title').textContent.trim();
@@ -273,10 +267,6 @@ export function refreshBlockDetail() {
     applyRooms(block, height, DAY_LEVELS);
     const micro = height < 24;
     block.classList.toggle('is-micro', micro);
-    if (!micro && block.dataset.calloutWidth) {
-      block.style.setProperty('--ev-width', block.dataset.calloutWidth);
-      delete block.dataset.calloutWidth;
-    }
     // The normal block style shaves 2px off the slot for breathing room. A
     // micro block needs every pixel, so let it use the whole slot.
     if (block.style.height) {

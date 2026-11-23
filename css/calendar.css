@@ -229,6 +229,14 @@
   position: relative;
   pointer-events: none;
 }
+.event-blocks {
+  position: absolute;
+  inset: 0;
+}
+/* When micro blocks need callouts, reserve the right lane for their labels.
+   Every real block — including normal ones and their lanes — shrinks with this
+   wrapper, so no callout can cover another time box. */
+.timeline.has-callouts .event-blocks { right: var(--callout-space); }
 
 /* --------------------------------------------------------------- event --- */
 
