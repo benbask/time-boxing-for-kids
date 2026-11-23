@@ -24,6 +24,13 @@ import {
 import { getData, initState, subscribe, update } from './state.js';
 import { getStorageStats } from './storage.js';
 import { THEMES, applyTheme } from './themes.js';
+import {
+  calculatePrayerTimes,
+  CITY_PRESETS,
+  PRAYER_LABELS,
+  PRAYER_ORDER,
+  prayerTimeLabel,
+} from './prayer-times.js';
 import { confirmAction, initConfirmDialog, showToast } from './ui.js';
 import { escapeHtml, formatBytes, formatLongDate, todayKey, uid } from './utils.js';
 import { initWeekDrag } from './week-drag.js';
@@ -50,6 +57,7 @@ const els = {
   focusBar: document.getElementById('focusBar'),
   focusDate: document.getElementById('focusDate'),
   themeGrid: document.getElementById('themeGrid'),
+  prayerSettings: document.getElementById('prayerSettings'),
   storageStats: document.getElementById('storageStats'),
   profileDialog: document.getElementById('profileDialog'),
   profileDialogTitle: document.getElementById('profileDialogTitle'),
@@ -199,10 +207,51 @@ function themeCardMarkup(theme, activeTheme) {
     </button>`;
 }
 
+function prayerSettingsMarkup(data) {
+  const location = data.settings.location || {};
+  const prayer = data.settings.prayerSettings || {};
+  const times = calculatePrayerTimes(data.settings.selectedDate, location, prayer);
+  const cityName = location.name || 'Belum dipilih';
+  const markersOn = prayer.showMarkers !== false;
+
+  const rows = times
+    ? PRAYER_ORDER.map((key) => (
+      `<div><dt>${PRAYER_LABELS[key]}</dt><dd>${prayerTimeLabel(times[key])}</dd></div>`
+    )).join('')
+    : '';
+
+  return `
+    <div class="prayer-city-row">
+      <span class="prayer-city-label">Lokasi</span>
+      <details class="city-picker">
+        <summary class="city-picker-summary">
+          <span>${escapeHtml(cityName)}</span>
+          <span class="city-caret" aria-hidden="true">▾</span>
+        </summary>
+        <div class="city-list" role="listbox" aria-label="Pilih kota">
+          ${CITY_PRESETS.map((city) => {
+    const active = city.name === location.name;
+    return `<button type="button" class="city-option${active ? ' is-active' : ''}"
+            role="option" aria-selected="${active}"
+            data-action="set-prayer-city" data-city-id="${city.id}">${escapeHtml(city.name)}</button>`;
+  }).join('')}
+        </div>
+      </details>
+    </div>
+    ${times
+    ? `<dl class="prayer-preview">${rows}</dl>`
+    : '<p class="card-sub">Pilih kota dulu untuk melihat jadwal hari ini.</p>'}
+    <button type="button" class="btn btn-ghost btn-sm prayer-toggle"
+      data-action="toggle-prayer-markers" aria-pressed="${markersOn}">
+      ${markersOn ? '✓ Garis shalat tampil' : 'Garis shalat disembunyikan'}
+    </button>`;
+}
+
 function renderSettings(data) {
   els.themeGrid.innerHTML = THEMES
     .map((theme) => themeCardMarkup(theme, data.settings.activeTheme))
     .join('');
+  if (els.prayerSettings) els.prayerSettings.innerHTML = prayerSettingsMarkup(data);
 
   const stats = getStorageStats(data);
   els.storageStats.innerHTML = `
@@ -454,6 +503,27 @@ async function handleActionClick(event) {
     case 'set-theme':
       mutate((draft) => { draft.settings.activeTheme = actionTarget.dataset.themeId; });
       els.themeGrid.querySelector('.theme-card[aria-checked="true"]')?.focus();
+      break;
+    case 'set-prayer-city': {
+      const city = CITY_PRESETS.find((entry) => entry.id === actionTarget.dataset.cityId);
+      if (!city) break;
+      mutate((draft) => {
+        draft.settings.location = {
+          name: city.name,
+          latitude: city.latitude,
+          longitude: city.longitude,
+          timezone: city.timezone,
+          elevation: city.elevation,
+        };
+      }, `Jadwal shalat: ${city.name}`);
+      break;
+    }
+    case 'toggle-prayer-markers':
+      mutate((draft) => {
+        const prayer = draft.settings.prayerSettings;
+        const currentlyOn = prayer.showMarkers !== false;
+        prayer.showMarkers = !currentlyOn;
+      });
       break;
     case 'dismiss-gesture-hint':
       dismissGestureHint();

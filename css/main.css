@@ -789,6 +789,119 @@ button { cursor: pointer; }
   font-weight: 700;
 }
 
+/* ------------------------------------------------------ prayer settings --- */
+
+.prayer-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.prayer-city-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.prayer-city-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.city-picker {
+  position: relative;
+  flex: 1 1 200px;
+  max-width: 340px;
+}
+
+.city-picker-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  padding: 10px 14px;
+  list-style: none;
+  cursor: pointer;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.city-picker-summary::-webkit-details-marker { display: none; }
+
+.city-caret {
+  color: var(--text-muted);
+  transition: transform 0.15s ease;
+}
+
+.city-picker[open] .city-caret { transform: rotate(180deg); }
+
+.city-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 6px;
+  max-height: 224px;
+  margin-top: 8px;
+  padding: 8px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.city-option {
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+.city-option.is-active {
+  border-color: var(--primary);
+  background: var(--surface-3);
+  color: var(--primary-strong);
+  font-weight: 600;
+}
+
+.prayer-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.prayer-preview div {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+
+.prayer-preview dt {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.prayer-preview dd {
+  margin: 2px 0 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.prayer-toggle { align-self: flex-start; }
+
 /* -------------------------------------------------------- profile list --- */
 
 .profile-list {

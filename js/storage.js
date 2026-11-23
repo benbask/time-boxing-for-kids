@@ -62,7 +62,7 @@ export function defaultSettings(selectedDate = todayKey()) {
       ishaAngle: null,
       asrShadowFactor: null,
       elevationCorrection: true,
-      ihtiyatiMinutes: 0,
+      ihtiyatiMinutes: 2,
       showMarkers: true,
       preparationMinutes: 0,
     },
@@ -280,9 +280,12 @@ function sanitizeSettings(raw) {
         ? Number(prayer.asrShadowFactor)
         : null,
       elevationCorrection: prayer.elevationCorrection !== false,
+      // Legacy data saved 0 before the Kemenag default existed; treat it as
+      // "unset" so every calculation uses the official 2-minute ihtiyati.
       ihtiyatiMinutes: Number.isFinite(Number(prayer.ihtiyatiMinutes))
+        && Number(prayer.ihtiyatiMinutes) > 0
         ? Number(prayer.ihtiyatiMinutes)
-        : 0,
+        : 2,
       showMarkers: prayer.showMarkers !== false,
       preparationMinutes: Number.isFinite(Number(prayer.preparationMinutes))
         ? Number(prayer.preparationMinutes)

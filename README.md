@@ -364,6 +364,11 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 103 | Posisi vertikal saat swipe dibaca dan dipakai sebagai posisi awal halaman berikutnya (Hari & Minggu) | Lulus |
 | 104 | Pesan "Belum ada kegiatan" tampil melayang di atas kanvas dengan latar kaca blur, tidak memakan tinggi timeline, dan bisa ditutup | Lulus |
 | 105 | Menutup pemberitahuan menyembunyikannya untuk tanggal itu (muncul lagi di tanggal lain), dan ketukan di area kosong tetap membuat kegiatan | Lulus |
+| 106 | Pengaturan → Jadwal shalat: pilih kota dari daftar dalam aplikasi (bukan dialog sistem Android), lokasi & jadwal tersimpan | Lulus |
+| 107 | Jadwal Bandar Lampung 23 Nov 2026: Subuh 04:13 · Dzuhur 11:48 · Ashar 15:12 · Maghrib 17:59 · Isya 19:14 (selisih ≤1 menit dari jadwal acuan) | Lulus |
+| 108 | Garis putus-putus ringan + label nama dan jam shalat tampil di timeline Hari, tetap terbaca di atas blok, tidak bisa digeser/dihapus | Lulus |
+| 109 | Tombol "Garis shalat tampil/disembunyikan" menyembunyikan atau menampilkan kembali garis & legenda; perubahan mengikuti tanggal | Lulus |
+| 110 | Tampilan 500 px: garis & label shalat terbaca, blok tidak tertutup, tanpa overflow horizontal | Lulus |
 
 **Batasan yang belum diverifikasi:**
 
@@ -373,8 +378,12 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
   detail lengkap tetap tersedia lewat ketuk (dialog) dan `aria-label`.
 - Lane otomatis/konflik (Fase 3) sudah ada; kegiatan yang bertumpuk tidak lagi
   saling menimpa, tetapi lane tidak bisa digeser horizontal.
-- Waktu salat belum dihitung sama sekali (Fase 5). Tidak ada angka salat yang
-  ditampilkan atau dikarang.
+- Waktu salat dihitung offline dengan kriteria Kemenag (Subuh −20°, Isya −18°,
+  bayangan Ashar 1, ihtiyati 2 menit) untuk kota yang dipilih di Pengaturan.
+  Garis penanda saat ini hanya tampil di tampilan Hari. Akurasi sudah dibandingkan
+  dengan jadwal acuan Bandar Lampung untuk 1, 23, dan 30 November 2026 (selisih
+  maksimal 1 menit); perbandingan langsung dengan SIHAT untuk kota lain belum
+  dilakukan.
 - Pengujian pada Android Chrome fisik, tablet, dan stylus belum dilakukan.
 
 ## Deployment GitHub Pages

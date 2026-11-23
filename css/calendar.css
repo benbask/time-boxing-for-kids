@@ -349,6 +349,58 @@
   pointer-events: none;
 }
 
+/* -------------------------------------------------------- prayer markers --- */
+
+.prayer-layer {
+  grid-column: 2 / 4;
+  grid-row: 1;
+  position: relative;
+  pointer-events: none;
+}
+
+.prayer-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 1px dashed color-mix(in srgb, var(--primary) 32%, transparent);
+}
+
+/* The label sits above event blocks (z-index works because the layer itself
+   does not create a stacking context) so the prayer name stays readable. */
+.prayer-label {
+  position: absolute;
+  left: 6px;
+  bottom: 2px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 1px 6px;
+  border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  font-size: 0.58rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  color: color-mix(in srgb, var(--primary) 72%, var(--text));
+  white-space: nowrap;
+}
+
+.prayer-time {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.prayer-legend-mark {
+  display: inline-block;
+  width: 16px;
+  height: 0;
+  border-top: 1px dashed var(--primary);
+}
+
 /* --------------------------------------------------------------- event --- */
 
 .event-block {

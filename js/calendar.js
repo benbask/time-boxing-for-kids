@@ -18,6 +18,12 @@ import {
   WEEKDAY_SHORT,
 } from './periods.js';
 import {
+  calculatePrayerTimes,
+  PRAYER_LABELS,
+  PRAYER_ORDER,
+  prayerTimeLabel,
+} from './prayer-times.js';
+import {
   addDays,
   escapeHtml,
   formatDurationLabel,
@@ -205,9 +211,31 @@ function conflictNotice(data, layout) {
     </div>`;
 }
 
+function prayerMarkersMarkup(data, dateKey) {
+  if (data.settings.prayerSettings?.showMarkers === false) return '';
+  const times = calculatePrayerTimes(
+    dateKey,
+    data.settings.location,
+    data.settings.prayerSettings,
+  );
+  if (!times) return '';
+
+  return `
+    <div class="prayer-layer" aria-hidden="true">
+      ${PRAYER_ORDER.map((key) => {
+    const minutes = times[key];
+    const top = ((minutes / 1440) * 100).toFixed(4);
+    return `<div class="prayer-line" style="top:${top}%">
+          <span class="prayer-label">${PRAYER_LABELS[key]}<span class="prayer-time">${prayerTimeLabel(minutes)}</span></span>
+        </div>`;
+  }).join('')}
+    </div>`;
+}
+
 function dayViewMarkup(data, layout) {
   const dateKey = data.settings.selectedDate;
   const relative = relativeDayLabel(dateKey);
+  const prayerMarkers = prayerMarkersMarkup(data, dateKey);
 
   return `
     <div class="timeline-area">
@@ -219,6 +247,7 @@ function dayViewMarkup(data, layout) {
             <div class="time-canvas">
               ${hourRows()}
             </div>
+            ${prayerMarkers}
             <div class="event-layer">
               ${layout.blocks.map(renderBlock).join('')}
               ${nowLineMarkup(dateKey)}
@@ -229,6 +258,7 @@ function dayViewMarkup(data, layout) {
         <div class="timeline-legend">
           <div class="legend-items">
             <span class="legend-item"><span class="dot" style="--dot-color:var(--now)"></span> Waktu sekarang</span>
+            ${prayerMarkers ? '<span class="legend-item"><span class="prayer-legend-mark" aria-hidden="true"></span> Waktu shalat</span>' : ''}
             <span class="legend-item"><span class="shared-marks" aria-hidden="true">👥</span> <span class="legend-long">Kegiatan bersama tampil satu kali</span><span class="legend-short">Kegiatan bersama</span></span>
             ${layout.conflictCount > 0 ? '<span class="legend-item legend-conflict"><span aria-hidden="true">⚠</span> <span class="legend-long">Peserta bentrok</span><span class="legend-short">Bentrok</span></span>' : ''}
             <span class="legend-item legend-hint">Ketuk area kosong untuk menambah · geser untuk pindah hari · tahan blok untuk memindah · cubit untuk zoom</span>

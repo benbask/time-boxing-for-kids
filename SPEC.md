@@ -828,10 +828,32 @@ The panels above the timeline are intentionally compressed so the canvas keeps m
 - The number is written by `renderTodayIcon()` in `js/app.js` from `todayKey()` and refreshed with the existing 30-second clock, so a tab left open across midnight stays correct. `aria-label`/`title` name the full date (`Kembali ke hari ini, Kamis, 19 November 2026`).
 - One- and two-digit days share the same font size; the number sits below the header band so it never collides with the binder rings.
 
-## 22.14 Known risks
+## 22.14 Phase 5 — prayer markers (first pass)
+
+- `js/prayer-times.js` calculates times locally with no network and no city table:
+  solar declination and the equation of time (NOAA approximation) feed the hour-angle
+  formula for each altitude. Kemenag criteria are the defaults when a saved parameter
+  is missing: Fajr −20°, Isha −18°, Asr shadow ratio 1 (Shafi'i), ihtiyati 2 minutes.
+  Legacy stored `ihtiyatiMinutes: 0` is migrated to 2.
+- Validation: Bandar Lampung (−5.3833, 105.2667, WIB) vs. the published Kemenag-style
+  schedule for 2026-11-01 / 23 / 30 — Subuh, Dzuhur, Ashar, Maghrib and Isya are all
+  within 1 minute. Coordinates come from a small preset list (`CITY_PRESETS`);
+  Bandar Lampung is available alongside 14 other Indonesian cities.
+- Settings → **Jadwal shalat** has an in-app city picker (`<details>` + option buttons,
+  never the Android system `<select>`), a five-row preview for the selected date, and
+  a `Garis shalat tampil` toggle backed by `settings.prayerSettings.showMarkers`.
+- Day view renders `.prayer-layer` with one `.prayer-line` per prayer at
+  `top: (minutes / 1440) * 100%`. The line is a faint dashed rule; a small pill label
+  carries the prayer name and `HH:mm`. Lines sit behind event blocks, while the label
+  has a higher z-index so it stays readable. The markers are `aria-hidden`, never
+  draggable/resizable, and a matching legend item appears only when markers are on.
+- Scope note: markers currently render in Day view only; Week and Month do not show
+  them yet.
+
+## 22.15 Known risks
 
 1. **Lane algorithm on narrow screens** - Phase 3 keeps every lane tappable (5 lanes ≈ 47 px at 390 px) by dropping secondary content per lane density; long titles clamp instead of widening the lane. Horizontal lane overflow is deliberately not implemented.
-2. **Prayer-time accuracy** — Phase 5 must document Kemenag parameters and compare against SIHAT output for several cities/dates; results must not be presented as verified before that comparison exists.
+2. **Prayer-time accuracy** — Phase 5 now documents Kemenag parameters and compares three Bandar Lampung dates against a published reference (max 1-minute drift). Direct SIHAT output for more cities is still pending; results are described as "calculated with Kemenag criteria", not as officially certified.
 3. **LocalStorage capacity** — roughly 5 MB per origin; a few thousand events fit comfortably. Quota failures are surfaced as a toast.
 4. **Browser storage is per device** — permanent UI warning plus documented JSON transfer workflow.
 5. **Android gesture handling** — Phase 2 requires real-device testing; `touch-action` will be scoped to the interaction surface so page scrolling elsewhere is unaffected.
