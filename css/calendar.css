@@ -884,6 +884,17 @@ body.is-gesturing {
 /* While a swipe follows the finger, never let the translated grid create a
    horizontal scrollbar. */
 .is-swiping { overflow-x: hidden !important; }
+.is-swiping .timeline,
+.is-swiping .week-grid { position: relative; z-index: 2; }
+.swipe-preview {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  pointer-events: none;
+  transform-origin: 0 0;
+  will-change: transform;
+}
 
 .week-grid {
   --week-hour-height-base: 34px;

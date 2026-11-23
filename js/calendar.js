@@ -11,12 +11,14 @@ import { buildDayLayout } from './layout-engine.js';
 import {
   monthHeadline,
   monthSummary,
+  shiftWeekKey,
   SPECIAL_TYPES,
   weekHeadline,
   weekSummary,
   WEEKDAY_SHORT,
 } from './periods.js';
 import {
+  addDays,
   escapeHtml,
   formatDurationLabel,
   formatLongDate,
@@ -390,6 +392,24 @@ function restoreScroll(stage, dateKey) {
       previousScrollTop = container.scrollTop;
     }, { passive: true });
   }
+}
+
+/** Markup for the neighbouring day/week, used as a peek during a swipe. */
+export function adjacentGridMarkup(data, direction) {
+  const view = data.settings.currentView;
+  if (view !== 'day' && view !== 'week') return '';
+
+  const current = data.settings.selectedDate;
+  const nextKey = view === 'week'
+    ? shiftWeekKey(current, direction)
+    : addDays(current, direction);
+  const nextData = { ...data, settings: { ...data.settings, selectedDate: nextKey } };
+  const holder = document.createElement('div');
+
+  if (view === 'week') holder.innerHTML = weekViewMarkup(nextData);
+  else holder.innerHTML = dayViewMarkup(nextData, buildDayLayout(nextData, nextKey));
+
+  return holder.querySelector(view === 'week' ? '.week-grid' : '.timeline')?.outerHTML || '';
 }
 
 export function renderCalendar(stage, data) {

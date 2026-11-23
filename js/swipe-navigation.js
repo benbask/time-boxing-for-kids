@@ -6,6 +6,7 @@
  * blocks keep their own drag/resize gestures.
  */
 
+import { adjacentGridMarkup } from './calendar.js';
 import { moveSelectedDate, moveSelectedPeriod } from './navigation.js';
 import { getData } from './state.js';
 
@@ -44,6 +45,24 @@ function handleNavigation(view, direction) {
   suppressClickUntil = now + CLICK_SUPPRESS_MS;
 }
 
+function previewOffset(g) {
+  const width = g.scroller.clientWidth;
+  return g.previewDirection > 0 ? width : -width;
+}
+
+function showPreview(g, direction) {
+  if (g.previewDirection === direction) return;
+  g.preview?.remove();
+  const holder = document.createElement('div');
+  holder.className = 'swipe-preview';
+  holder.innerHTML = adjacentGridMarkup(getData(), direction);
+  holder.style.width = `${g.scroller.clientWidth}px`;
+  holder.style.height = `${g.grid.scrollHeight}px`;
+  g.scroller.appendChild(holder);
+  g.preview = holder;
+  g.previewDirection = direction;
+}
+
 function stopGesture() {
   if (finishTimer) {
     window.clearTimeout(finishTimer);
@@ -53,6 +72,7 @@ function stopGesture() {
     gesture.grid.style.transition = '';
     gesture.grid.style.transform = '';
   }
+  gesture?.preview?.remove();
   gesture?.scroller?.classList.remove('is-swiping');
   gesture = null;
 }
@@ -108,7 +128,15 @@ function onPointerMove(event) {
   if (event.cancelable) event.preventDefault();
   // A little resistance at longer distances keeps the motion calm.
   const resistance = Math.abs(dx) > 120 ? 0.65 : 1;
-  gesture.grid.style.transform = `translateX(${(dx * resistance).toFixed(1)}px)`;
+  const offset = dx * resistance;
+  gesture.grid.style.transform = `translateX(${offset.toFixed(1)}px)`;
+
+  const direction = dx < 0 ? 1 : -1;
+  showPreview(gesture, direction);
+  if (gesture.preview) {
+    const base = previewOffset(gesture);
+    gesture.preview.style.transform = `translate(${(base + offset).toFixed(1)}px, ${(-gesture.scroller.scrollTop).toFixed(1)}px)`;
+  }
 }
 
 function onPointerEnd(event, cancelled = false) {
@@ -123,9 +151,14 @@ function onPointerEnd(event, cancelled = false) {
   if (g.swiping && !cancelled && horizontal) {
     g.grid.style.transition = `transform ${SLIDE_OUT_MS}ms ease-out`;
     g.grid.style.transform = `translateX(${direction > 0 ? -window.innerWidth : window.innerWidth}px)`;
+    if (g.preview) {
+      g.preview.style.transition = `transform ${SLIDE_OUT_MS}ms ease-out`;
+      g.preview.style.transform = `translate(0px, ${(-g.scroller.scrollTop).toFixed(1)}px)`;
+    }
     finishTimer = window.setTimeout(() => {
       gesture = null;
       finishTimer = null;
+      g.preview?.remove();
       handleNavigation(g.view, direction);
     }, SLIDE_OUT_MS);
     return;
@@ -134,6 +167,10 @@ function onPointerEnd(event, cancelled = false) {
   if (g.swiping) {
     g.grid.style.transition = `transform ${SNAP_BACK_MS}ms ease`;
     g.grid.style.transform = 'translateX(0px)';
+    if (g.preview) {
+      g.preview.style.transition = `transform ${SNAP_BACK_MS}ms ease`;
+      g.preview.style.transform = `translate(${previewOffset(g).toFixed(1)}px, ${(-g.scroller.scrollTop).toFixed(1)}px)`;
+    }
     finishTimer = window.setTimeout(() => stopGesture(), SNAP_BACK_MS);
     suppressClickUntil = Date.now() + CLICK_SUPPRESS_MS;
     return;
