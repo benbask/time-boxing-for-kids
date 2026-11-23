@@ -194,9 +194,7 @@ function dayViewMarkup(data, layout) {
             ${hourRows()}
           </div>
           <div class="event-layer">
-            <div class="event-blocks">
-              ${layout.blocks.map(renderBlock).join('')}
-            </div>
+            ${layout.blocks.map(renderBlock).join('')}
             ${nowLineMarkup(dateKey)}
           </div>
           <div class="scroll-zone" aria-hidden="true"></div>

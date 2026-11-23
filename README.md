@@ -357,7 +357,6 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 96 | Bulan di 390/360 px: sel ≥44 px, footer terlihat, tanpa overflow horizontal | Lulus |
 | 97 | Swipe kiri/kanan di area kosong: timeline mengikuti jari, lalu pindah ±1 hari/minggu atau kembali jika kurang jauh | Lulus |
 | 98 | Swipe horizontal juga bekerja di atas blok; tahan lama tetap menggeser kegiatan, ketuk blok tetap membuka editor | Lulus |
-| 99 | Saat ada callout, semua blok asli (termasuk lane-nya) mengecil sehingga tidak ada floating box yang menutupi blok lain | Lulus |
 
 **Batasan yang belum diverifikasi:**
 
