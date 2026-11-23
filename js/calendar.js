@@ -138,34 +138,49 @@ function nowLineMarkup(dateKey) {
     </div>`;
 }
 
+// Notices dismissed during this page session. Keyed by date + notice type so
+// the hint comes back on another day, but not right after being closed.
+const dismissedNoticeKeys = new Set();
+
+export function dismissNotice(key) {
+  if (key) dismissedNoticeKeys.add(key);
+}
+
+function noticeKey(data, kind) {
+  return `${data.settings.selectedDate}:${kind}`;
+}
+
+function noticeMarkup(data, kind, icon, html) {
+  const key = noticeKey(data, kind);
+  if (dismissedNoticeKeys.has(key)) return '';
+  return `
+    <p class="notice" data-notice-key="${escapeHtml(key)}">
+      <span class="notice-icon" aria-hidden="true">${icon}</span>
+      <span class="notice-body">${html}</span>
+      <button type="button" class="notice-close" data-action="dismiss-notice"
+        data-notice-key="${escapeHtml(key)}" aria-label="Tutup pemberitahuan">✕</button>
+    </p>`;
+}
+
 function dayNotices(data, layout) {
   const messages = [];
   const visibleProfiles = data.profiles.filter((profile) => profile.visible);
 
   if (data.profiles.length > 0 && visibleProfiles.length === 0) {
-    messages.push({
-      icon: '👀',
-      html: '<strong>Semua profil sedang disembunyikan.</strong> Kegiatan tetap tersimpan. Tampilkan profil dengan mengetuk namanya di atas.',
-    });
+    messages.push(['profiles-hidden', '👀', '<strong>Semua profil sedang disembunyikan.</strong> Kegiatan tetap tersimpan. Tampilkan profil dengan mengetuk namanya di atas.']);
   } else if (layout.totalCount === 0) {
-    messages.push({
-      icon: '✏️',
-      html: '<strong>Belum ada kegiatan pada tanggal ini.</strong> Ketuk area kosong di timeline untuk membuat kegiatan 30 menit.',
-    });
+    messages.push(['empty', '✏️', '<strong>Belum ada kegiatan pada tanggal ini.</strong> Ketuk area kosong di timeline untuk membuat kegiatan 30 menit.']);
   } else if (layout.hiddenCount > 0) {
-    messages.push({
-      icon: '🙈',
-      html: `<strong>${layout.hiddenCount} kegiatan disembunyikan</strong> karena profil pesertanya tidak ditampilkan.`,
-    });
+    messages.push(['hidden-events', '🙈', `<strong>${layout.hiddenCount} kegiatan disembunyikan</strong> karena profil pesertanya tidak ditampilkan.`]);
   }
 
-  return messages.map((message) => (
-    `<p class="notice"><span class="notice-icon" aria-hidden="true">${message.icon}</span><span>${message.html}</span></p>`
-  )).join('');
+  return messages.map(([kind, icon, html]) => noticeMarkup(data, kind, icon, html)).join('');
 }
 
-function conflictNotice(layout) {
+function conflictNotice(data, layout) {
   if (layout.conflictCount === 0) return '';
+  const key = noticeKey(data, 'conflicts');
+  if (dismissedNoticeKeys.has(key)) return '';
 
   const people = [...new Set(layout.conflictPairs.flatMap((pair) => pair.profileNames))];
   const details = layout.conflictPairs.map((pair) => `
@@ -175,12 +190,14 @@ function conflictNotice(layout) {
     </li>`).join('');
 
   return `
-    <div class="notice notice-warning notice-collapsible" data-conflict-notice>
+    <div class="notice notice-warning notice-collapsible" data-conflict-notice data-notice-key="${escapeHtml(key)}">
       <button type="button" class="notice-summary" data-action="toggle-conflict-notice" aria-expanded="false">
         <span class="notice-icon" aria-hidden="true">⚠️</span>
         <span class="notice-text"><strong>${layout.conflictCount} jadwal bentrok</strong>${people.length ? ` · ${escapeHtml(people.join(', '))}` : ''}</span>
         <span class="notice-chevron" aria-hidden="true">›</span>
       </button>
+      <button type="button" class="notice-close" data-action="dismiss-notice"
+        data-notice-key="${escapeHtml(key)}" aria-label="Tutup pemberitahuan">✕</button>
       <div class="notice-detail" hidden>
         <p>Blok bergaris putus-putus perlu dicek. Data tidak dihapus dan tidak diblokir.</p>
         <ul>${details}</ul>
@@ -193,31 +210,32 @@ function dayViewMarkup(data, layout) {
   const relative = relativeDayLabel(dateKey);
 
   return `
-    ${dayNotices(data, layout)}
-    ${conflictNotice(layout)}
-    <div class="timeline-card">
-      <div class="timeline-scroll" id="timelineScroll" role="region" aria-label="Garis waktu ${escapeHtml(relative || dateKey)}" tabindex="0">
-        <div class="timeline">
-          <div class="time-gutter" aria-hidden="true">${hourLabels()}</div>
-          <div class="time-canvas">
-            ${hourRows()}
+    <div class="timeline-area">
+      <div class="notice-layer">${dayNotices(data, layout)}${conflictNotice(data, layout)}</div>
+      <div class="timeline-card">
+        <div class="timeline-scroll" id="timelineScroll" role="region" aria-label="Garis waktu ${escapeHtml(relative || dateKey)}" tabindex="0">
+          <div class="timeline">
+            <div class="time-gutter" aria-hidden="true">${hourLabels()}</div>
+            <div class="time-canvas">
+              ${hourRows()}
+            </div>
+            <div class="event-layer">
+              ${layout.blocks.map(renderBlock).join('')}
+              ${nowLineMarkup(dateKey)}
+            </div>
+            <div class="scroll-zone" aria-hidden="true"></div>
           </div>
-          <div class="event-layer">
-            ${layout.blocks.map(renderBlock).join('')}
-            ${nowLineMarkup(dateKey)}
+        </div>
+        <div class="timeline-legend">
+          <div class="legend-items">
+            <span class="legend-item"><span class="dot" style="--dot-color:var(--now)"></span> Waktu sekarang</span>
+            <span class="legend-item"><span class="shared-marks" aria-hidden="true">👥</span> <span class="legend-long">Kegiatan bersama tampil satu kali</span><span class="legend-short">Kegiatan bersama</span></span>
+            ${layout.conflictCount > 0 ? '<span class="legend-item legend-conflict"><span aria-hidden="true">⚠</span> <span class="legend-long">Peserta bentrok</span><span class="legend-short">Bentrok</span></span>' : ''}
+            <span class="legend-item legend-hint">Ketuk area kosong untuk menambah · geser untuk pindah hari · tahan blok untuk memindah · cubit untuk zoom</span>
           </div>
-          <div class="scroll-zone" aria-hidden="true"></div>
+          <button type="button" class="zoom-reset" data-action="reset-zoom" hidden>Zoom 100%</button>
+          <span>${layout.visibleCount} kegiatan</span>
         </div>
-      </div>
-      <div class="timeline-legend">
-        <div class="legend-items">
-          <span class="legend-item"><span class="dot" style="--dot-color:var(--now)"></span> Waktu sekarang</span>
-          <span class="legend-item"><span class="shared-marks" aria-hidden="true">👥</span> <span class="legend-long">Kegiatan bersama tampil satu kali</span><span class="legend-short">Kegiatan bersama</span></span>
-          ${layout.conflictCount > 0 ? '<span class="legend-item legend-conflict"><span aria-hidden="true">⚠</span> <span class="legend-long">Peserta bentrok</span><span class="legend-short">Bentrok</span></span>' : ''}
-          <span class="legend-item legend-hint">Ketuk area kosong untuk menambah · geser untuk pindah hari · tahan blok untuk memindah · cubit untuk zoom</span>
-        </div>
-        <button type="button" class="zoom-reset" data-action="reset-zoom" hidden>Zoom 100%</button>
-        <span>${layout.visibleCount} kegiatan</span>
       </div>
     </div>`;
 }

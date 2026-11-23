@@ -362,6 +362,8 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 101 | Floating callout punya fallback gesture sentuh langsung; jika pointer & touch keduanya terpicu, tanggal hanya bergeser sekali | Lulus |
 | 102 | Saat swipe, sebagian isi hari/minggu berikutnya ikut masuk sebagai panel preview dengan gutter jam sejajar, lalu diganti setelah pindah | Lulus |
 | 103 | Posisi vertikal saat swipe dibaca dan dipakai sebagai posisi awal halaman berikutnya (Hari & Minggu) | Lulus |
+| 104 | Pesan "Belum ada kegiatan" tampil melayang di atas kanvas dengan latar kaca blur, tidak memakan tinggi timeline, dan bisa ditutup | Lulus |
+| 105 | Menutup pemberitahuan menyembunyikannya untuk tanggal itu (muncul lagi di tanggal lain), dan ketukan di area kosong tetap membuat kegiatan | Lulus |
 
 **Batasan yang belum diverifikasi:**
 

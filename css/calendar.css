@@ -22,6 +22,7 @@
 /* ------------------------------------------------------------ notices --- */
 
 .notice {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -100,7 +101,112 @@
 .notice-detail ul { margin: 0; padding-left: 16px; }
 .notice-detail li { margin: 2px 0; }
 
+/* Floating glass notices over the timeline canvas. They never take layout
+   height away from the timeline, and each one can be dismissed. */
+.notice-layer {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.notice-layer .notice {
+  pointer-events: auto;
+  padding: 12px 48px 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 58%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  box-shadow: 0 14px 34px rgb(15 23 42 / 16%);
+  color: var(--text-muted);
+  animation: notice-in 0.18s ease-out;
+}
+
+.notice-layer .notice-warning {
+  border-color: color-mix(in srgb, var(--warning) 70%, transparent);
+  background: color-mix(in srgb, var(--warning-soft) 78%, transparent);
+}
+
+.notice-layer .notice-collapsible {
+  padding: 0;
+}
+
+.notice-layer .notice-collapsible .notice-summary {
+  padding-right: 48px;
+}
+
+/* The collapsible can grow tall when expanded; keep its close button on the
+   summary row instead of centring it over the detail list. */
+.notice-layer .notice-collapsible .notice-close {
+  top: 0;
+  transform: none;
+}
+
+.notice-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.notice-close {
+  position: absolute;
+  top: 50%;
+  right: 2px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.notice-close:active {
+  background: color-mix(in srgb, var(--text-muted) 16%, transparent);
+}
+
+.notice-layer .notice.is-dismissing {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.97);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  pointer-events: none;
+}
+
+@keyframes notice-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notice-layer .notice { animation: none; }
+  .notice-layer .notice.is-dismissing { transition: none; }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .notice-layer .notice { background: var(--surface); }
+  .notice-layer .notice-warning { background: var(--warning-soft); }
+}
+
 /* -------------------------------------------------------- timeline card --- */
+
+.timeline-area {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
 
 .timeline-card {
   display: flex;
@@ -718,8 +824,10 @@ body.is-focus .calendar-stage {
   overflow-y: auto;
 }
 
-body.is-focus .calendar-stage > .notice {
-  margin: 8px 12px 0;
+body.is-focus .notice-layer {
+  top: 8px;
+  left: 12px;
+  right: 12px;
 }
 
 body.is-focus .timeline-card {

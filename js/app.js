@@ -4,7 +4,7 @@
  * Modules own their rendering; this file owns wiring, dialogs and toasts.
  */
 
-import { renderCalendar, refreshNowIndicator } from './calendar.js';
+import { dismissNotice, renderCalendar, refreshNowIndicator } from './calendar.js';
 import { initEventEditor, openEventEditor } from './event-editor.js';
 import { initCalendarInteractions } from './event-interactions.js';
 import {
@@ -466,6 +466,18 @@ async function handleActionClick(event) {
       detail.hidden = !opening;
       notice.classList.toggle('is-open', opening);
       actionTarget.setAttribute('aria-expanded', String(opening));
+      break;
+    }
+    case 'dismiss-notice': {
+      const notice = actionTarget.closest('.notice');
+      dismissNotice(actionTarget.dataset.noticeKey);
+      if (!notice) break;
+      const layer = notice.parentElement;
+      notice.classList.add('is-dismissing');
+      window.setTimeout(() => {
+        notice.remove();
+        if (layer && !layer.querySelector('.notice')) layer.hidden = true;
+      }, 180);
       break;
     }
     default:
