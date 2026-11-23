@@ -118,19 +118,31 @@
 .notice-layer .notice {
   pointer-events: auto;
   padding: 12px 48px 12px 14px;
-  border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
   border-radius: 16px;
-  background: color-mix(in srgb, var(--surface) 58%, transparent);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
-  backdrop-filter: blur(16px) saturate(150%);
-  box-shadow: 0 14px 34px rgb(15 23 42 / 16%);
+  /* ~18% opaque on average (82% transparent): the timeline behind stays
+     visible through the blur instead of reading as a solid white card. */
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--surface) 24%, transparent),
+    color-mix(in srgb, var(--surface) 12%, transparent)
+  );
+  -webkit-backdrop-filter: blur(8px) saturate(170%);
+  backdrop-filter: blur(8px) saturate(170%);
+  box-shadow:
+    0 14px 34px rgb(15 23 42 / 14%),
+    inset 0 1px 0 rgb(255 255 255 / 70%);
   color: var(--text-muted);
   animation: notice-in 0.18s ease-out;
 }
 
 .notice-layer .notice-warning {
   border-color: color-mix(in srgb, var(--warning) 70%, transparent);
-  background: color-mix(in srgb, var(--warning-soft) 78%, transparent);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--warning-soft) 48%, transparent),
+    color-mix(in srgb, var(--warning-soft) 26%, transparent)
+  );
 }
 
 .notice-layer .notice-collapsible {
@@ -194,8 +206,9 @@
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .notice-layer .notice { background: var(--surface); }
-  .notice-layer .notice-warning { background: var(--warning-soft); }
+  /* No blur available: stay translucent instead of snapping to a solid card. */
+  .notice-layer .notice { background: color-mix(in srgb, var(--surface) 62%, transparent); }
+  .notice-layer .notice-warning { background: color-mix(in srgb, var(--warning-soft) 78%, transparent); }
 }
 
 /* -------------------------------------------------------- timeline card --- */
