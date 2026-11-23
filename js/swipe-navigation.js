@@ -12,9 +12,7 @@ import { getData } from './state.js';
 const MIN_DISTANCE_PX = 50;
 const AXIS_RATIO = 1.5;
 const START_TOLERANCE_PX = 10;
-const BLOCK_TOLERANCE_PX = 18;
-// After this long on a block, the gesture belongs to long-press drag instead.
-const LONG_PRESS_MS = 380;
+const BLOCK_TOLERANCE_PX = 12;
 const SLIDE_OUT_MS = 160;
 const SNAP_BACK_MS = 200;
 const CLICK_SUPPRESS_MS = 400;
@@ -24,7 +22,9 @@ let finishTimer = null;
 let suppressClickUntil = 0;
 
 function isSwipeTarget(target) {
-  if (target.closest?.('[data-resize], .callout')) return false;
+  // Resize handles are allowed: their gesture is vertical, so a horizontal
+  // swipe starting there must still navigate. Only the callout UI is exempt.
+  if (target.closest?.('.callout')) return false;
   return Boolean(target.closest?.('#timelineScroll, .week-scroll'));
 }
 
@@ -64,7 +64,6 @@ function onPointerDown(event) {
     scroller,
     swiping: false,
     onBlock: Boolean(event.target.closest?.('.event-block, .week-event')),
-    downAt: Date.now(),
   };
 }
 
@@ -75,8 +74,9 @@ function onPointerMove(event) {
   const dy = event.clientY - gesture.y;
 
   if (!gesture.swiping) {
-    // A held block belongs to the long-press move/resize gesture.
-    if (gesture.onBlock && Date.now() - gesture.downAt > LONG_PRESS_MS) {
+    // Only an actually armed block gesture (set by the long-press handlers)
+    // owns the pointer. Merely resting a finger does not cancel a swipe.
+    if (gesture.onBlock && document.body.classList.contains('is-gesturing')) {
       stopGesture();
       return;
     }
