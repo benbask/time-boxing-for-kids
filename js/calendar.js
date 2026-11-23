@@ -332,10 +332,33 @@ function weekColumn(day, dateKey) {
     </div>`;
 }
 
+function weekPrayerMarkersMarkup(data, dateKey) {
+  if (data.settings.prayerSettings?.showMarkers === false) return '';
+  const times = calculatePrayerTimes(
+    dateKey,
+    data.settings.location,
+    data.settings.prayerSettings,
+  );
+  if (!times) return '';
+
+  return `
+    <div class="week-prayer-layer" aria-hidden="true">
+      ${PRAYER_ORDER.map((key) => {
+    const minutes = times[key];
+    const top = ((minutes / 1440) * 100).toFixed(4);
+    const title = `${PRAYER_LABELS[key]} · ${prayerTimeLabel(minutes)}`;
+    return `<div class="prayer-line week-prayer-line" style="top:${top}%">
+          <span class="prayer-label week-prayer-label" title="${title}">${PRAYER_LABELS[key]}</span>
+        </div>`;
+  }).join('')}
+    </div>`;
+}
+
 function weekViewMarkup(data) {
   const dateKey = data.settings.selectedDate;
   const summary = weekSummary(data, dateKey);
   const headline = weekHeadline(dateKey);
+  const prayerMarkers = weekPrayerMarkersMarkup(data, dateKey);
 
   return `
     <div class="period-card week-card">
@@ -351,10 +374,12 @@ function weekViewMarkup(data) {
           <div class="week-gutter" aria-hidden="true">${weekHourLabels()}</div>
           <div class="week-cols">
             ${summary.days.map((day) => weekColumn(day, dateKey)).join('')}
+            ${prayerMarkers}
           </div>
         </div>
       </div>
       <p class="period-hint">Geser ke kiri/kanan untuk pindah minggu · tahan blok lalu geser untuk pindah hari · cubit untuk zoom · ketuk blok untuk mengubah. <button type="button" class="zoom-reset" data-action="reset-zoom" hidden>Zoom 100%</button></p>
+      ${prayerMarkers ? '<p class="period-hint week-prayer-hint">Garis putus-putus = waktu shalat untuk tanggal terpilih.</p>' : ''}
     </div>`;
 }
 

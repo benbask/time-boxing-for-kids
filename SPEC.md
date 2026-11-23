@@ -853,8 +853,8 @@ The panels above the timeline are intentionally compressed so the canvas keeps m
 - Settings → **Jadwal shalat** has an in-app city picker (`<details>` + option buttons,
   never the Android system `<select>`), a five-row preview for the selected date, and
   a `Garis shalat tampil` toggle backed by `settings.prayerSettings.showMarkers`.
-- Day view renders `.prayer-layer` with one `.prayer-line` per prayer at
-  `top: (minutes / 1440) * 100%`. The layer floats **above** event blocks and the
+- Day view renders `.prayer-layer` / Week renders `.week-prayer-layer` with one
+  `.prayer-line` per prayer at `top: (minutes / 1440) * 100%`. The layer floats **above** event blocks and the
   now-line (`z-index: 8`; dragged blocks and callouts still win). Each line is a
   2 px dashed rule at ≈28% opacity, and the pill label is centred on that line —
   horizontally at the canvas midpoint and vertically straddling it — with a
@@ -866,8 +866,11 @@ The panels above the timeline are intentionally compressed so the canvas keeps m
   an overlap when no free gap exists, and re-runs on zoom, resize and re-render.
   The markers are `aria-hidden`, never draggable/resizable, and a matching
   legend item appears only when markers are on.
-- Scope note: markers currently render in Day view only; Week and Month do not show
-  them yet.
+- Scope note: markers render in **Day and Week**. Week shows one set of lines
+  across all seven columns, calculated for the selected date, with compact
+  name-only balloons (full `name · HH:mm` in the title tooltip) that use the same
+  dynamic text-avoidance as Day. Month view has no prayer lines. There is no
+  preparation-period band.
 
 ## 22.15 Known risks
 

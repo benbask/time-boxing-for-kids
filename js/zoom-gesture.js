@@ -323,14 +323,18 @@ function visibleTextRect(element) {
   };
 }
 
-function positionPrayerLabels() {
-  const layer = document.querySelector('#calendarStage .prayer-layer');
+const WEEK_PRAYER_LABEL_SELECTOR = [
+  '.week-event-title',
+  '.week-event-time',
+].join(',');
+
+/** Keep each prayer balloon clear of event text (Day and Week). */
+function placePrayerLabels(layer, obstacleSelector) {
   if (!layer) return;
 
   const bounds = layer.getBoundingClientRect();
-  const obstacles = Array.from(
-    document.querySelectorAll(`#calendarStage .event-block ${PRAYER_LABEL_SELECTOR}`),
-  ).map(visibleTextRect)
+  const obstacles = Array.from(document.querySelectorAll(obstacleSelector))
+    .map(visibleTextRect)
     .filter((rect) => rect.width > 0 && rect.height > 0);
 
   layer.querySelectorAll('.prayer-line').forEach((line) => {
@@ -378,6 +382,17 @@ function positionPrayerLabels() {
 
     label.style.left = `${(best.center - bounds.left).toFixed(1)}px`;
   });
+}
+
+function positionPrayerLabels() {
+  placePrayerLabels(
+    document.querySelector('#calendarStage .prayer-layer'),
+    `#calendarStage .event-block ${PRAYER_LABEL_SELECTOR}`,
+  );
+  placePrayerLabels(
+    document.querySelector('#calendarStage .week-prayer-layer'),
+    `#calendarStage .week-event ${WEEK_PRAYER_LABEL_SELECTOR}`,
+  );
 }
 
 /** Re-measure every block after a zoom, a re-render or an orientation change. */

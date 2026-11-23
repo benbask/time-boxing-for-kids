@@ -378,6 +378,8 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 | 113 | Kolom cari filter nama kab/kota + provinsi, hasil dibatasi 30; tanpa query tampil 15 kota populer + 24 pertama | Lulus |
 | 114 | Pilih kota dari hasil cari menyimpan id, nama, koordinat, dan zona waktu; jadwal diperbarui sesuai kota | Lulus |
 | 115 | Tombol "Gunakan lokasi saya" memakai GPS, mencari kota terdekat untuk zona waktu, dan fallback ke toast bila izin ditolak | Lulus |
+| 116 | Minggu: garis shalat melintang ke tujuh kolom, sejajar dengan garis jam, balon nama shalat dinamis menghindari teks blok | Lulus |
+| 117 | Minggu/500 px: garis & balon terbaca, tanpa overflow horizontal; toggle sembunyikan garis juga berlaku di Minggu | Lulus |
 
 **Batasan yang belum diverifikasi:**
 
@@ -390,7 +392,9 @@ perangkat Android fisik** — itu bagian dari Fase 7 (dan gesture Fase 2).
 - Waktu salat dihitung offline dengan kriteria Kemenag (Subuh −20°, Isya −18°,
   bayangan Ashar 1, ihtiyati 2 menit) untuk lokasi yang dipilih di Pengaturan.
   Pilihannya mencakup **514 kabupaten/kota** (pencarian nama + provinsi) atau GPS.
-  Garis penanda saat ini hanya tampil di tampilan Hari. Akurasi sudah dibandingkan
+  Garis penanda tampil di tampilan Hari dan Minggu (Bulan tidak). Di Minggu, garis
+  dihitung untuk tanggal terpilih dan balon hanya memuat nama shalat; jam lengkap
+  ada di tooltip. Akurasi sudah dibandingkan
   dengan jadwal acuan Bandar Lampung untuk 1, 23, dan 30 November 2026 (selisih
   maksimal 1 menit). Koordinat adalah pusat kabupaten/kota, jadi untuk kabupaten
   luas jadwal bisa selisih beberapa menit dari jadwal Kemenag setempat.
