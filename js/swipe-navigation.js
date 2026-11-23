@@ -134,8 +134,10 @@ function onPointerMove(event) {
   const direction = dx < 0 ? 1 : -1;
   showPreview(gesture, direction);
   if (gesture.preview) {
+    // The preview is absolutely positioned at the scroller's content origin,
+    // exactly like the current grid, so only X needs to move.
     const base = previewOffset(gesture);
-    gesture.preview.style.transform = `translate(${(base + offset).toFixed(1)}px, ${(-gesture.scroller.scrollTop).toFixed(1)}px)`;
+    gesture.preview.style.transform = `translateX(${(base + offset).toFixed(1)}px)`;
   }
 }
 
@@ -153,7 +155,7 @@ function onPointerEnd(event, cancelled = false) {
     g.grid.style.transform = `translateX(${direction > 0 ? -window.innerWidth : window.innerWidth}px)`;
     if (g.preview) {
       g.preview.style.transition = `transform ${SLIDE_OUT_MS}ms ease-out`;
-      g.preview.style.transform = `translate(0px, ${(-g.scroller.scrollTop).toFixed(1)}px)`;
+      g.preview.style.transform = 'translateX(0px)';
     }
     finishTimer = window.setTimeout(() => {
       gesture = null;
@@ -169,7 +171,7 @@ function onPointerEnd(event, cancelled = false) {
     g.grid.style.transform = 'translateX(0px)';
     if (g.preview) {
       g.preview.style.transition = `transform ${SNAP_BACK_MS}ms ease`;
-      g.preview.style.transform = `translate(${previewOffset(g).toFixed(1)}px, ${(-g.scroller.scrollTop).toFixed(1)}px)`;
+      g.preview.style.transform = `translateX(${previewOffset(g).toFixed(1)}px)`;
     }
     finishTimer = window.setTimeout(() => stopGesture(), SNAP_BACK_MS);
     suppressClickUntil = Date.now() + CLICK_SUPPRESS_MS;
