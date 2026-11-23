@@ -141,15 +141,8 @@ function renderCallouts() {
   layer.appendChild(svg);
   items.forEach(({ button }) => layer.appendChild(button));
 
-  // Labels start from the real time-box rhythm, then each one is nudged up or
-  // down until it covers no real block and no other label. The main boxes keep
-  // their full width; only the floating labels move.
-  const blockRects = [...document.querySelectorAll('.event-block')].map((el) => {
-    const r = el.getBoundingClientRect();
-    return { top: r.top - timelineRect.top, bottom: r.bottom - timelineRect.top };
-  });
-  const LABEL_GAP = 4;
-  const CLEARANCE = 3;
+  // Label spacing mirrors the real time-boxes: touching blocks produce
+  // touching labels; a 5- or 10-minute gap produces that same pixel gap.
   items.sort((a, b) => (
     a.block.getBoundingClientRect().top - b.block.getBoundingClientRect().top
   ));
@@ -158,31 +151,12 @@ function renderCallouts() {
   items.forEach(({ block, button }, index) => {
     const blockRect = block.getBoundingClientRect();
     const labelHeight = button.getBoundingClientRect().height;
-    let desired;
+    let top;
     if (index === 0) {
-      desired = blockRect.top + blockRect.height / 2 - timelineRect.top - labelHeight / 2;
+      top = blockRect.top + blockRect.height / 2 - timelineRect.top - labelHeight / 2;
     } else {
-      desired = previousBottom + Math.max(0, blockRect.top - previousBlockBottom);
-    }
-    const minTop = index === 0 ? 0 : previousBottom + LABEL_GAP;
-    const collides = (top) => {
-      const bottom = top + labelHeight;
-      if (top < minTop) return true;
-      return blockRects.some((r) => top < r.bottom + CLEARANCE && bottom > r.top - CLEARANCE);
-    };
-
-    let top = Math.max(desired, minTop);
-    if (collides(top)) {
-      let free = null;
-      for (let offset = 8; offset <= 3000 && free === null; offset += 8) {
-        const down = top + offset;
-        const up = top - offset;
-        if (down >= minTop && !collides(down)) free = down;
-        else if (up >= minTop && !collides(up)) free = up;
-      }
-      top = free === null
-        ? Math.max(minTop, ...blockRects.map((r) => r.bottom + CLEARANCE))
-        : free;
+      const realGap = Math.max(0, blockRect.top - previousBlockBottom);
+      top = previousBottom + realGap;
     }
     button.style.top = `${top}px`;
     previousBottom = top + labelHeight;
