@@ -247,11 +247,11 @@ function dayViewMarkup(data, layout) {
             <div class="time-canvas">
               ${hourRows()}
             </div>
-            ${prayerMarkers}
             <div class="event-layer">
               ${layout.blocks.map(renderBlock).join('')}
               ${nowLineMarkup(dateKey)}
             </div>
+            ${prayerMarkers}
             <div class="scroll-zone" aria-hidden="true"></div>
           </div>
         </div>

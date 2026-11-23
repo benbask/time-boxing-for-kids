@@ -843,10 +843,13 @@ The panels above the timeline are intentionally compressed so the canvas keeps m
   never the Android system `<select>`), a five-row preview for the selected date, and
   a `Garis shalat tampil` toggle backed by `settings.prayerSettings.showMarkers`.
 - Day view renders `.prayer-layer` with one `.prayer-line` per prayer at
-  `top: (minutes / 1440) * 100%`. The line is a faint dashed rule; a small pill label
-  carries the prayer name and `HH:mm`. Lines sit behind event blocks, while the label
-  has a higher z-index so it stays readable. The markers are `aria-hidden`, never
-  draggable/resizable, and a matching legend item appears only when markers are on.
+  `top: (minutes / 1440) * 100%`. The layer floats **above** event blocks and the
+  now-line (`z-index: 8`; dragged blocks and callouts still win). Each line is a
+  2 px dashed rule at ≈28% opacity, and the pill label is centred on that line —
+  horizontally at the canvas midpoint and vertically straddling it — with a
+  translucent (`≈68%`) blurred background so any text it must cross stays faintly
+  readable. The markers are `aria-hidden`, never draggable/resizable, and a matching
+  legend item appears only when markers are on.
 - Scope note: markers currently render in Day view only; Week and Month do not show
   them yet.
 

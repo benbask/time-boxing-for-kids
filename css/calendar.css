@@ -355,6 +355,9 @@
   grid-column: 2 / 4;
   grid-row: 1;
   position: relative;
+  /* Floats above blocks and the now-line; a dragged block (z 12) and callouts
+     (z 11+) still take precedence. */
+  z-index: 8;
   pointer-events: none;
 }
 
@@ -363,23 +366,26 @@
   left: 0;
   right: 0;
   height: 0;
-  border-top: 1px dashed color-mix(in srgb, var(--primary) 32%, transparent);
+  border-top: 2px dashed color-mix(in srgb, var(--primary) 28%, transparent);
 }
 
-/* The label sits above event blocks (z-index works because the layer itself
-   does not create a stacking context) so the prayer name stays readable. */
+/* The balloon straddles the line at its midpoint: translucent with a light
+   blur, so anything it unavoidably covers stays faintly readable. */
 .prayer-label {
   position: absolute;
-  left: 6px;
-  bottom: 2px;
-  z-index: 4;
+  left: 50%;
+  top: -1px;
+  transform: translate(-50%, -50%);
   display: inline-flex;
   align-items: baseline;
   gap: 4px;
-  padding: 1px 6px;
-  border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent);
+  padding: 2px 8px;
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, transparent);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  background: color-mix(in srgb, var(--surface) 68%, transparent);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgb(15 23 42 / 10%);
   font-size: 0.58rem;
   font-weight: 600;
   line-height: 1.35;
@@ -398,7 +404,7 @@
   display: inline-block;
   width: 16px;
   height: 0;
-  border-top: 1px dashed var(--primary);
+  border-top: 2px dashed color-mix(in srgb, var(--primary) 55%, transparent);
 }
 
 /* --------------------------------------------------------------- event --- */
